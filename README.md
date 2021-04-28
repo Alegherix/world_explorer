@@ -16,10 +16,10 @@ Add the installation instructions.
 
 1. `example.js:10-15` - Remember to think about X and this could be refactored using the amazing Y function.
 
-## Creators
+# Creators
 
-- [Martin Hansson](https://github.com/carolinahagman)
-- [Jakob Gustafsson](https://github.com/Alegherix)
+- [Martin Hansson](https://github.com/Alegherix)
+- [Jakob Gustafsson](https://github.com/gusjak)
 
 # Testers
 
