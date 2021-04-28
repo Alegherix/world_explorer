@@ -1,0 +1,13 @@
+MVP)
+1) Trackande kamera
+2) Karaktär med proper Movements
+3) Kolission och bounds
+4) En full scenemiljö
+    - World terrain *
+    - Skybox *
+    - Skattkista *
+    - UI -> T.ex. öppna bag *
+    - En annan entity att attackera
+    - Hp -> allt efter tid
+
+4) Publicera på Vercel / Netlify
