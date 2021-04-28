@@ -16,6 +16,11 @@ Add the installation instructions.
 
 1. `example.js:10-15` - Remember to think about X and this could be refactored using the amazing Y function.
 
+## Creators
+
+- [Martin Hansson](https://github.com/carolinahagman)
+- [Jakob Gustafsson](https://github.com/Alegherix)
+
 # Testers
 
 Tested by the following people:
