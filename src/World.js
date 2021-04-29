@@ -1,4 +1,4 @@
-import CANNON from 'cannon';
+import CANNON, { Vec3 } from 'cannon';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -68,7 +68,6 @@ class World {
       1000
     );
     this.camera.position.set(2, 200, 200);
-    // this.camera.position.set(1, 2, 10);
 
     const light = new THREE.DirectionalLight('white');
     light.position.set(100, 100, 100);
@@ -122,26 +121,16 @@ class World {
       map: groundTexture,
     });
 
-    const floorShape = new CANNON.Plane();
-    const floorBody = new CANNON.Body({
-      mass: 0,
-      shape: floorShape,
-      material: this.rockMaterial,
-    });
-
-    // Rotates the physical floor to match the mesh plane
-    floorBody.quaternion.setFromAxisAngle(
-      new CANNON.Vec3(-1, 0, 0),
-      Math.PI * 0.5
-    );
-    this.world.addBody(floorBody);
-
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.castShadow = false;
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI / 2;
     plane.material.side = THREE.DoubleSide;
+    // Move just slightly to prevent Z-Fighting
+    plane.position.y = -0.2;
     this.scene.add(plane);
+
+    this.addInvisibleBoundries();
   }
 
   onWindowResize() {
@@ -164,6 +153,29 @@ class World {
     if (index.length > 0) {
       this.objectsToUpdate.splice(index[0], 1);
     }
+  }
+
+  // Creates invisible physical boundries
+  createBoundry(x1, y1, z1, x2, y2, z2, rotation, floorShape) {
+    const body = new CANNON.Body({
+      mass: 0,
+      shape: floorShape,
+      material: this.rockMaterial,
+    });
+    body.quaternion.setFromAxisAngle(new CANNON.Vec3(x1, y1, z1), rotation);
+    body.position = new Vec3(x2, y2, z2);
+    this.world.addBody(body);
+  }
+
+  addInvisibleBoundries() {
+    // Keep here as not to reinstantiate plane object
+    const floorShape = new CANNON.Plane();
+
+    this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
+    this.createBoundry(0, 1, 0, -60, 0, 0, Math.PI * 0.5, floorShape); // Left
+    this.createBoundry(0, -1, 0, 60, 0, 0, Math.PI * 0.5, floorShape); // Right
+    this.createBoundry(0, 0, 1, 0, 0, -30, Math.PI * 0.5, floorShape); // Back
+    this.createBoundry(0, 1, 0, 0, 0, 30, Math.PI, floorShape); // Back
   }
 
   setupDebugGUI() {
@@ -190,7 +202,7 @@ class World {
         object.mesh.quaternion.copy(object.boxBody.quaternion);
       }
 
-      this.removeIdleCubes();
+      // this.removeIdleCubes();
 
       this.world.step(1 / 60, timeDelta, 3);
 
