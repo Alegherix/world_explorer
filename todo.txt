@@ -1,15 +1,10 @@
 MVP)
-1) Trackande kamera
-2) Karaktär med proper Movements
-3) Kolission och bounds
-4) En full scenemiljö
-    - World terrain *
-    - Skybox *
-    - Skattkista *
-    - UI -> T.ex. öppna bag *
-    - En annan entity att attackera
-    - Hp -> allt efter tid
+1) Ta bort rader när 80% är fylld
+2) Låt random bitar falla
+3) Låt spelaren styra de fallande bitarna
 
-4) Publicera på Vercel / Netlify
-5) Fix README -> Add Link to each PR
-6) Add License
+
+
+
+Resources:
+https://stackoverflow.com/questions/24543722/create-cannon-rigidbody-from-three-mesh-or-three-geometry

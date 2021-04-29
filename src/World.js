@@ -49,7 +49,7 @@ class World {
       1.0,
       1000
     );
-    this.camera.position.set(2, 80, 300);
+    this.camera.position.set(2, 200, 200);
     // this.camera.position.set(1, 2, 10);
 
     this.scene = new THREE.Scene();
@@ -79,15 +79,12 @@ class World {
     this.createPlanet();
     this.scene.add(this.game.getBounds(-50));
     this.scene.add(this.game.getBounds(50));
-    this.scene.add(this.game.getOBlock());
-    this.scene.add(this.game.getIBlock());
-    // this.game.getTetrisPieces(this.scene);
 
-    // this.sphereBody = this.game.getPhysicsSphere(iceMaterial);
-    // this.tetrisSphere = this.game.getTetrisSphere();
+    this.oBlock = this.game.getBlock('o');
+    this.oBlockPhysics = this.game.getOBlockPhysics();
 
-    // this.scene.add(this.tetrisSphere);
-    // this.world.addBody(this.sphereBody);
+    this.scene.add(this.oBlock);
+    this.world.addBody(this.oBlockPhysics);
 
     this.gui.add(light, 'intensity').min(0).max(3).step(0.001);
     this.tick();
@@ -109,24 +106,10 @@ class World {
   createPlanet() {
     const textureLoader = new THREE.TextureLoader();
     const groundTexture = textureLoader.load('textures/test/iceTexture.jpg');
-    const groundHeightTexture = textureLoader.load(
-      'textures/test/heightMap.png'
-    );
 
-    // groundTexture.repeat.set(4, 4);
-    // groundTexture.wrapS = THREE.RepeatWrapping;
-    // groundTexture.wrapT = THREE.RepeatWrapping;
-
-    // groundHeightTexture.repeat.set(8, 8);
-    // groundHeightTexture.wrapS = THREE.RepeatWrapping;
-    // groundHeightTexture.wrapT = THREE.RepeatWrapping;
-
-    const planeGeometry = new THREE.PlaneBufferGeometry(600, 600, 128, 128);
-    // const planeGeometry = new THREE.PlaneBufferGeometry(2, 2, 2, 2);
+    const planeGeometry = new THREE.PlaneBufferGeometry(200, 200, 128, 128);
     const planeMaterial = new THREE.MeshStandardMaterial({
       map: groundTexture,
-      displacementMap: groundHeightTexture,
-      displacementScale: 0,
     });
 
     const floorShape = new CANNON.Plane();
@@ -135,8 +118,7 @@ class World {
       shape: floorShape,
       material: this.rockMaterial,
     });
-    // floorBody.mass = 0;
-    // floorBody.addShape(floorShape);
+
     floorBody.quaternion.setFromAxisAngle(
       new CANNON.Vec3(-1, 0, 0),
       Math.PI * 0.5
@@ -154,27 +136,6 @@ class World {
     this.gui.add(planeMaterial, 'displacementScale').min(0).max(50).step(0.1);
   }
 
-  // getPhysicsSphere() {
-  //   const sphereShape = new CANNON.Sphere(0.5);
-  //   const sphereBody = new CANNON.Body({
-  //     mass: 1,
-  //     position: new CANNON.Vec3(0, 10, 0),
-  //     shape: sphereShape,
-  //   });
-  //   return sphereBody;
-  // }
-
-  // getTetrisSphere() {
-  //   const sphere = new THREE.Mesh(
-  //     new THREE.SphereBufferGeometry(0.5, 32, 32),
-  //     new THREE.MeshStandardMaterial({
-  //       color: 'pink',
-  //     })
-  //   );
-  //   sphere.name = 'tetrisSphere';
-  //   return sphere;
-  // }
-
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
@@ -186,14 +147,14 @@ class World {
       this.threejs.render(this.scene, this.camera);
 
       // Time calculations to figure out time since last tick
-      // const elapsedTime = this.clock.getElapsedTime();
-      // const timeDelta = elapsedTime - this.previousElapsedTime;
-      // this.previousElapsedTime = elapsedTime;
+      const elapsedTime = this.clock.getElapsedTime();
+      const timeDelta = elapsedTime - this.previousElapsedTime;
+      this.previousElapsedTime = elapsedTime;
 
-      // this.tetrisSphere.position.copy(this.sphereBody.position);
+      this.oBlock.position.copy(this.oBlockPhysics.position);
 
       // // Update Physics world
-      // this.world.step(1 / 60, timeDelta, 3);
+      this.world.step(1 / 60, timeDelta, 3);
 
       this.tick();
     });

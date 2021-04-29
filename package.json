@@ -1,5 +1,5 @@
 {
-  "name": "game",
+  "name": "battle_tetris",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
