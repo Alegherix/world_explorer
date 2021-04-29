@@ -45,6 +45,7 @@ class Game {
     const mesh = new THREE.Mesh(this.oBlockGeometry, this.standardMaterial);
     mesh.castShadow = true;
     mesh.position.copy(position);
+    mesh.name = 'falling';
     this.scene.add(mesh);
 
     const boxShape = new CANNON.Box(new Vec3(5, 5, 5));
@@ -56,8 +57,20 @@ class Game {
     });
     boxBody.position.copy(position);
     this.world.addBody(boxBody);
-
     this.objectToUpdate.push({ mesh, boxBody });
+
+    // Updates cube when idle, should be used later down the road
+    // For knowing when we can start generating new cubes from within Gameloop
+    boxBody.addEventListener(
+      'sleep',
+      (event) => {
+        const elementToHaveNameChanged = this.objectToUpdate.find(
+          (item) => item.boxBody === event.target
+        );
+        elementToHaveNameChanged.mesh.name = 'idle';
+      },
+      { once: true }
+    );
   }
 
   // Get Sets the outer edges of the playing field

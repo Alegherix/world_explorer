@@ -16,6 +16,10 @@ class World {
     this.scene.receiveShadow = true;
     this.gui = new dat.GUI();
     this.world = new CANNON.World();
+    // Updates to not check colission of objects far apart from eachother
+    this.world.broadphase = new CANNON.SAPBroadphase(this.world);
+    this.world.allowSleep = true;
+
     this.world.gravity.set(0, -9.82, 0);
     this.rockMaterial = new CANNON.Material('rock');
     const iceMaterial = new CANNON.Material('ice');
@@ -91,9 +95,6 @@ class World {
     this.scene.add(this.game.getBounds(-50));
     this.scene.add(this.game.getBounds(50));
 
-    // Initial Falling block
-    this.game.createOBlock({ x: 0, y: 140, z: 0 });
-
     this.setupDebugGUI();
 
     this.tick();
@@ -149,10 +150,26 @@ class World {
     this.threejs.setSize(window.innerWidth, window.innerHeight);
   }
 
+  // Removes idle cubes not from event fired, due to event causing nullPointerExceptions
+  removeIdleCubes() {
+    let index = [];
+    for (const object of this.objectsToUpdate) {
+      console.log(object.mesh.name);
+      if (object.mesh.name === 'idle') {
+        this.world.removeBody(object.boxBody);
+        this.scene.remove(object.mesh);
+        index.push(this.objectsToUpdate.indexOf(object));
+      }
+    }
+    if (index.length > 0) {
+      this.objectsToUpdate.splice(index[0], 1);
+    }
+  }
+
   setupDebugGUI() {
     const debugObject = {};
     debugObject.createOBlock = () => {
-      this.game.createOBlock({ x: 0, y: 160, z: 0 });
+      this.game.createOBlock({ x: (Math.random() - 0.5) * 40, y: 160, z: 0 });
     };
     this.gui.add(debugObject, 'createOBlock');
   }
@@ -166,12 +183,15 @@ class World {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
-      // Updates every item from objects that need to be updated,
-      // Needs to be kept until item is removed from game, since they're all
-      // Interactable
+      // Updates every item from objects that need to be updated, both position, and
+      // Needs to be kept until item is removed from game, since they're all Interactable
       for (const object of this.objectsToUpdate) {
         object.mesh.position.copy(object.boxBody.position);
+        object.mesh.quaternion.copy(object.boxBody.quaternion);
       }
+
+      this.removeIdleCubes();
+
       this.world.step(1 / 60, timeDelta, 3);
 
       this.tick();
