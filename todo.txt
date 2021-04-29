@@ -11,3 +11,5 @@ MVP)
     - Hp -> allt efter tid
 
 4) Publicera på Vercel / Netlify
+5) Fix README -> Add Link to each PR
+6) Add License
