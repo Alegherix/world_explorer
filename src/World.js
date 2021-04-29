@@ -1,10 +1,9 @@
-import './style.css';
+import CANNON from 'cannon';
+import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import * as dat from 'dat.gui';
-import { SphereBufferGeometry } from 'three';
 import Game from './Game';
-import CANNON from 'cannon';
+import './style.css';
 
 class World {
   constructor() {
@@ -12,14 +11,14 @@ class World {
   }
 
   init() {
+    this.objectsToUpdate = [];
+    this.scene = new THREE.Scene();
+    this.scene.receiveShadow = true;
     this.gui = new dat.GUI();
-    this.game = new Game();
-
     this.world = new CANNON.World();
     this.world.gravity.set(0, -9.82, 0);
     this.rockMaterial = new CANNON.Material('rock');
     const iceMaterial = new CANNON.Material('ice');
-
     this.world.addContactMaterial(
       new CANNON.ContactMaterial(this.rockMaterial, iceMaterial, {
         friction: 5,
@@ -27,6 +26,21 @@ class World {
         contactEquationRelaxation: 4,
         frictionEquationRelaxation: 10,
       })
+    );
+    this.world.addContactMaterial(
+      new CANNON.ContactMaterial(iceMaterial, iceMaterial, {
+        friction: 15,
+        restitution: 0,
+        contactEquationRelaxation: 4,
+        frictionEquationRelaxation: 10,
+      })
+    );
+
+    this.game = new Game(
+      this.scene,
+      this.world,
+      this.objectsToUpdate,
+      iceMaterial
     );
 
     this.clock = new THREE.Clock();
@@ -51,9 +65,6 @@ class World {
     );
     this.camera.position.set(2, 200, 200);
     // this.camera.position.set(1, 2, 10);
-
-    this.scene = new THREE.Scene();
-    this.scene.receiveShadow = true;
 
     const light = new THREE.DirectionalLight('white');
     light.position.set(100, 100, 100);
@@ -80,13 +91,11 @@ class World {
     this.scene.add(this.game.getBounds(-50));
     this.scene.add(this.game.getBounds(50));
 
-    this.oBlock = this.game.getBlock('o');
-    this.oBlockPhysics = this.game.getOBlockPhysics();
+    // Initial Falling block
+    this.game.createOBlock({ x: 0, y: 140, z: 0 });
 
-    this.scene.add(this.oBlock);
-    this.world.addBody(this.oBlockPhysics);
+    this.setupDebugGUI();
 
-    this.gui.add(light, 'intensity').min(0).max(3).step(0.001);
     this.tick();
   }
 
@@ -119,27 +128,33 @@ class World {
       material: this.rockMaterial,
     });
 
+    // Rotates the physical floor to match the mesh plane
     floorBody.quaternion.setFromAxisAngle(
       new CANNON.Vec3(-1, 0, 0),
       Math.PI * 0.5
     );
     this.world.addBody(floorBody);
 
-    // const planeGeometry = new SphereBufferGeometry(500, 128, 128);
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.castShadow = false;
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI / 2;
     plane.material.side = THREE.DoubleSide;
     this.scene.add(plane);
-
-    this.gui.add(planeMaterial, 'displacementScale').min(0).max(50).step(0.1);
   }
 
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.threejs.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  setupDebugGUI() {
+    const debugObject = {};
+    debugObject.createOBlock = () => {
+      this.game.createOBlock({ x: 0, y: 160, z: 0 });
+    };
+    this.gui.add(debugObject, 'createOBlock');
   }
 
   tick() {
@@ -151,9 +166,12 @@ class World {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
-      this.oBlock.position.copy(this.oBlockPhysics.position);
-
-      // // Update Physics world
+      // Updates every item from objects that need to be updated,
+      // Needs to be kept until item is removed from game, since they're all
+      // Interactable
+      for (const object of this.objectsToUpdate) {
+        object.mesh.position.copy(object.boxBody.position);
+      }
       this.world.step(1 / 60, timeDelta, 3);
 
       this.tick();

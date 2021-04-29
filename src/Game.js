@@ -5,47 +5,33 @@ import CANNON, { Vec3 } from 'cannon';
 // Använd en instans variabel av Mesh & Material,
 
 class Game {
-  constructor() {
+  constructor(scene, world, objectToUpdate, material, texture) {
+    this.scene = scene;
+    this.world = world;
+    this.objectToUpdate = objectToUpdate;
+    this.material = material;
     this.init();
   }
 
   init() {
+    // Only instantiating a new TextureLoader temp,
+    // Refactor to use the already created one.
+    const textureLoader = new THREE.TextureLoader();
+    const groundTexture = textureLoader.load('textures/test/wobbly.jpg');
     this.standardMaterial = new THREE.MeshStandardMaterial({
-      color: 'cyan',
+      color: 'white',
+      map: groundTexture,
     });
 
     // Geometries
-    this.oBlockGeometry = new THREE.BoxBufferGeometry(10, 10, 10, 2, 2);
-    this.iBlockGeometry = new THREE.BoxBufferGeometry(5, 20, 5, 2, 2);
+    this.oBlockGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
+    this.iBlockGeometry = new THREE.BoxBufferGeometry(5, 20, 5);
   }
 
-  // getPhysicsSphere(material) {
-  //   const sphereShape = new CANNON.Sphere(0.5);
-  //   const sphereBody = new CANNON.Body({
-  //     mass: 1,
-  //     position: new CANNON.Vec3(0, 10, 0),
-  //     shape: sphereShape,
-  //     material,
-  //   });
-  //   return sphereBody;
-  // }
-
-  // getTetrisSphere() {
-  //   const sphere = new THREE.Mesh(
-  //     new THREE.SphereBufferGeometry(0.5, 32, 32),
-  //     new THREE.MeshStandardMaterial({
-  //       color: 'pink',
-  //     })
-  //   );
-  //   sphere.name = 'tetrisSphere';
-  //   return sphere;
-  // }
-
-  getBlock(letter) {
-    let block;
+  createBlock(letter, position) {
     switch (letter) {
       case 'o':
-        block = this.getOBlock();
+        block = this.createOBlock(position);
         break;
       case 'i':
         block = new THREE.Mesh(this.iBlockGeometry, this.standardMaterial);
@@ -53,24 +39,25 @@ class Game {
       default:
         break;
     }
-    block.name = 'piece';
-    return block;
   }
 
-  getOBlockPhysics() {
+  createOBlock(position) {
+    const mesh = new THREE.Mesh(this.oBlockGeometry, this.standardMaterial);
+    mesh.castShadow = true;
+    mesh.position.copy(position);
+    this.scene.add(mesh);
+
     const boxShape = new CANNON.Box(new Vec3(5, 5, 5));
     const boxBody = new CANNON.Body({
       mass: 1,
       position: new Vec3(5, 160, 0),
       shape: boxShape,
+      material: this.material,
     });
-    return boxBody;
-  }
+    boxBody.position.copy(position);
+    this.world.addBody(boxBody);
 
-  getOBlock() {
-    const geometry = new THREE.Mesh(this.oBlockGeometry, this.standardMaterial);
-    geometry.name = 'piece';
-    return geometry;
+    this.objectToUpdate.push({ mesh, boxBody });
   }
 
   // Get Sets the outer edges of the playing field
