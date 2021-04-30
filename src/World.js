@@ -2,9 +2,20 @@ import CANNON, { Vec3 } from 'cannon';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Debugger from './Debugger';
 import Game from './Game';
 import Platform from './Platform';
 import './style.css';
+import config from './utils';
+const {
+  WINZONE_DEPTH,
+  WINZONE_HEIGHT,
+  WINZONE_WIDTH,
+  BLOCK_DEPTH,
+  WIN_PERCENTAGE_LIMIT,
+  PLANET_WIDTH,
+  PLANET_HEIGHT,
+} = config;
 
 class World {
   constructor() {
@@ -24,6 +35,7 @@ class World {
     this.world.gravity.set(0, -9.82, 0);
     this.rockMaterial = new CANNON.Material('rock');
     const iceMaterial = new CANNON.Material('ice');
+    const spungeMaterial = new CANNON.Material('spunge');
     this.world.addContactMaterial(
       new CANNON.ContactMaterial(this.rockMaterial, iceMaterial, {
         friction: 5,
@@ -35,13 +47,19 @@ class World {
     this.world.addContactMaterial(
       new CANNON.ContactMaterial(iceMaterial, iceMaterial, {
         friction: 15,
-        restitution: 0,
+        restitution: 1,
         contactEquationRelaxation: 4,
         frictionEquationRelaxation: 10,
       })
     );
 
-    this.game = new Game(this.scene, this.world, this.activeCubes, iceMaterial);
+    this.game = new Game(
+      this.scene,
+      this.world,
+      this.activeCubes,
+      iceMaterial,
+      spungeMaterial
+    );
 
     this.clock = new THREE.Clock();
     this.previousElapsedTime = 0;
@@ -87,11 +105,13 @@ class World {
 
     this.createSpace();
     this.createPlanet();
-    this.scene.add(this.game.getBounds(-50));
-    this.scene.add(this.game.getBounds(50));
+    // this.scene.add(this.game.getBounds(-50));
+    // this.scene.add(this.game.getBounds(50));
 
     this.setupDebugGUI();
     this.scene.add(this.game.getWinObject().mesh);
+
+    new Debugger(this.gui, this.scene);
 
     this.tick();
   }
@@ -133,29 +153,6 @@ class World {
     this.debugBox;
   }
 
-  onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.threejs.setSize(window.innerWidth, window.innerHeight);
-  }
-
-  // Removes idle cubes not from event fired, due to event causing nullPointerExceptions
-  removeIdleCubes() {
-    let index = [];
-    for (const object of this.activeCubes) {
-      console.log(object.mesh.name);
-      if (object.mesh.name === 'idle') {
-        this.world.removeBody(object.boxBody);
-        this.scene.remove(object.mesh);
-        index.push(this.activeCubes.indexOf(object));
-      }
-    }
-    if (index.length > 0) {
-      this.activeCubes.splice(index[0], 1);
-    }
-  }
-
-  // Creates invisible physical boundries
   createBoundry(x1, y1, z1, x2, y2, z2, rotation, floorShape) {
     const body = new CANNON.Body({
       mass: 0,
@@ -167,16 +164,31 @@ class World {
     this.world.addBody(body);
   }
 
-  // Adds each invisible boundry to the scene
   addInvisibleBoundries() {
-    // Keep here as not to reinstantiate plane object
-    const floorShape = new CANNON.Plane();
-
+    const floorShape = new CANNON.Box(new Vec3(100, 100, 0.1));
     this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
-    this.createBoundry(0, 1, 0, -60, 0, 0, Math.PI * 0.5, floorShape); // Left
-    this.createBoundry(0, -1, 0, 60, 0, 0, Math.PI * 0.5, floorShape); // Right
-    this.createBoundry(0, 0, 1, 0, 0, -30, Math.PI * 0.5, floorShape); // Back
-    this.createBoundry(0, 1, 0, 0, 0, 30, Math.PI, floorShape); // Back
+  }
+
+  onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.threejs.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  // Removes idle cubes not from event fired, due to event causing nullPointerExceptions
+  removeIdleCubes() {
+    let index = [];
+    for (const cube of this.activeCubes) {
+      console.log(cube.mesh.name);
+      if (cube.mesh.name === 'idle') {
+        this.world.removeBody(cube.boxBody);
+        this.scene.remove(cube.mesh);
+        index.push(this.activeCubes.indexOf(cube));
+      }
+    }
+    if (index.length > 0) {
+      this.activeCubes.splice(index[0], 1);
+    }
   }
 
   setupDebugGUI() {
@@ -254,8 +266,6 @@ class World {
         object.mesh.position.copy(object.boxBody.position);
         object.mesh.quaternion.copy(object.boxBody.quaternion);
       }
-
-      // this.removeIdleCubes();
 
       this.world.step(1 / 60, timeDelta, 3);
 

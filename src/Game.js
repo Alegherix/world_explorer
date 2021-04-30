@@ -1,16 +1,28 @@
 import * as THREE from 'three';
 import CANNON, { Vec3 } from 'cannon';
+import config from './utils';
+import { CylinderBufferGeometry, MeshPhongMaterial } from 'three';
+const {
+  WINZONE_DEPTH,
+  WINZONE_HEIGHT,
+  WINZONE_WIDTH,
+  BLOCK_DEPTH,
+  WIN_PERCENTAGE_LIMIT,
+} = config;
 
 // Återanvänd samma Mesh & Material, i så hög utsträckning man kan, dvs om vi ska ta fram en ny fallande shape
 // Använd en instans variabel av Mesh & Material,
 
 class Game {
-  constructor(scene, world, objectToUpdate, material, texture) {
+  constructor(scene, world, activeCubes, material, spungeMaterial) {
     this.scene = scene;
     this.world = world;
-    this.objectToUpdate = objectToUpdate;
+    this.activeCubes = activeCubes;
     this.material = material;
+    this.spungeMaterial = spungeMaterial;
     this.init();
+    this.activeCubes;
+    window.addEventListener('keydown', this.steerDebugBox.bind(this));
   }
 
   init() {
@@ -19,15 +31,15 @@ class Game {
     const textureLoader = new THREE.TextureLoader();
     const groundTexture = textureLoader.load('textures/test/wobbly.jpg');
     this.standardMaterial = new THREE.MeshStandardMaterial({
-      color: 'white',
       map: groundTexture,
     });
 
     // Geometries
-    this.oBlockGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
+    this.oBlockGeometry = new THREE.BoxBufferGeometry(10, 10, BLOCK_DEPTH);
     this.iBlockGeometry = new THREE.BoxBufferGeometry(5, 20, 5);
 
     this.winObject = this.createWinObject();
+    this.createBounceArea();
   }
 
   createBlock(letter, position) {
@@ -59,20 +71,43 @@ class Game {
     });
     boxBody.position.copy(position);
     this.world.addBody(boxBody);
-    this.objectToUpdate.push({ mesh, boxBody });
+    this.activeCubes.push({ mesh, boxBody });
+    this.activeCube = mesh;
 
     // Updates cube when idle, should be used later down the road
     // For knowing when we can start generating new cubes from within Gameloop
     boxBody.addEventListener(
       'sleep',
       (event) => {
-        const elementToHaveNameChanged = this.objectToUpdate.find(
+        const elementToHaveNameChanged = this.activeCubes.find(
           (item) => item.boxBody === event.target
         );
         elementToHaveNameChanged.mesh.name = 'idle';
       },
       { once: true }
     );
+  }
+
+  createBounceArea() {
+    const geometry = new THREE.CylinderBufferGeometry(5, 5, 4, 32);
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x49ef4,
+      emissive: 0x0,
+      shininess: 40,
+    });
+    const cylinder = new THREE.Mesh(geometry, material);
+    cylinder.position.set(80, 2, 80);
+    this.scene.add(cylinder);
+
+    const cylinderShape = new CANNON.Cylinder(5, 5, 4, 32);
+    const cylinderBody = new CANNON.Body({
+      mass: 1,
+      shape: cylinderShape,
+      material: this.spungeMaterial,
+    });
+    cylinderBody.position.copy(cylinder.position);
+    this.world.addBody(cylinderBody);
+    this.activeCubes.push({ mesh, boxBody });
   }
 
   // Get Sets the outer edges of the playing field
@@ -91,16 +126,23 @@ class Game {
     return geometry;
   }
 
+  // Used for creating a mesh and boundingBox for checking intersections
   createWinObject() {
     const winMaterial = new THREE.MeshStandardMaterial({
-      color: 'rgb(80,210,65',
+      color: 'rgb(80,210,65)',
       transparent: true,
       opacity: 0.4,
     });
-    const winGeometry = new THREE.BoxBufferGeometry(100, 10, 10, 4, 4);
+    const winGeometry = new THREE.BoxBufferGeometry(
+      WINZONE_WIDTH,
+      WINZONE_HEIGHT,
+      WINZONE_WIDTH,
+      4,
+      4
+    );
     const winMesh = new THREE.Mesh(winGeometry, winMaterial);
     winGeometry.computeBoundingBox();
-    winMesh.position.set(0, 5, 0);
+    winMesh.position.set(-75, 5, -75);
     winMesh.name = 'winMesh';
 
     const box = new THREE.Box3();
@@ -116,12 +158,47 @@ class Game {
   getWinObject() {
     return this.winObject;
   }
+
+  steerDebugBox(event) {
+    switch (event.key) {
+      case 'a':
+        // console.log(this.ac);
+        break;
+
+      case 'd':
+        this.activeCube.position.x += 0.5;
+        break;
+
+      case 'w':
+        this.activeCube.position.z -= 0.5;
+        break;
+
+      case 's':
+        this.activeCube.position.z += 0.5;
+        break;
+
+      case 'q':
+        this.activeCube.position.y += 0.2;
+        break;
+
+      case 'e':
+        this.activeCube.position.y -= 0.2;
+        break;
+
+      case 'r':
+        this.activeCube.rotation.x += 0.4;
+        break;
+
+      case 't':
+        this.activeCube.rotation.y += 0.5;
+        break;
+
+      case 'x':
+        break;
+
+      case ' ':
+    }
+  }
 }
 
 export default Game;
-
-// TODO -> Gör så att när alla delar är idle, så startar själva gameloopens uträkningar
-// TODO -> Uträkningar är b.la Kolla om Deras bounding box ligger inuti winZoneBox,
-// TODO -> Om så är fallet, Beräkna den totala volymen av varje Box som ligger inuti Winzone,
-// TODO -> Därefter om volymen > 80% av winzone, gör en clean removal av alla objekt som ligger inuti winzone,
-// TODO -> Uppdatera sedan score till antalet objekt som fanns inuti winzone innan vi tog bort dem

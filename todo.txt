@@ -11,7 +11,11 @@ https://stackoverflow.com/questions/24543722/create-cannon-rigidbody-from-three-
 
 https://stackoverflow.com/questions/15492857/any-way-to-get-a-bounding-box-from-a-three-js-object3d
 
+https://discourse.threejs.org/t/bounding-box-is-calculated-wrong/1763
+
 https://javascript.plainenglish.io/3d-with-svelte-and-three-js-f4366f342f9f
+
+https://threejs.org/docs/#manual/en/introduction/Matrix-transformations
 
 
 Questions: 
