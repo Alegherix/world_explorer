@@ -3,6 +3,7 @@ import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Game from './Game';
+import Platform from './Platform';
 import './style.css';
 
 class World {
@@ -11,7 +12,7 @@ class World {
   }
 
   init() {
-    this.objectsToUpdate = [];
+    this.activeCubes = [];
     this.scene = new THREE.Scene();
     this.scene.receiveShadow = true;
     this.gui = new dat.GUI();
@@ -40,12 +41,7 @@ class World {
       })
     );
 
-    this.game = new Game(
-      this.scene,
-      this.world,
-      this.objectsToUpdate,
-      iceMaterial
-    );
+    this.game = new Game(this.scene, this.world, this.activeCubes, iceMaterial);
 
     this.clock = new THREE.Clock();
     this.previousElapsedTime = 0;
@@ -142,16 +138,16 @@ class World {
   // Removes idle cubes not from event fired, due to event causing nullPointerExceptions
   removeIdleCubes() {
     let index = [];
-    for (const object of this.objectsToUpdate) {
+    for (const object of this.activeCubes) {
       console.log(object.mesh.name);
       if (object.mesh.name === 'idle') {
         this.world.removeBody(object.boxBody);
         this.scene.remove(object.mesh);
-        index.push(this.objectsToUpdate.indexOf(object));
+        index.push(this.activeCubes.indexOf(object));
       }
     }
     if (index.length > 0) {
-      this.objectsToUpdate.splice(index[0], 1);
+      this.activeCubes.splice(index[0], 1);
     }
   }
 
@@ -167,6 +163,7 @@ class World {
     this.world.addBody(body);
   }
 
+  // Adds each invisible boundry to the scene
   addInvisibleBoundries() {
     // Keep here as not to reinstantiate plane object
     const floorShape = new CANNON.Plane();
@@ -184,6 +181,22 @@ class World {
       this.game.createOBlock({ x: (Math.random() - 0.5) * 40, y: 160, z: 0 });
     };
     this.gui.add(debugObject, 'createOBlock');
+
+    const debugMaterial = new THREE.MeshStandardMaterial({
+      color: 'red',
+      wireframe: true,
+    });
+    const debugBox = new THREE.BoxBufferGeometry(100, 10, 10, 4, 4);
+    const debugMesh = new THREE.Mesh(debugBox, debugMaterial);
+    debugMesh.position.set(0, 5, 0);
+    debugMesh.name = 'debugMesh';
+
+    debugObject.showDebugMesh = () => {
+      this.scene.getObjectByName('debugMesh')
+        ? this.scene.remove(debugMesh)
+        : this.scene.add(debugMesh);
+    };
+    this.gui.add(debugObject, 'showDebugMesh');
   }
 
   tick() {
@@ -197,7 +210,7 @@ class World {
 
       // Updates every item from objects that need to be updated, both position, and
       // Needs to be kept until item is removed from game, since they're all Interactable
-      for (const object of this.objectsToUpdate) {
+      for (const object of this.activeCubes) {
         object.mesh.position.copy(object.boxBody.position);
         object.mesh.quaternion.copy(object.boxBody.quaternion);
       }

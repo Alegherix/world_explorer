@@ -8,3 +8,9 @@ MVP)
 
 Resources:
 https://stackoverflow.com/questions/24543722/create-cannon-rigidbody-from-three-mesh-or-three-geometry
+
+https://stackoverflow.com/questions/15492857/any-way-to-get-a-bounding-box-from-a-three-js-object3d
+
+
+
+Questions: Import av samma typer av av paket i olika filer, är de ett problem?
