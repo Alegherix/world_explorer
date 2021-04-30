@@ -11,6 +11,9 @@ https://stackoverflow.com/questions/24543722/create-cannon-rigidbody-from-three-
 
 https://stackoverflow.com/questions/15492857/any-way-to-get-a-bounding-box-from-a-three-js-object3d
 
+https://javascript.plainenglish.io/3d-with-svelte-and-three-js-f4366f342f9f
 
 
-Questions: Import av samma typer av av paket i olika filer, är de ett problem?
+Questions: 
+Import av samma typer av av paket i olika filer, är de ett problem?
+Hur stort projekt vore det att dra in svelte / Sapper för state management och routing?

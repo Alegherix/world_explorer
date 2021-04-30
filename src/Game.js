@@ -26,6 +26,8 @@ class Game {
     // Geometries
     this.oBlockGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
     this.iBlockGeometry = new THREE.BoxBufferGeometry(5, 20, 5);
+
+    this.winObject = this.createWinObject();
   }
 
   createBlock(letter, position) {
@@ -89,11 +91,37 @@ class Game {
     return geometry;
   }
 
-  // Used for deciding which pieces can be removed
-  getTetrisPieces(scene) {
-    const pieces = scene.children.filter((child) => child.name === 'piece');
-    console.log(pieces);
+  createWinObject() {
+    const winMaterial = new THREE.MeshStandardMaterial({
+      color: 'rgb(80,210,65',
+      transparent: true,
+      opacity: 0.4,
+    });
+    const winGeometry = new THREE.BoxBufferGeometry(100, 10, 10, 4, 4);
+    const winMesh = new THREE.Mesh(winGeometry, winMaterial);
+    winGeometry.computeBoundingBox();
+    winMesh.position.set(0, 5, 0);
+    winMesh.name = 'winMesh';
+
+    const box = new THREE.Box3();
+    box.setFromObject(winMesh);
+
+    const winObject = {
+      mesh: winMesh,
+      box,
+    };
+    return winObject;
+  }
+
+  getWinObject() {
+    return this.winObject;
   }
 }
 
 export default Game;
+
+// TODO -> Gör så att när alla delar är idle, så startar själva gameloopens uträkningar
+// TODO -> Uträkningar är b.la Kolla om Deras bounding box ligger inuti winZoneBox,
+// TODO -> Om så är fallet, Beräkna den totala volymen av varje Box som ligger inuti Winzone,
+// TODO -> Därefter om volymen > 80% av winzone, gör en clean removal av alla objekt som ligger inuti winzone,
+// TODO -> Uppdatera sedan score till antalet objekt som fanns inuti winzone innan vi tog bort dem

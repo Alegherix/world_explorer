@@ -91,6 +91,7 @@ class World {
     this.scene.add(this.game.getBounds(50));
 
     this.setupDebugGUI();
+    this.scene.add(this.game.getWinObject().mesh);
 
     this.tick();
   }
@@ -127,6 +128,9 @@ class World {
     this.scene.add(plane);
 
     this.addInvisibleBoundries();
+
+    this.baseBox;
+    this.debugBox;
   }
 
   onWindowResize() {
@@ -192,11 +196,47 @@ class World {
     debugMesh.name = 'debugMesh';
 
     debugObject.showDebugMesh = () => {
-      this.scene.getObjectByName('debugMesh')
-        ? this.scene.remove(debugMesh)
-        : this.scene.add(debugMesh);
+      if (this.scene.getObjectByName('debugMesh')) {
+        this.scene.remove(debugMesh);
+      } else {
+        this.scene.add(debugMesh);
+        debugMesh.geometry.computeBoundingBox();
+
+        this.baseBox = new THREE.Box3();
+        this.baseBox.setFromObject(debugMesh);
+      }
     };
     this.gui.add(debugObject, 'showDebugMesh');
+
+    // Trying to figure out bonding boxes
+
+    debugObject.getBoundingBox = () => {
+      this.debugBox = new THREE.Box3();
+
+      const mesh = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(10, 10, 10),
+        new THREE.MeshBasicMaterial({
+          transparent: true,
+          opacity: 0,
+        })
+      );
+      mesh.position.set(5, 5, 8);
+      this.scene.add(mesh);
+
+      // Create box from mesh
+      this.debugBox.setFromObject(mesh);
+
+      const intersectedBox = this.debugBox.intersect(this.baseBox);
+      // Create Overlapping box
+      console.log('BaseBox: ', this.baseBox);
+      console.log('GroundBox: ', this.debugBox);
+
+      console.log('IntersectBox: ', intersectedBox);
+      const helper = new THREE.Box3Helper(intersectedBox, 'purple');
+      this.scene.add(helper);
+    };
+
+    this.gui.add(debugObject, 'getBoundingBox');
   }
 
   tick() {
