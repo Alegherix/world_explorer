@@ -79,24 +79,6 @@ class Debugger {
         break;
 
       case ' ':
-        const obb = new OBB();
-        this.mesh.geometry.computeBoundingBox();
-        this.mesh.updateMatrixWorld(true);
-        obb.applyMatrix4(this.mesh.matrixWorld);
-
-        obb.fromBox3(new Box3().setFromObject(this.mesh));
-        const winMesh = this.scene.getObjectByName('winMesh');
-        const winBox = new THREE.Box3();
-        winBox.setFromObject(winMesh);
-
-        const helper = new THREE.Box3Helper(winBox, 0xffffff);
-        this.scene.add(helper);
-        const intersect = obb.intersectsBox3(winBox);
-        console.log('Does it intersect?', intersect);
-        console.log(obb.getSize());
-
-      // const obb2 = obb.clone();
-      // console.log(obb.getSize());
     }
   }
 }

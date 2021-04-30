@@ -4,18 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Debugger from './Debugger';
 import Game from './Game';
-import Platform from './Platform';
 import './style.css';
-import config from './utils';
-const {
-  WINZONE_DEPTH,
-  WINZONE_HEIGHT,
-  WINZONE_WIDTH,
-  BLOCK_DEPTH,
-  WIN_PERCENTAGE_LIMIT,
-  PLANET_WIDTH,
-  PLANET_HEIGHT,
-} = config;
 
 class World {
   constructor() {
@@ -32,13 +21,13 @@ class World {
     this.world.broadphase = new CANNON.SAPBroadphase(this.world);
     this.world.allowSleep = true;
 
-    this.world.gravity.set(0, -9.82, 0);
+    this.world.gravity.set(0, -30, 0);
     this.rockMaterial = new CANNON.Material('rock');
     const iceMaterial = new CANNON.Material('ice');
     const spungeMaterial = new CANNON.Material('spunge');
     this.world.addContactMaterial(
       new CANNON.ContactMaterial(this.rockMaterial, iceMaterial, {
-        friction: 5,
+        friction: 10,
         restitution: 0,
         contactEquationRelaxation: 4,
         frictionEquationRelaxation: 10,
@@ -50,6 +39,13 @@ class World {
         restitution: 1,
         contactEquationRelaxation: 4,
         frictionEquationRelaxation: 10,
+      })
+    );
+
+    this.world.addContactMaterial(
+      new CANNON.ContactMaterial(iceMaterial, spungeMaterial, {
+        friction: 2,
+        restitution: 1.5,
       })
     );
 
@@ -105,13 +101,13 @@ class World {
 
     this.createSpace();
     this.createPlanet();
-    // this.scene.add(this.game.getBounds(-50));
-    // this.scene.add(this.game.getBounds(50));
 
     this.setupDebugGUI();
     this.scene.add(this.game.getWinObject().mesh);
 
     new Debugger(this.gui, this.scene);
+
+    this.game.createOBlock({ x: 0, y: 100, z: 0 });
 
     this.tick();
   }
@@ -207,19 +203,6 @@ class World {
     debugMesh.position.set(0, 5, 0);
     debugMesh.name = 'debugMesh';
 
-    debugObject.showDebugMesh = () => {
-      if (this.scene.getObjectByName('debugMesh')) {
-        this.scene.remove(debugMesh);
-      } else {
-        this.scene.add(debugMesh);
-        debugMesh.geometry.computeBoundingBox();
-
-        this.baseBox = new THREE.Box3();
-        this.baseBox.setFromObject(debugMesh);
-      }
-    };
-    this.gui.add(debugObject, 'showDebugMesh');
-
     // Trying to figure out bonding boxes
 
     debugObject.getBoundingBox = () => {
@@ -263,8 +246,9 @@ class World {
       // Updates every item from objects that need to be updated, both position, and
       // Needs to be kept until item is removed from game, since they're all Interactable
       for (const object of this.activeCubes) {
-        object.mesh.position.copy(object.boxBody.position);
-        object.mesh.quaternion.copy(object.boxBody.quaternion);
+        // console.log(object);
+        object.mesh.position.copy(object.body.position);
+        object.mesh.quaternion.copy(object.body.quaternion);
       }
 
       this.world.step(1 / 60, timeDelta, 3);

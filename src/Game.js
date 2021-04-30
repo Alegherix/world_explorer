@@ -42,50 +42,38 @@ class Game {
     this.createBounceArea();
   }
 
-  createBlock(letter, position) {
-    switch (letter) {
-      case 'o':
-        block = this.createOBlock(position);
-        break;
-      case 'i':
-        block = new THREE.Mesh(this.iBlockGeometry, this.standardMaterial);
-        break;
-      default:
-        break;
-    }
-  }
-
   createOBlock(position) {
     const mesh = new THREE.Mesh(this.oBlockGeometry, this.standardMaterial);
     mesh.castShadow = true;
+    console.log(position);
     mesh.position.copy(position);
     mesh.name = 'falling';
     this.scene.add(mesh);
 
     const boxShape = new CANNON.Box(new Vec3(5, 5, 5));
-    const boxBody = new CANNON.Body({
+    const body = new CANNON.Body({
       mass: 1,
       position: new Vec3(5, 160, 0),
       shape: boxShape,
       material: this.material,
     });
-    boxBody.position.copy(position);
-    this.world.addBody(boxBody);
-    this.activeCubes.push({ mesh, boxBody });
-    this.activeCube = mesh;
+    body.position.copy(position);
+    this.world.addBody(body);
+    this.activeCubes.push({ mesh, body });
+    this.activeCube = { mesh, body };
 
     // Updates cube when idle, should be used later down the road
     // For knowing when we can start generating new cubes from within Gameloop
-    boxBody.addEventListener(
-      'sleep',
-      (event) => {
-        const elementToHaveNameChanged = this.activeCubes.find(
-          (item) => item.boxBody === event.target
-        );
-        elementToHaveNameChanged.mesh.name = 'idle';
-      },
-      { once: true }
-    );
+    // body.addEventListener(
+    //   'sleep',
+    //   (event) => {
+    //     const elementToHaveNameChanged = this.activeCubes.find(
+    //       (item) => item.boxBody === event.target
+    //     );
+    //     elementToHaveNameChanged.mesh.name = 'idle';
+    //   },
+    //   { once: true }
+    // );
   }
 
   createBounceArea() {
@@ -95,19 +83,21 @@ class Game {
       emissive: 0x0,
       shininess: 40,
     });
-    const cylinder = new THREE.Mesh(geometry, material);
-    cylinder.position.set(80, 2, 80);
-    this.scene.add(cylinder);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.position.set(0, 2, 0);
+    this.scene.add(mesh);
 
     const cylinderShape = new CANNON.Cylinder(5, 5, 4, 32);
-    const cylinderBody = new CANNON.Body({
-      mass: 1,
+    const body = new CANNON.Body({
+      mass: 0,
       shape: cylinderShape,
       material: this.spungeMaterial,
     });
-    cylinderBody.position.copy(cylinder.position);
-    this.world.addBody(cylinderBody);
-    this.activeCubes.push({ mesh, boxBody });
+    body.position.copy(mesh.position);
+    this.world.addBody(body);
+    body.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
+    // this.activeCubes.push({ mesh, body });
   }
 
   // Get Sets the outer edges of the playing field
@@ -162,41 +152,25 @@ class Game {
   steerDebugBox(event) {
     switch (event.key) {
       case 'a':
-        // console.log(this.ac);
+        this.activeCube.mesh.position.x -= 3;
+        this.activeCube.body.position.copy(this.activeCube.mesh.position);
+        break;
         break;
 
       case 'd':
-        this.activeCube.position.x += 0.5;
+        this.activeCube.mesh.position.x += 3;
+        this.activeCube.body.position.copy(this.activeCube.mesh.position);
         break;
 
       case 'w':
-        this.activeCube.position.z -= 0.5;
+        this.activeCube.mesh.position.z -= 3;
+        this.activeCube.body.position.copy(this.activeCube.mesh.position);
         break;
 
       case 's':
-        this.activeCube.position.z += 0.5;
+        this.activeCube.mesh.position.z += 3;
+        this.activeCube.body.position.copy(this.activeCube.mesh.position);
         break;
-
-      case 'q':
-        this.activeCube.position.y += 0.2;
-        break;
-
-      case 'e':
-        this.activeCube.position.y -= 0.2;
-        break;
-
-      case 'r':
-        this.activeCube.rotation.x += 0.4;
-        break;
-
-      case 't':
-        this.activeCube.rotation.y += 0.5;
-        break;
-
-      case 'x':
-        break;
-
-      case ' ':
     }
   }
 }
