@@ -9,6 +9,7 @@ const {
   BLOCK_DEPTH,
   WIN_PERCENTAGE_LIMIT,
 } = config;
+import { getBlockGeometry } from './Geometries';
 
 // Återanvänd samma Mesh & Material, i så hög utsträckning man kan, dvs om vi ska ta fram en ny fallande shape
 // Använd en instans variabel av Mesh & Material,
@@ -35,8 +36,7 @@ class Game {
     });
 
     // Geometries
-    this.oBlockGeometry = new THREE.BoxBufferGeometry(10, 10, BLOCK_DEPTH);
-    this.iBlockGeometry = new THREE.BoxBufferGeometry(5, 20, 5);
+    this.oBlockGeometry = getBlockGeometry();
 
     this.winObject = this.createWinObject();
     this.createBounceArea();
@@ -77,11 +77,17 @@ class Game {
   }
 
   createBounceArea() {
+    const textureLoader = new THREE.TextureLoader();
+    const colorTexture = textureLoader.load(
+      'textures/metalPlate/MetalPlates006_1K_Color.jpg'
+    );
+
     const geometry = new THREE.CylinderBufferGeometry(5, 5, 4, 32);
     const material = new THREE.MeshPhongMaterial({
       color: 0x49ef4,
       emissive: 0x0,
       shininess: 40,
+      // map: colorTexture,
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
@@ -154,7 +160,6 @@ class Game {
       case 'a':
         this.activeCube.mesh.position.x -= 3;
         this.activeCube.body.position.copy(this.activeCube.mesh.position);
-        break;
         break;
 
       case 'd':

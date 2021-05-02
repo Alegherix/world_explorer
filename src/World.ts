@@ -4,10 +4,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Debugger from './Debugger';
 import Game from './Game';
-import './style.css';
 
 class World {
-  constructor() {
+  constructor(canvas) {
+    this.canvas = canvas;
     this.init();
   }
 
@@ -61,8 +61,8 @@ class World {
     this.previousElapsedTime = 0;
 
     // Enable the Three Renderer with soft shadows and size
-    const canvas = document.querySelector('.webgl');
-    this.threejs = new THREE.WebGLRenderer({ canvas });
+    // const canvas = document.querySelector('.webgl');
+    this.threejs = new THREE.WebGLRenderer({ canvas: this.canvas });
     this.threejs.shadowMap.enabled = true;
     this.threejs.shadowMap.type = THREE.PCFSoftShadowMap;
     this.threejs.setPixelRatio(window.devicePixelRatio);
@@ -97,7 +97,7 @@ class World {
     const ambientLight = new THREE.AmbientLight(0x404040);
     this.scene.add(ambientLight);
 
-    new OrbitControls(this.camera, canvas);
+    new OrbitControls(this.camera, this.canvas);
 
     this.createSpace();
     this.createPlanet();
@@ -107,7 +107,7 @@ class World {
 
     new Debugger(this.gui, this.scene);
 
-    this.game.createOBlock({ x: 0, y: 100, z: 0 });
+    // this.game.createOBlock({ x: 0, y: 100, z: 0 });
 
     this.tick();
   }

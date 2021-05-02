@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { Box3, Box3Helper, BoxHelper } from 'three';
-import { OBB } from 'three/examples/jsm/math/OBB';
 import config from './utils';
 const {
   WINZONE_DEPTH,
@@ -9,8 +7,13 @@ const {
   BLOCK_DEPTH,
   WIN_PERCENTAGE_LIMIT,
 } = config;
+// import type * as dat from 'dat.gui';
+import Controller from './Controller';
 
 class Debugger {
+  // gui : dat.GUI;
+  // scene: THREE.Scene
+
   constructor(gui, scene) {
     this.gui = gui;
     this.scene = scene;
@@ -27,7 +30,9 @@ class Debugger {
   debugBox() {
     this.mesh.name = 'debugBox';
     this.mesh.position.set(10, 10, 10);
-    document.addEventListener('keydown', this.steerDebugBox.bind(this));
+    const controller = new Controller(this.mesh);
+    // document.addEventListener('keydown', this.steerDebugBox.bind(this));
+    // document.addEventListener('keydown', controller.steerDebugBox);
 
     const debugConfig = {};
     debugConfig.debugABox = () => {
@@ -38,48 +43,6 @@ class Debugger {
       }
     };
     this.gui.add(debugConfig, 'debugABox');
-  }
-
-  steerDebugBox(event) {
-    switch (event.key) {
-      case 'a':
-        this.mesh.position.x -= 0.5;
-        break;
-
-      case 'd':
-        this.mesh.position.x += 0.5;
-        break;
-
-      case 'w':
-        this.mesh.position.z -= 0.5;
-        break;
-
-      case 's':
-        this.mesh.position.z += 0.5;
-        break;
-
-      case 'q':
-        this.mesh.position.y += 0.2;
-        break;
-
-      case 'e':
-        this.mesh.position.y -= 0.2;
-        break;
-
-      case 'r':
-        this.mesh.rotation.x += 0.4;
-        break;
-
-      case 't':
-        this.mesh.rotation.y += 0.5;
-        break;
-
-      case 'x':
-        console.log(this.mesh);
-        break;
-
-      case ' ':
-    }
   }
 }
 
