@@ -35,3 +35,19 @@ export default config;
 //   this.createBoundry(0, 0, 1, 0, 0, -30, Math.PI * 0.5, floorShape); // Back
 //   this.createBoundry(0, 1, 0, 0, 0, 30, Math.PI, floorShape); // Back
 // }
+
+// // Removes idle cubes not from event fired, due to event causing nullPointerExceptions
+// removeIdleCubes() {
+//   let index = [];
+//   for (const cube of this.activeCubes) {
+//     console.log(cube.mesh.name);
+//     if (cube.mesh.name === 'idle') {
+//       this.world.removeBody(cube.boxBody);
+//       this.scene.remove(cube.mesh);
+//       index.push(this.activeCubes.indexOf(cube));
+//     }
+//   }
+//   if (index.length > 0) {
+//     this.activeCubes.splice(index[0], 1);
+//   }
+// }

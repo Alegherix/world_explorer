@@ -28,6 +28,8 @@ class Material {
     if (this.iceMaterial) return this.iceMaterial;
     else {
       this.iceMaterial = new CANNON.Material('ice');
+      console.log('Creating ice material');
+
       return this.iceMaterial;
     }
   }

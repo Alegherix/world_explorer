@@ -25,6 +25,9 @@ class Game {
   private currentGamePiece: IGamePiece;
   private scene: THREE.Scene;
   private world: CANNON.World;
+  private startPosition: IPosition;
+  private gamePieceTexture: THREE.Texture;
+  private gamePieceMaterial: THREE.MeshStandardMaterial;
 
   constructor(
     scene: THREE.Scene,
@@ -39,26 +42,28 @@ class Game {
     this.material = material;
     this.blockGeometry = new BlockGeometry();
     this.loader = loader;
+    this.startPosition = { x: 0, y: 150, z: 0 };
+    this.gamePieceTexture = this.loader
+      .getTextureLoader()
+      .load('textures/test/wobbly.jpg');
+    this.gamePieceMaterial = new THREE.MeshStandardMaterial({
+      map: this.gamePieceTexture,
+    });
 
-    this.createOBlock({ x: 0, y: 150, z: 0 });
+    this.createOBlock();
     this.createBounceArea();
     this.createWinZone();
 
     window.addEventListener('keydown', this.steerDebugBox.bind(this));
   }
 
-  createOBlock(position: IPosition) {
-    // Create the mesh object
-    const groundTexture = this.loader
-      .getTextureLoader()
-      .load('textures/test/wobbly.jpg');
-    const iceMaterial = new THREE.MeshStandardMaterial({
-      map: groundTexture,
-    });
-
-    const mesh = new THREE.Mesh(this.blockGeometry.getSquare(), iceMaterial);
+  createOBlock() {
+    const mesh = new THREE.Mesh(
+      this.blockGeometry.getSquare(),
+      this.gamePieceMaterial
+    );
     mesh.castShadow = true;
-    mesh.position.copy(position as Vector3);
+    mesh.position.copy(this.startPosition as Vector3);
 
     // Create the physics object to match the mesh object
     const boxShape = new CANNON.Box(new Vec3(5, 5, 5));
@@ -68,7 +73,7 @@ class Game {
       shape: boxShape,
       material: this.material.getIceMaterial(),
     });
-    body.position.copy(position as Vec3);
+    body.position.copy(this.startPosition as Vec3);
 
     // Add entities to the world
     this.scene.add(mesh);
@@ -78,16 +83,7 @@ class Game {
 
     // Updates cube when idle, should be used later down the road
     // For knowing when we can start generating new cubes from within Gameloop
-    // body.addEventListener(
-    //   'sleep',
-    //   (event) => {
-    //     const elementToHaveNameChanged = this.activeCubes.find(
-    //       (item) => item.boxBody === event.target
-    //     );
-    //     elementToHaveNameChanged.mesh.name = 'idle';
-    //   },
-    //   { once: true }
-    // );
+    body.addEventListener('sleep', () => (mesh.name = 'idle'));
   }
 
   createBounceArea() {
@@ -162,6 +158,16 @@ class Game {
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );
         break;
+    }
+  }
+
+  runGameLoop() {
+    if (
+      this.currentGamePiece.mesh.name === 'idle' ||
+      this.currentGamePiece.body.position.y < -1
+    ) {
+      // update score and whatever
+      this.createOBlock();
     }
   }
 }

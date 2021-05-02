@@ -1,14 +1,12 @@
-import type { IGamePiece } from './interfaces';
 import CANNON, { Vec3 } from 'cannon';
-import * as dat from 'dat.gui';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Debugger from './Debugger';
-import Game from './Game';
-import Loader from './Loader';
-import Material from './Materials';
 import Stats from 'stats.js';
 import type { Vector3 } from 'three';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Game from './Game';
+import type { IGamePiece } from './interfaces';
+import Loader from './Loader';
+import Material from './Materials';
 
 class World {
   previousElapsedTime: number;
@@ -42,7 +40,6 @@ class World {
     // Initialize the
     this.initRenderer();
     this.initCamera();
-    this.init();
     this.initLights();
     this.createSpace();
     this.createPlanet();
@@ -105,29 +102,6 @@ class World {
 
     const ambientLight = new THREE.AmbientLight(0x404040);
     this.scene.add(ambientLight);
-  }
-
-  init() {
-    // this.gui = new dat.GUI();
-
-    // this.game = new Game(
-    //   this.scene,
-    //   this.world,
-    //   this.activeCubes,
-    //   iceMaterial,
-    //   spungeMaterial
-    // );
-
-    // new OrbitControls(this.worldCamera, this.canvas);
-
-    // this.setupDebugGUI();
-    // this.scene.add(this.game.getWinObject().mesh);
-
-    // new Debugger(this.gui, this.scene);
-
-    // this.game.createOBlock({ x: 0, y: 100, z: 0 });
-
-    this.tick();
   }
 
   startGame() {}
@@ -200,69 +174,6 @@ class World {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  // // Removes idle cubes not from event fired, due to event causing nullPointerExceptions
-  // removeIdleCubes() {
-  //   let index = [];
-  //   for (const cube of this.activeCubes) {
-  //     console.log(cube.mesh.name);
-  //     if (cube.mesh.name === 'idle') {
-  //       this.world.removeBody(cube.boxBody);
-  //       this.scene.remove(cube.mesh);
-  //       index.push(this.activeCubes.indexOf(cube));
-  //     }
-  //   }
-  //   if (index.length > 0) {
-  //     this.activeCubes.splice(index[0], 1);
-  //   }
-  // }
-
-  // setupDebugGUI() {
-  //   const debugObject = {};
-  //   debugObject.createOBlock = () => {
-  //     this.game.createOBlock({ x: (Math.random() - 0.5) * 40, y: 160, z: 0 });
-  //   };
-  //   this.gui.add(debugObject, 'createOBlock');
-
-  //   const debugMaterial = new THREE.MeshStandardMaterial({
-  //     color: 'red',
-  //     wireframe: true,
-  //   });
-  //   const debugBox = new THREE.BoxBufferGeometry(100, 10, 10, 4, 4);
-  //   const debugMesh = new THREE.Mesh(debugBox, debugMaterial);
-  //   debugMesh.position.set(0, 5, 0);
-  //   debugMesh.name = 'debugMesh';
-
-  //   // Trying to figure out bonding boxes
-
-  //   debugObject.getBoundingBox = () => {
-  //     this.debugBox = new THREE.Box3();
-
-  //     const mesh = new THREE.Mesh(
-  //       new THREE.BoxBufferGeometry(10, 10, 10),
-  //       new THREE.MeshBasicMaterial({
-  //         transparent: true,
-  //         opacity: 0,
-  //       })
-  //     );
-  //     mesh.position.set(5, 5, 8);
-  //     this.scene.add(mesh);
-
-  //     // Create box from mesh
-  //     this.debugBox.setFromObject(mesh);
-
-  //     const intersectedBox = this.debugBox.intersect(this.baseBox);
-  //     // Create Overlapping box
-  //     console.log('BaseBox: ', this.baseBox);
-  //     console.log('GroundBox: ', this.debugBox);
-
-  //     console.log('IntersectBox: ', intersectedBox);
-  //     const helper = new THREE.Box3Helper(intersectedBox, 'purple');
-  //     this.scene.add(helper);
-  //   };
-
-  //   this.gui.add(debugObject, 'getBoundingBox');
-  // }
-
   tick() {
     requestAnimationFrame(() => {
       this.stats.begin();
@@ -284,6 +195,8 @@ class World {
           (gamePiece.body.quaternion as unknown) as THREE.Quaternion
         );
       }
+
+      this.game.runGameLoop();
 
       this.world.step(1 / 60, timeDelta, 3);
 
