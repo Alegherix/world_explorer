@@ -1,3 +1,4 @@
+import type { IGamePiece } from './interfaces';
 import CANNON, { Vec3 } from 'cannon';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
@@ -6,14 +7,17 @@ import Debugger from './Debugger';
 import Game from './Game';
 import Loader from './Loader';
 import Material from './Materials';
+import Stats from 'stats.js';
+import type { Vector3 } from 'three';
 
 class World {
   previousElapsedTime: number;
-  activeCubes: any[];
+  gamePieces: IGamePiece[];
   canvas: HTMLCanvasElement;
 
   material: Material;
   loader: Loader;
+  game: Game;
 
   worldCamera: THREE.PerspectiveCamera;
   scene: THREE.Scene;
@@ -22,12 +26,16 @@ class World {
 
   world: CANNON.World;
 
+  // Stricly for debugging
+  stats;
+
   constructor(canvas) {
     this.canvas = canvas;
     this.clock = new THREE.Clock();
     this.previousElapsedTime = 0;
     this.material = new Material();
     this.loader = new Loader();
+    this.gamePieces = [];
     this.scene = new THREE.Scene();
     this.scene.receiveShadow = true;
 
@@ -39,10 +47,23 @@ class World {
     this.createSpace();
     this.createPlanet();
 
+    this.stats = new Stats();
+    this.stats.showPanel(0);
+    document.body.appendChild(this.stats.dom);
+
     new OrbitControls(this.worldCamera, this.canvas);
     window.addEventListener('resize', () => this.onWindowResize(), false);
 
-    // Starts the actual
+    //Creates the game Object
+    this.game = new Game(
+      this.scene,
+      this.world,
+      this.gamePieces,
+      this.material,
+      this.loader
+    );
+
+    // Starts the actual World Loop -> Kept here and not in the game logic due to possible implementation of multiplayer later.
     this.tick();
   }
 
@@ -87,8 +108,6 @@ class World {
   }
 
   init() {
-    this.activeCubes = [];
-
     // this.gui = new dat.GUI();
 
     // this.game = new Game(
@@ -110,6 +129,8 @@ class World {
 
     this.tick();
   }
+
+  startGame() {}
 
   createSpace() {
     const cubeLoader = this.loader.getCubeTextureLoader();
@@ -244,6 +265,8 @@ class World {
 
   tick() {
     requestAnimationFrame(() => {
+      this.stats.begin();
+
       this.renderer.render(this.scene, this.worldCamera);
 
       // Time calculations to figure out time since last tick
@@ -253,13 +276,18 @@ class World {
 
       // Updates every item from objects that need to be updated, both position, and
       // Needs to be kept until item is removed from game, since they're all Interactable
-      for (const object of this.activeCubes) {
-        // console.log(object);
-        object.mesh.position.copy(object.body.position);
-        object.mesh.quaternion.copy(object.body.quaternion);
+      for (const gamePiece of this.gamePieces) {
+        gamePiece.mesh.position.copy(
+          (gamePiece.body.position as unknown) as Vector3
+        );
+        gamePiece.mesh.quaternion.copy(
+          (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+        );
       }
 
       this.world.step(1 / 60, timeDelta, 3);
+
+      this.stats.end();
 
       this.tick();
     });
