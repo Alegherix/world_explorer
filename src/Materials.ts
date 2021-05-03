@@ -8,46 +8,20 @@ class Material {
   private spungeMaterial: CANNON.Material;
   private iceRockContactMaterial: CANNON.ContactMaterial;
 
-  // Higher order function to create singleton instances to reduce unecessary object instantiations
-  private getMaterial(
-    material: CANNON.Material,
-    materialName: string
-  ): CANNON.Material {
-    if (material) return material;
-    else {
-      material = new CANNON.Material(materialName);
-      console.log(
-        'Creating new Instance, this statement is only used for debugging'
-      );
-
-      return material;
-    }
-  }
-
   getIceMaterial(): CANNON.Material {
-    if (this.iceMaterial) return this.iceMaterial;
-    else {
-      this.iceMaterial = new CANNON.Material('ice');
-      console.log('Creating ice material');
-
-      return this.iceMaterial;
-    }
+    if (!this.iceMaterial) this.iceMaterial = new CANNON.Material('ice');
+    return this.iceMaterial;
   }
 
   getRockMaterial(): CANNON.Material {
-    if (this.rockMaterial) return this.rockMaterial;
-    else {
-      this.rockMaterial = new CANNON.Material('rock');
-      return this.rockMaterial;
-    }
+    if (!this.rockMaterial) this.rockMaterial = new CANNON.Material('rock');
+    return this.rockMaterial;
   }
 
   getSpungeMaterial(): CANNON.Material {
-    if (this.spungeMaterial) return this.spungeMaterial;
-    else {
+    if (!this.spungeMaterial)
       this.spungeMaterial = new CANNON.Material('spunge');
-      return this.spungeMaterial;
-    }
+    return this.spungeMaterial;
   }
 
   getIceRockContactMaterial = (): CANNON.ContactMaterial => {

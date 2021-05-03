@@ -9,23 +9,23 @@ import Loader from './Loader';
 import Material from './Materials';
 
 class World {
-  previousElapsedTime: number;
-  gamePieces: IGamePiece[];
-  canvas: HTMLCanvasElement;
+  private previousElapsedTime: number;
+  private gamePieces: IGamePiece[];
+  private canvas: HTMLCanvasElement;
 
-  material: Material;
-  loader: Loader;
-  game: Game;
+  private material: Material;
+  private loader: Loader;
+  private game: Game;
 
-  worldCamera: THREE.PerspectiveCamera;
-  scene: THREE.Scene;
-  clock: THREE.Clock;
-  renderer: THREE.WebGLRenderer;
+  private worldCamera: THREE.PerspectiveCamera;
+  private scene: THREE.Scene;
+  private clock: THREE.Clock;
+  private renderer: THREE.WebGLRenderer;
 
-  world: CANNON.World;
+  private world: CANNON.World;
 
   // Stricly for debugging
-  stats;
+  private stats;
 
   constructor(canvas) {
     this.canvas = canvas;

@@ -12,6 +12,22 @@ class BlockGeometry {
       return this.squareBlock;
     }
   }
+
+  getIBlock(): THREE.BoxBufferGeometry {
+    if (this.iBlock) return this.iBlock;
+    else {
+      this.iBlock = new THREE.BoxBufferGeometry(20, 10, 5);
+      return this.iBlock;
+    }
+  }
+
+  // getTBlock(): THREE.BoxBufferGeometry {
+  //   if (this.iBlock) return this.iBlock;
+  //   else {
+  //     this.iBlock = new THREE.BoxBufferGeometry(20, 10, 5);
+  //     return this.iBlock;
+  //   }
+  // }
 }
 
 // export const getIGeometry = (): THREE.BoxBufferGeometry => {
