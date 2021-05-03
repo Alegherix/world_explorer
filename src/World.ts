@@ -9,23 +9,23 @@ import Loader from './Loader';
 import Material from './Materials';
 
 class World {
-  previousElapsedTime: number;
-  gamePieces: IGamePiece[];
-  canvas: HTMLCanvasElement;
+  private previousElapsedTime: number;
+  private gamePieces: IGamePiece[];
+  private canvas: HTMLCanvasElement;
 
-  material: Material;
-  loader: Loader;
-  game: Game;
+  private material: Material;
+  private loader: Loader;
+  private game: Game;
 
-  worldCamera: THREE.PerspectiveCamera;
-  scene: THREE.Scene;
-  clock: THREE.Clock;
-  renderer: THREE.WebGLRenderer;
+  private worldCamera: THREE.PerspectiveCamera;
+  private scene: THREE.Scene;
+  private clock: THREE.Clock;
+  private renderer: THREE.WebGLRenderer;
 
-  world: CANNON.World;
+  private world: CANNON.World;
 
   // Stricly for debugging
-  stats;
+  private stats;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -125,8 +125,8 @@ class World {
     this.world.allowSleep = true;
     this.world.gravity.set(0, -30, 0);
     this.world.addContactMaterial(this.material.getIceRockContactMaterial());
-    this.world.addContactMaterial(this.material.getIceIceContactMatrial());
-    this.world.addContactMaterial(this.material.getIceSpungeContactMatrial());
+    this.world.addContactMaterial(this.material.getIceIceContactMaterial());
+    this.world.addContactMaterial(this.material.getIceSpungeContactMaterial());
   }
 
   // Creates the Plane which the player plays upon

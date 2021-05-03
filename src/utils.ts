@@ -33,7 +33,7 @@ export default config;
 //   this.createBoundry(0, 1, 0, -60, 0, 0, Math.PI * 0.5, floorShape); // Left
 //   this.createBoundry(0, -1, 0, 60, 0, 0, Math.PI * 0.5, floorShape); // Right
 //   this.createBoundry(0, 0, 1, 0, 0, -30, Math.PI * 0.5, floorShape); // Back
-//   this.createBoundry(0, 1, 0, 0, 0, 30, Math.PI, floorShape); // Back
+//   this.createBoundry(0, 1, 0, 0, 0, 30, Math.PI, floorShape); // Up
 // }
 
 // // Removes idle cubes not from event fired, due to event causing nullPointerExceptions

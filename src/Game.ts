@@ -18,27 +18,22 @@ const {
 // Använd en instans variabel av Mesh & Material,
 
 class Game {
-  private material: Material;
-  private loader: Loader;
   private blockGeometry: BlockGeometry;
-  private activeGamePieces: IGamePiece[];
   private currentGamePiece: IGamePiece;
-  private scene: THREE.Scene;
-  private world: CANNON.World;
   private startPosition: IPosition;
   private gamePieceTexture: THREE.Texture;
   private gamePieceMaterial: THREE.MeshStandardMaterial;
 
   constructor(
-    scene: THREE.Scene,
-    world: CANNON.World,
-    gamePieces: IGamePiece[],
-    material: Material,
-    loader: Loader
+    private scene: THREE.Scene,
+    private world: CANNON.World,
+    private activeGamePieces: IGamePiece[],
+    private material: Material,
+    private loader: Loader
   ) {
     this.scene = scene;
     this.world = world;
-    this.activeGamePieces = gamePieces;
+    this.activeGamePieces = activeGamePieces;
     this.material = material;
     this.blockGeometry = new BlockGeometry();
     this.loader = loader;
@@ -132,28 +127,28 @@ class Game {
     // Needs to cast to unknown then to Vec3, due to type constraints, the conversion is as intended.
     switch (event.key) {
       case 'a':
-        this.currentGamePiece.mesh.position.x -= 3;
+        this.currentGamePiece.mesh.position.x -= 7;
         this.currentGamePiece.body.position.copy(
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );
         break;
 
       case 'd':
-        this.currentGamePiece.mesh.position.x += 3;
+        this.currentGamePiece.mesh.position.x += 7;
         this.currentGamePiece.body.position.copy(
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );
         break;
 
       case 'w':
-        this.currentGamePiece.mesh.position.z -= 3;
+        this.currentGamePiece.mesh.position.z -= 7;
         this.currentGamePiece.body.position.copy(
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );
         break;
 
       case 's':
-        this.currentGamePiece.mesh.position.z += 3;
+        this.currentGamePiece.mesh.position.z += 7;
         this.currentGamePiece.body.position.copy(
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );

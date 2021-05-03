@@ -1,0 +1,13 @@
+målområdet rör på sig
+bounce området rör på sig
+man kan styra målområdet själv
+ladda in modeller för de olika områdena
+Samla poäng / mynt med objektet man styr innan man låser upp målområdet.
+Man studsar på olika delar av mappen för att ta sig fram.
+
+
+
+1) Studsande Plan i luften
+2) Poäng som man kan samla ihop
+3) Startpunkt att bounca ifrån
+4) Följande Kamera. 
