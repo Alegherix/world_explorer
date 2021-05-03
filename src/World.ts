@@ -7,6 +7,7 @@ import Game from './Game';
 import type { IGamePiece } from './interfaces';
 import Loader from './Loader';
 import Material from './Materials';
+import ThirdPersonCamera from './ThirdPersonCamera';
 
 class World {
   private previousElapsedTime: number;
@@ -26,6 +27,7 @@ class World {
 
   // Stricly for debugging
   private stats;
+  // private thirdPersonCamera: ThirdPersonCamera;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -48,7 +50,7 @@ class World {
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
 
-    new OrbitControls(this.worldCamera, this.canvas);
+    // new OrbitControls(this.worldCamera, this.canvas);
     window.addEventListener('resize', () => this.onWindowResize(), false);
 
     //Creates the game Object
@@ -57,7 +59,8 @@ class World {
       this.world,
       this.gamePieces,
       this.material,
-      this.loader
+      this.loader,
+      this.worldCamera
     );
 
     // Starts the actual World Loop -> Kept here and not in the game logic due to possible implementation of multiplayer later.

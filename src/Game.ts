@@ -1,11 +1,12 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import type { Vector3 } from 'three';
+import { MeshStandardMaterial, Vector3 } from 'three';
 import BlockGeometry from './BlockGeometry';
 import type { IGamePiece, IPosition } from './interfaces';
 import type Loader from './Loader';
 import type Material from './Materials';
 import config from './utils';
+import ThirdPersonCamera from './ThirdPersonCamera';
 const {
   WINZONE_DEPTH,
   WINZONE_HEIGHT,
@@ -23,16 +24,19 @@ class Game {
   private startPosition: IPosition;
   private gamePieceTexture: THREE.Texture;
   private gamePieceMaterial: THREE.MeshStandardMaterial;
+  private thirdPersonCamera: ThirdPersonCamera;
 
   constructor(
     private scene: THREE.Scene,
     private world: CANNON.World,
     private activeGamePieces: IGamePiece[],
     private material: Material,
-    private loader: Loader
+    private loader: Loader,
+    private camera: THREE.PerspectiveCamera
   ) {
     this.scene = scene;
     this.world = world;
+    this.camera = camera;
     this.activeGamePieces = activeGamePieces;
     this.material = material;
     this.blockGeometry = new BlockGeometry();
@@ -45,6 +49,7 @@ class Game {
       map: this.gamePieceTexture,
     });
 
+    this.thirdPersonCamera = new ThirdPersonCamera(this.camera);
     this.createOBlock();
     this.createBounceArea();
     this.createWinZone();
@@ -55,7 +60,8 @@ class Game {
   createOBlock() {
     const mesh = new THREE.Mesh(
       this.blockGeometry.getSquare(),
-      this.gamePieceMaterial
+      new MeshStandardMaterial({ color: 'yellow' })
+      // this.gamePieceMaterial
     );
     mesh.castShadow = true;
     mesh.position.copy(this.startPosition as Vector3);
@@ -75,6 +81,8 @@ class Game {
     this.world.addBody(body);
     this.activeGamePieces.push({ mesh, body });
     this.currentGamePiece = { mesh, body };
+
+    this.thirdPersonCamera.setTracking({ mesh, body });
 
     // Updates cube when idle, should be used later down the road
     // For knowing when we can start generating new cubes from within Gameloop
@@ -123,25 +131,22 @@ class Game {
     this.scene.add(winMesh);
   }
 
+  getCurrentGamePiece(): IGamePiece {
+    return this.currentGamePiece;
+  }
+
   steerDebugBox(event) {
     // Needs to cast to unknown then to Vec3, due to type constraints, the conversion is as intended.
     switch (event.key) {
-      case 'a':
-        this.currentGamePiece.mesh.position.x -= 7;
-        this.currentGamePiece.body.position.copy(
-          (this.currentGamePiece.mesh.position as unknown) as Vec3
-        );
-        break;
-
-      case 'd':
-        this.currentGamePiece.mesh.position.x += 7;
-        this.currentGamePiece.body.position.copy(
-          (this.currentGamePiece.mesh.position as unknown) as Vec3
-        );
-        break;
-
       case 'w':
         this.currentGamePiece.mesh.position.z -= 7;
+        this.currentGamePiece.body.position.copy(
+          (this.currentGamePiece.mesh.position as unknown) as Vec3
+        );
+        break;
+
+      case 'a':
+        this.currentGamePiece.mesh.position.x -= 7;
         this.currentGamePiece.body.position.copy(
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );
@@ -153,10 +158,18 @@ class Game {
           (this.currentGamePiece.mesh.position as unknown) as Vec3
         );
         break;
+
+      case 'd':
+        this.currentGamePiece.mesh.position.x += 7;
+        this.currentGamePiece.body.position.copy(
+          (this.currentGamePiece.mesh.position as unknown) as Vec3
+        );
+        break;
     }
   }
 
   runGameLoop() {
+    this.thirdPersonCamera.update();
     if (
       this.currentGamePiece.mesh.name === 'idle' ||
       this.currentGamePiece.body.position.y < -1
