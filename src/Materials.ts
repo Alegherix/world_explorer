@@ -1,12 +1,12 @@
 import CANNON from 'cannon';
-// Material for ejector
-import * as THREE from 'three';
 
 class Material {
   private iceMaterial: CANNON.Material;
   private rockMaterial: CANNON.Material;
   private spungeMaterial: CANNON.Material;
   private iceRockContactMaterial: CANNON.ContactMaterial;
+  private iceIceContactMaterial: CANNON.ContactMaterial;
+  private iceSpungeContactMaterial: CANNON.ContactMaterial;
 
   getIceMaterial(): CANNON.Material {
     if (!this.iceMaterial) this.iceMaterial = new CANNON.Material('ice');
@@ -25,48 +25,50 @@ class Material {
   }
 
   getIceRockContactMaterial = (): CANNON.ContactMaterial => {
-    return new CANNON.ContactMaterial(
-      this.getRockMaterial(),
-      this.getIceMaterial(),
-      {
-        friction: 10,
-        restitution: 0,
-        contactEquationRelaxation: 4,
-        frictionEquationRelaxation: 10,
-      }
-    );
+    if (!this.iceRockContactMaterial) {
+      this.iceRockContactMaterial = new CANNON.ContactMaterial(
+        this.getRockMaterial(),
+        this.getIceMaterial(),
+        {
+          friction: 10,
+          restitution: 0,
+          contactEquationRelaxation: 4,
+          frictionEquationRelaxation: 10,
+        }
+      );
+    }
+    return this.iceRockContactMaterial;
   };
 
-  getIceIceContactMatrial = (): CANNON.ContactMaterial => {
-    return new CANNON.ContactMaterial(
-      this.getIceMaterial(),
-      this.getIceMaterial(),
-      {
-        friction: 15,
-        restitution: 1,
-        contactEquationRelaxation: 4,
-        frictionEquationRelaxation: 10,
-      }
-    );
+  getIceIceContactMaterial = (): CANNON.ContactMaterial => {
+    if (!this.iceIceContactMaterial) {
+      this.iceIceContactMaterial = new CANNON.ContactMaterial(
+        this.getIceMaterial(),
+        this.getIceMaterial(),
+        {
+          friction: 15,
+          restitution: 1,
+          contactEquationRelaxation: 4,
+          frictionEquationRelaxation: 10,
+        }
+      );
+    }
+    return this.iceIceContactMaterial;
   };
 
-  getIceSpungeContactMatrial = (): CANNON.ContactMaterial => {
-    return new CANNON.ContactMaterial(
-      this.getIceMaterial(),
-      this.getSpungeMaterial(),
-      {
-        friction: 2,
-        restitution: 1.5,
-      }
-    );
+  getIceSpungeContactMaterial = (): CANNON.ContactMaterial => {
+    if (!this.iceSpungeContactMaterial) {
+      this.iceSpungeContactMaterial = new CANNON.ContactMaterial(
+        this.getIceMaterial(),
+        this.getSpungeMaterial(),
+        {
+          friction: 2,
+          restitution: 1.5,
+        }
+      );
+    }
+    return this.iceSpungeContactMaterial;
   };
 }
-
-const ejectorMaterial = (): THREE.MeshPhongMaterial =>
-  new THREE.MeshPhongMaterial({
-    color: 0x49ef4,
-    emissive: 0x0,
-    shininess: 40,
-  });
 
 export default Material;

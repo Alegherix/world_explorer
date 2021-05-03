@@ -125,8 +125,8 @@ class World {
     this.world.allowSleep = true;
     this.world.gravity.set(0, -30, 0);
     this.world.addContactMaterial(this.material.getIceRockContactMaterial());
-    this.world.addContactMaterial(this.material.getIceIceContactMatrial());
-    this.world.addContactMaterial(this.material.getIceSpungeContactMatrial());
+    this.world.addContactMaterial(this.material.getIceIceContactMaterial());
+    this.world.addContactMaterial(this.material.getIceSpungeContactMaterial());
   }
 
   // Creates the Plane which the player plays upon
