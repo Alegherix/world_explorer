@@ -63,7 +63,7 @@ class Material {
         this.getSpungeMaterial(),
         {
           friction: 2,
-          restitution: 1.5,
+          restitution: 1.2,
         }
       );
     }

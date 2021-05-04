@@ -27,6 +27,7 @@ class World {
 
   // Stricly for debugging
   private stats;
+  // orbitControl: OrbitControls;
   // private thirdPersonCamera: ThirdPersonCamera;
 
   constructor(canvas) {
@@ -50,7 +51,7 @@ class World {
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
 
-    // new OrbitControls(this.worldCamera, this.canvas);
+    // this.orbitControl = new OrbitControls(this.worldCamera, this.canvas);
     window.addEventListener('resize', () => this.onWindowResize(), false);
 
     //Creates the game Object
@@ -60,7 +61,8 @@ class World {
       this.gamePieces,
       this.material,
       this.loader,
-      this.worldCamera
+      this.worldCamera,
+      this.previousElapsedTime
     );
 
     // Starts the actual World Loop -> Kept here and not in the game logic due to possible implementation of multiplayer later.
@@ -188,6 +190,8 @@ class World {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
+      this.world.step(1 / 100, timeDelta, 10);
+
       // Updates every item from objects that need to be updated, both position, and
       // Needs to be kept until item is removed from game, since they're all Interactable
       for (const gamePiece of this.gamePieces) {
@@ -201,7 +205,7 @@ class World {
 
       this.game.runGameLoop();
 
-      this.world.step(1 / 60, timeDelta, 3);
+      this.game.updateTimeDelta(timeDelta);
 
       this.stats.end();
 

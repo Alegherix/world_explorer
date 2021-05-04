@@ -32,7 +32,8 @@ class Game {
     private activeGamePieces: IGamePiece[],
     private material: Material,
     private loader: Loader,
-    private camera: THREE.PerspectiveCamera
+    private camera: THREE.PerspectiveCamera,
+    private timeDelta: number
   ) {
     this.scene = scene;
     this.world = world;
@@ -60,8 +61,8 @@ class Game {
   createOBlock() {
     const mesh = new THREE.Mesh(
       this.blockGeometry.getSquare(),
-      new MeshStandardMaterial({ color: 'yellow' })
-      // this.gamePieceMaterial
+      // new MeshStandardMaterial({ color: 'yellow' })
+      this.gamePieceMaterial
     );
     mesh.castShadow = true;
     mesh.position.copy(this.startPosition as Vector3);
@@ -135,6 +136,10 @@ class Game {
     return this.currentGamePiece;
   }
 
+  updateTimeDelta(delta: number) {
+    this.timeDelta = delta;
+  }
+
   steerDebugBox(event) {
     // Needs to cast to unknown then to Vec3, due to type constraints, the conversion is as intended.
     switch (event.key) {
@@ -173,10 +178,9 @@ class Game {
     if (
       this.currentGamePiece.mesh.name === 'idle' ||
       this.currentGamePiece.body.position.y < -1
-    ) {
+    )
       // update score and whatever
       this.createOBlock();
-    }
   }
 }
 
