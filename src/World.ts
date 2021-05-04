@@ -7,7 +7,6 @@ import Game from './Game';
 import type { IGamePiece } from './interfaces';
 import Loader from './Loader';
 import Material from './Materials';
-import ThirdPersonCamera from './ThirdPersonCamera';
 
 class World {
   private previousElapsedTime: number;
@@ -190,8 +189,6 @@ class World {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
-      this.world.step(1 / 100, timeDelta, 10);
-
       // Updates every item from objects that need to be updated, both position, and
       // Needs to be kept until item is removed from game, since they're all Interactable
       for (const gamePiece of this.gamePieces) {
@@ -206,6 +203,7 @@ class World {
       this.game.runGameLoop();
 
       this.game.updateTimeDelta(timeDelta);
+      this.world.step(1 / 100, timeDelta);
 
       this.stats.end();
 
