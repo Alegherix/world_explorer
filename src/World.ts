@@ -26,7 +26,7 @@ class World {
 
   // Stricly for debugging
   private stats;
-  // orbitControl: OrbitControls;
+  orbitControl: OrbitControls;
   // private thirdPersonCamera: ThirdPersonCamera;
 
   constructor(canvas) {
@@ -50,7 +50,7 @@ class World {
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
 
-    // this.orbitControl = new OrbitControls(this.worldCamera, this.canvas);
+    this.orbitControl = new OrbitControls(this.worldCamera, this.canvas);
     window.addEventListener('resize', () => this.onWindowResize(), false);
 
     //Creates the game Object
@@ -131,6 +131,7 @@ class World {
     this.world.addContactMaterial(this.material.getIceRockContactMaterial());
     this.world.addContactMaterial(this.material.getIceIceContactMaterial());
     this.world.addContactMaterial(this.material.getIceSpungeContactMaterial());
+    this.world.addContactMaterial(this.material.getIceGlassContactMaterial());
   }
 
   // Creates the Plane which the player plays upon

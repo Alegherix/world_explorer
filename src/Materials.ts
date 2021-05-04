@@ -4,9 +4,11 @@ class Material {
   private iceMaterial: CANNON.Material;
   private rockMaterial: CANNON.Material;
   private spungeMaterial: CANNON.Material;
+  private glassMaterial: CANNON.Material;
   private iceRockContactMaterial: CANNON.ContactMaterial;
   private iceIceContactMaterial: CANNON.ContactMaterial;
   private iceSpungeContactMaterial: CANNON.ContactMaterial;
+  private iceGlassContactMaterial: CANNON.ContactMaterial;
 
   getIceMaterial(): CANNON.Material {
     if (!this.iceMaterial) this.iceMaterial = new CANNON.Material('ice');
@@ -16,6 +18,11 @@ class Material {
   getRockMaterial(): CANNON.Material {
     if (!this.rockMaterial) this.rockMaterial = new CANNON.Material('rock');
     return this.rockMaterial;
+  }
+
+  getGlassMaterial(): CANNON.Material {
+    if (!this.glassMaterial) this.glassMaterial = new CANNON.Material('glass');
+    return this.glassMaterial;
   }
 
   getSpungeMaterial(): CANNON.Material {
@@ -38,6 +45,22 @@ class Material {
       );
     }
     return this.iceRockContactMaterial;
+  };
+
+  getIceGlassContactMaterial = (): CANNON.ContactMaterial => {
+    if (!this.iceGlassContactMaterial) {
+      this.iceGlassContactMaterial = new CANNON.ContactMaterial(
+        this.getGlassMaterial(),
+        this.getIceMaterial(),
+        {
+          friction: 0,
+          restitution: 0.1,
+          contactEquationRelaxation: 4,
+          frictionEquationRelaxation: 10,
+        }
+      );
+    }
+    return this.iceGlassContactMaterial;
   };
 
   getIceIceContactMaterial = (): CANNON.ContactMaterial => {
