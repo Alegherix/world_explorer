@@ -1,12 +1,12 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { MeshStandardMaterial, Vector3 } from 'three';
+import { Vector3, SphereBufferGeometry } from 'three';
 import BlockGeometry from './BlockGeometry';
 import type { IGamePiece, IPosition } from './interfaces';
 import type Loader from './Loader';
 import type Material from './Materials';
-import config from './utils';
 import ThirdPersonCamera from './ThirdPersonCamera';
+import config from './utils';
 const {
   WINZONE_DEPTH,
   WINZONE_HEIGHT,
@@ -32,7 +32,8 @@ class Game {
     private activeGamePieces: IGamePiece[],
     private material: Material,
     private loader: Loader,
-    private camera: THREE.PerspectiveCamera
+    private camera: THREE.PerspectiveCamera,
+    private timeDelta: number
   ) {
     this.scene = scene;
     this.world = world;
@@ -51,7 +52,7 @@ class Game {
 
     this.thirdPersonCamera = new ThirdPersonCamera(this.camera);
     this.createOBlock();
-    this.createBounceArea();
+    // this.createBounceArea();
     this.createWinZone();
 
     window.addEventListener('keydown', this.steerDebugBox.bind(this));
@@ -59,15 +60,15 @@ class Game {
 
   createOBlock() {
     const mesh = new THREE.Mesh(
-      this.blockGeometry.getSquare(),
-      new MeshStandardMaterial({ color: 'yellow' })
-      // this.gamePieceMaterial
+      new SphereBufferGeometry(5, 64, 64),
+      // new MeshStandardMaterial({ color: 'yellow' })
+      this.gamePieceMaterial
     );
     mesh.castShadow = true;
     mesh.position.copy(this.startPosition as Vector3);
 
     // Create the physics object to match the mesh object
-    const boxShape = new CANNON.Box(new Vec3(5, 5, 5));
+    const boxShape = new CANNON.Sphere(5);
     const body = new CANNON.Body({
       mass: 1,
       position: new Vec3(5, 160, 0),
@@ -86,7 +87,7 @@ class Game {
 
     // Updates cube when idle, should be used later down the road
     // For knowing when we can start generating new cubes from within Gameloop
-    body.addEventListener('sleep', () => (mesh.name = 'idle'));
+    // body.addEventListener('sleep', () => (mesh.name = 'idle'));
   }
 
   createBounceArea() {
@@ -135,34 +136,49 @@ class Game {
     return this.currentGamePiece;
   }
 
+  updateTimeDelta(delta: number) {
+    this.timeDelta = delta;
+  }
+
   steerDebugBox(event) {
+    // console.log(this.currentGamePiece);
+    // console.log(this.currentGamePiece.body.sleepState === 2){}
+    if (this.currentGamePiece.body.sleepState === 2)
+      this.currentGamePiece.body.wakeUp();
+
     // Needs to cast to unknown then to Vec3, due to type constraints, the conversion is as intended.
     switch (event.key) {
       case 'w':
-        this.currentGamePiece.mesh.position.z -= 7;
-        this.currentGamePiece.body.position.copy(
-          (this.currentGamePiece.mesh.position as unknown) as Vec3
+        this.currentGamePiece.body.applyForce(
+          new Vec3(0, 0, -250),
+          this.currentGamePiece.body.position
         );
         break;
 
       case 'a':
-        this.currentGamePiece.mesh.position.x -= 7;
-        this.currentGamePiece.body.position.copy(
-          (this.currentGamePiece.mesh.position as unknown) as Vec3
+        this.currentGamePiece.body.applyForce(
+          new Vec3(-250, 0, 0),
+          this.currentGamePiece.body.position
         );
         break;
 
       case 's':
-        this.currentGamePiece.mesh.position.z += 7;
-        this.currentGamePiece.body.position.copy(
-          (this.currentGamePiece.mesh.position as unknown) as Vec3
+        this.currentGamePiece.body.applyForce(
+          new Vec3(0, 0, 250),
+          this.currentGamePiece.body.position
         );
         break;
 
       case 'd':
-        this.currentGamePiece.mesh.position.x += 7;
-        this.currentGamePiece.body.position.copy(
-          (this.currentGamePiece.mesh.position as unknown) as Vec3
+        this.currentGamePiece.body.applyForce(
+          new Vec3(250, 0, 0),
+          this.currentGamePiece.body.position
+        );
+
+      case ' ':
+        this.currentGamePiece.body.applyForce(
+          new Vec3(0, 2500, 0),
+          this.currentGamePiece.body.position
         );
         break;
     }
@@ -170,13 +186,12 @@ class Game {
 
   runGameLoop() {
     this.thirdPersonCamera.update();
-    if (
-      this.currentGamePiece.mesh.name === 'idle' ||
-      this.currentGamePiece.body.position.y < -1
-    ) {
-      // update score and whatever
-      this.createOBlock();
-    }
+    // if (
+    //   this.currentGamePiece.mesh.name === 'idle' ||
+    //   this.currentGamePiece.body.position.y < -1
+    // )
+    //   // update score and whatever
+    //   this.createOBlock();
   }
 }
 

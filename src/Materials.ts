@@ -30,10 +30,10 @@ class Material {
         this.getRockMaterial(),
         this.getIceMaterial(),
         {
-          friction: 10,
-          restitution: 0,
+          friction: 5,
+          restitution: 0.1,
           contactEquationRelaxation: 4,
-          frictionEquationRelaxation: 10,
+          // frictionEquationRelaxation: 10,
         }
       );
     }
@@ -46,7 +46,7 @@ class Material {
         this.getIceMaterial(),
         this.getIceMaterial(),
         {
-          friction: 15,
+          friction: 1,
           restitution: 1,
           contactEquationRelaxation: 4,
           frictionEquationRelaxation: 10,
@@ -63,7 +63,7 @@ class Material {
         this.getSpungeMaterial(),
         {
           friction: 2,
-          restitution: 1.5,
+          restitution: 1.2,
         }
       );
     }
