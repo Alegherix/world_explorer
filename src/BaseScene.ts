@@ -22,12 +22,13 @@ class BaseScene {
 
   private selectedWorld: THREE.Mesh;
 
+  private cursor: THREE.Vector2;
+  private raycaster: THREE.Raycaster;
+  private intersects: THREE.Intersection[] = [];
+
   // Stricly for debugging
   private stats;
   private orbitControl: OrbitControls;
-  private cursor: THREE.Vector2;
-  private raycaster: THREE.Raycaster;
-  private intersects: THREE.Intersection[];
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -240,19 +241,10 @@ class BaseScene {
 
   updateClicked() {
     if (this.intersects.length > 0) {
-      this.selectedWorld = this.intersects[0].object as THREE.Mesh;
+      this.selectedWorld = this.intersects[0]?.object as THREE.Mesh;
       this.updatePlanetName(this.selectedWorld.name);
     }
   }
-
-  // createRayCaster() {
-  //   const raycaster = new THREE.Raycaster();
-  //   const rayOrigin = new THREE.Vector3(-3, 0, 0);
-  //   const rayDirection = new THREE.Vector3(1, 0, 0);
-  //   rayDirection.normalize();
-
-  //   raycaster.set(rayOrigin, rayDirection);
-  // }
 
   onWindowResize() {
     this.worldCamera.aspect = window.innerWidth / window.innerHeight;

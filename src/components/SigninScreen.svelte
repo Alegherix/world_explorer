@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher<{ addUser: { username: string } }>();
-  export let username;
+  let username;
 
   const handleSubmit = () => {
     dispatch('addUser', {
@@ -23,11 +23,13 @@
 
 <style>
   main {
+    position: relative;
     width: 100vw;
     height: 100vh;
     background: black;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
 
   .container {
@@ -38,9 +40,15 @@
     align-items: center;
     justify-content: space-between;
   }
+
   h1 {
     font-size: 96px;
-    color: #0f39f5;
+    position: absolute;
+    top: 0;
+    margin-top: 20rem;
+    text-align: center;
+    z-index: 2;
+    color: #1987ee;
   }
 
   input {

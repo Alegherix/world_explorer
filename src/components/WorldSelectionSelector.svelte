@@ -1,17 +1,27 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher<{
+    setWorld: { planetName: string };
+  }>();
   import BaseScene from '../BaseScene';
 
   let canvas;
   let planetName;
 
-  const updatePlanetName = (newName: string) => {
-    planetName = newName;
+  const updatePlanetName = (name) => {
+    planetName = name;
   };
 
   onMount(() => {
     new BaseScene(canvas, updatePlanetName);
   });
+
+  const setWorld = () => {
+    console.log('Pressing the set world button');
+
+    dispatch('setWorld', { planetName });
+  };
 </script>
 
 <div>
@@ -20,7 +30,7 @@
   {#if planetName}
     <div class="selectionContainer">
       <p>{planetName}</p>
-      <button>PLAY</button>
+      <button on:click={setWorld}>PLAY</button>
     </div>
   {/if}
 </div>
@@ -49,7 +59,7 @@
     bottom: 10%;
     margin-left: auto;
     margin-right: auto;
-    width: 800px; /* Need a specific value to work */
+    width: 800px;
     z-index: 2;
   }
   p {

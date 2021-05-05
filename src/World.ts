@@ -2,7 +2,7 @@ import CANNON, { Vec3 } from 'cannon';
 import Stats from 'stats.js';
 import type { Vector3 } from 'three';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Game from './Game';
 import type { IGamePiece } from './utils/interfaces';
 import Loader from './utils/Loader';
@@ -26,7 +26,7 @@ class World {
 
   // Stricly for debugging
   private stats;
-  private orbitControl: OrbitControls;
+  // private orbitControl: OrbitControls;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -49,7 +49,7 @@ class World {
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
 
-    this.orbitControl = new OrbitControls(this.worldCamera, this.canvas);
+    // this.orbitControl = new OrbitControls(this.worldCamera, this.canvas);
     window.addEventListener('resize', () => this.onWindowResize(), false);
 
     //Creates the game Object

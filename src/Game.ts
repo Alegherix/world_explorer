@@ -44,9 +44,6 @@ class Game {
 
     this.thirdPersonCamera = new ThirdPersonCamera(this.camera);
     this.createOBlock();
-    // this.createBounceArea();
-    // this.createWinZone();
-
     window.addEventListener('keydown', this.steerDebugBox.bind(this));
   }
 
@@ -149,7 +146,7 @@ class Game {
 
       case 'a':
         this.currentGamePiece.body.applyForce(
-          new Vec3(-250, 0, 0),
+          new Vec3(-500, 0, 0),
           this.currentGamePiece.body.position
         );
         break;
@@ -179,6 +176,7 @@ class Game {
 
   runGameLoop() {
     this.thirdPersonCamera.update();
+    // console.log(this.currentGamePiece);
   }
 }
 

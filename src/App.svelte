@@ -3,24 +3,24 @@
   import SigninScreen from './components/SigninScreen.svelte';
   import WorldSelectionSelector from './components/WorldSelectionSelector.svelte';
 
-  let username;
-  let hasSelected = false;
-  let selectedWorld;
+  let username: string;
+  let selectedWorld: string;
 
   const addUser = (event) => {
-    hasSelected = true;
     username = event.detail.username;
-    console.log(username);
+  };
+
+  const setSelectedWorld = (event) => {
+    selectedWorld = event.detail.planetName;
   };
 </script>
 
 <main>
-  <WorldSelectionSelector />
-  <!-- {#if selectedWorld}
+  {#if selectedWorld}
     <GameWorld />
-  {:else if hasSelected}
-   
+  {:else if username}
+    <WorldSelectionSelector on:setWorld={setSelectedWorld} />
   {:else}
-    <SigninScreen {username} on:addUser={addUser} />
-  {/if} -->
+    <SigninScreen on:addUser={addUser} />
+  {/if}
 </main>
