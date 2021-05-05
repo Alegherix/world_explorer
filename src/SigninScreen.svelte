@@ -1,5 +1,14 @@
-<script>
-  let username;
+<script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher<{ addUser: { username: string } }>();
+  export let username;
+
+  const handleSubmit = () => {
+    dispatch('addUser', {
+      username,
+    });
+  };
 </script>
 
 <main>
@@ -7,7 +16,7 @@
     <h1>World Explorer</h1>
     <input type="text" placeholder="Nickname" bind:value={username} />
     {#if username && username.length >= 2}
-      <button>Play</button>
+      <button on:click={handleSubmit}>Play</button>
     {/if}
   </div>
 </main>
