@@ -4,8 +4,8 @@
   const dispatch = createEventDispatcher<{
     setWorld: { planetName: string };
   }>();
-  import SelectionScene from '../SelectionScene';
-  import type { GameWorld } from '../utils/interfaces';
+  import SelectionScene from '../game/scenes/SelectionScene';
+  import type { GameWorld } from '../shared/interfaces';
 
   let canvas: HTMLCanvasElement;
   let planetName: GameWorld;

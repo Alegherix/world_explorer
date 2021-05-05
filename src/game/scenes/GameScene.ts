@@ -1,11 +1,14 @@
+/**
+ * @desc Used for creating the Game Scene, which is the scene which makes sure to render the actual game play inside
+ */
+
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
 import type { Vector3 } from 'three/src/math/Vector3';
 import BaseScene from './BaseScene';
-import Game from './Game';
-import ThirdPersonCamera from './ThirdPersonCamera';
-import type { GameWorld, IGamePiece } from './utils/interfaces';
-import Material from './utils/Materials';
+import Game from '../../Game';
+import type { GameWorld, IGamePiece } from '../../shared/interfaces';
+import Material from '../utils/Materials';
 
 class GameScene extends BaseScene {
   private selectedWorld: GameWorld;

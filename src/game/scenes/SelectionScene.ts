@@ -1,7 +1,11 @@
+/**
+ * @desc Used for creating the World Selection Scene, where a player decides which planet they want to play on
+ */
+
 import BaseScene from './BaseScene';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import type { GameWorld } from './utils/interfaces';
+import type { GameWorld } from '../../shared/interfaces';
 
 class SelectionScene extends BaseScene {
   private raycaster: THREE.Raycaster;

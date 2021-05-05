@@ -2,7 +2,7 @@
   import Game from './Game.svelte';
   import SigninScreen from './SigninScreen.svelte';
   import WorldSelectionSelector from './WorldSelectionSelector.svelte';
-  import type { GameWorld } from '../utils/interfaces';
+  import type { GameWorld } from '../shared/interfaces';
 
   let username: string;
   let selectedWorld: GameWorld;

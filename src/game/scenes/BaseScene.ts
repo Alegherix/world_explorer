@@ -1,9 +1,10 @@
+/**
+ * @desc Used for creating the Base scene which the SelectionScene & GameScene extends their shared properties from.
+ */
+
 import Stats from 'stats.js';
-import type { Vector3 } from 'three';
 import * as THREE from 'three';
-import type { IGamePiece } from './utils/interfaces';
-import Loader from './utils/Loader';
-import Material from './utils/Materials';
+import Loader from '../utils/Loader';
 
 abstract class BaseScene {
   protected previousElapsedTime: number;

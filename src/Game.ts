@@ -1,13 +1,13 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
 import { SphereBufferGeometry, Vector3 } from 'three';
-import BlockGeometry from './BlockGeometry';
-import Ramp from './Ramp';
-import ThirdPersonCamera from './ThirdPersonCamera';
-import type { IGamePiece, IPosition } from './utils/interfaces';
-import type Loader from './utils/Loader';
-import type Material from './utils/Materials';
-import config from './utils/utils';
+import BlockGeometry from './game/components/BlockGeometry';
+import Ramp from './game/components/Ramp';
+import ThirdPersonCamera from './game/utils/ThirdPersonCamera';
+import type { IGamePiece, IPosition } from './shared/interfaces';
+import type Loader from './game/utils/Loader';
+import type Material from './game/utils/Materials';
+import config from './game/utils/utils';
 const { WINZONE_HEIGHT, WINZONE_WIDTH } = config;
 
 class Game {
