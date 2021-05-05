@@ -4,9 +4,9 @@ import type { Vector3 } from 'three';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Game from './Game';
-import type { IGamePiece } from './interfaces';
-import Loader from './Loader';
-import Material from './Materials';
+import type { IGamePiece } from './utils/interfaces';
+import Loader from './utils/Loader';
+import Material from './utils/Materials';
 
 class World {
   private previousElapsedTime: number;
@@ -26,8 +26,7 @@ class World {
 
   // Stricly for debugging
   private stats;
-  orbitControl: OrbitControls;
-  // private thirdPersonCamera: ThirdPersonCamera;
+  private orbitControl: OrbitControls;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -107,8 +106,6 @@ class World {
     const ambientLight = new THREE.AmbientLight(0x404040);
     this.scene.add(ambientLight);
   }
-
-  startGame() {}
 
   createSpace() {
     const cubeLoader = this.loader.getCubeTextureLoader();

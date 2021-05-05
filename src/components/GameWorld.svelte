@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import World from './World';
+  import World from '../World';
 
   let canvas;
   onMount(() => {

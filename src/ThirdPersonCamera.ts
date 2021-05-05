@@ -1,4 +1,4 @@
-import type { IGamePiece } from './interfaces';
+import type { IGamePiece } from './utils/interfaces';
 import { Vector, Vector3 } from 'three';
 
 class ThirdPersonCamera {

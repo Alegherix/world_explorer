@@ -31,7 +31,7 @@
   }
 
   .container {
-    margin-top: 10%;
+    margin-top: 5rem;
     height: 200px;
     display: flex;
     flex-direction: column;

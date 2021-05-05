@@ -1,7 +1,7 @@
 <script lang="ts">
-  import GameWorld from './GameWorld.svelte';
-  import SigninScreen from './SigninScreen.svelte';
-  import WorldSelectionSelector from './WorldSelectionSelector.svelte';
+  import GameWorld from './components/GameWorld.svelte';
+  import SigninScreen from './components/SigninScreen.svelte';
+  import WorldSelectionSelector from './components/WorldSelectionSelector.svelte';
 
   let username;
   let hasSelected = false;
@@ -15,11 +15,12 @@
 </script>
 
 <main>
-  {#if hasSelected}
+  <WorldSelectionSelector />
+  <!-- {#if selectedWorld}
     <GameWorld />
-    <!-- {:else if hasSelected}
-    <WorldSelectionSelector /> -->
+  {:else if hasSelected}
+   
   {:else}
     <SigninScreen {username} on:addUser={addUser} />
-  {/if}
+  {/if} -->
 </main>

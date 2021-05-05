@@ -1,23 +1,14 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { Vector3, SphereBufferGeometry } from 'three';
+import { SphereBufferGeometry, Vector3 } from 'three';
 import BlockGeometry from './BlockGeometry';
-import type { IGamePiece, IPosition } from './interfaces';
-import type Loader from './Loader';
-import type Material from './Materials';
 import Ramp from './Ramp';
 import ThirdPersonCamera from './ThirdPersonCamera';
-import config from './utils';
-const {
-  WINZONE_DEPTH,
-  WINZONE_HEIGHT,
-  WINZONE_WIDTH,
-  BLOCK_DEPTH,
-  WIN_PERCENTAGE_LIMIT,
-} = config;
-
-// Återanvänd samma Mesh & Material, i så hög utsträckning man kan, dvs om vi ska ta fram en ny fallande shape
-// Använd en instans variabel av Mesh & Material,
+import type { IGamePiece, IPosition } from './utils/interfaces';
+import type Loader from './utils/Loader';
+import type Material from './utils/Materials';
+import config from './utils/utils';
+const { WINZONE_HEIGHT, WINZONE_WIDTH } = config;
 
 class Game {
   private blockGeometry: BlockGeometry;
