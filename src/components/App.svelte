@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Game from './components/Game.svelte';
-  import SigninScreen from './components/SigninScreen.svelte';
-  import WorldSelectionSelector from './components/WorldSelectionSelector.svelte';
-  import type { GameWorld } from './utils/interfaces';
+  import Game from './Game.svelte';
+  import SigninScreen from './SigninScreen.svelte';
+  import WorldSelectionSelector from './WorldSelectionSelector.svelte';
+  import type { GameWorld } from '../utils/interfaces';
 
   let username: string;
   let selectedWorld: GameWorld;
