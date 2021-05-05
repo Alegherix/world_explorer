@@ -1,23 +1,14 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { Vector3, SphereBufferGeometry } from 'three';
-import BlockGeometry from './BlockGeometry';
-import type { IGamePiece, IPosition } from './interfaces';
-import type Loader from './Loader';
-import type Material from './Materials';
-import Ramp from './Ramp';
-import ThirdPersonCamera from './ThirdPersonCamera';
-import config from './utils';
-const {
-  WINZONE_DEPTH,
-  WINZONE_HEIGHT,
-  WINZONE_WIDTH,
-  BLOCK_DEPTH,
-  WIN_PERCENTAGE_LIMIT,
-} = config;
-
-// Återanvänd samma Mesh & Material, i så hög utsträckning man kan, dvs om vi ska ta fram en ny fallande shape
-// Använd en instans variabel av Mesh & Material,
+import { SphereBufferGeometry, Vector3 } from 'three';
+import BlockGeometry from './game/components/BlockGeometry';
+import Ramp from './game/components/Ramp';
+import ThirdPersonCamera from './game/utils/ThirdPersonCamera';
+import type { IGamePiece, IPosition } from './shared/interfaces';
+import type Loader from './game/utils/Loader';
+import type Material from './game/utils/Materials';
+import config from './game/utils/utils';
+const { WINZONE_HEIGHT, WINZONE_WIDTH } = config;
 
 class Game {
   private blockGeometry: BlockGeometry;
@@ -53,9 +44,6 @@ class Game {
 
     this.thirdPersonCamera = new ThirdPersonCamera(this.camera);
     this.createOBlock();
-    // this.createBounceArea();
-    // this.createWinZone();
-
     window.addEventListener('keydown', this.steerDebugBox.bind(this));
   }
 
@@ -158,7 +146,7 @@ class Game {
 
       case 'a':
         this.currentGamePiece.body.applyForce(
-          new Vec3(-250, 0, 0),
+          new Vec3(-500, 0, 0),
           this.currentGamePiece.body.position
         );
         break;
@@ -188,6 +176,7 @@ class Game {
 
   runGameLoop() {
     this.thirdPersonCamera.update();
+    // console.log(this.currentGamePiece);
   }
 }
 

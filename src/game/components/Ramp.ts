@@ -1,6 +1,6 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import type Material from './Materials';
+import type Material from '../utils/Materials';
 
 class Ramp {
   constructor(

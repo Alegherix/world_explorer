@@ -1,59 +1,31 @@
+/**
+ * @desc Used for creating the Game Scene, which is the scene which makes sure to render the actual game play inside
+ */
+
 import CANNON, { Vec3 } from 'cannon';
-import Stats from 'stats.js';
-import type { Vector3 } from 'three';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Game from './Game';
-import type { IGamePiece } from './interfaces';
-import Loader from './Loader';
-import Material from './Materials';
+import type { Vector3 } from 'three/src/math/Vector3';
+import BaseScene from './BaseScene';
+import Game from '../../Game';
+import type { GameWorld, IGamePiece } from '../../shared/interfaces';
+import Material from '../utils/Materials';
 
-class World {
-  private previousElapsedTime: number;
+class GameScene extends BaseScene {
+  private selectedWorld: GameWorld;
   private gamePieces: IGamePiece[];
-  private canvas: HTMLCanvasElement;
-
-  private material: Material;
-  private loader: Loader;
-  private game: Game;
-
-  private worldCamera: THREE.PerspectiveCamera;
-  private scene: THREE.Scene;
-  private clock: THREE.Clock;
-  private renderer: THREE.WebGLRenderer;
 
   private world: CANNON.World;
+  private game: Game;
+  private material: Material;
 
-  // Stricly for debugging
-  private stats;
-  orbitControl: OrbitControls;
-  // private thirdPersonCamera: ThirdPersonCamera;
-
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.clock = new THREE.Clock();
-    this.previousElapsedTime = 0;
+  constructor(canvas: HTMLCanvasElement, selectedWorld: GameWorld) {
+    super(canvas);
+    this.selectedWorld = selectedWorld;
     this.material = new Material();
-    this.loader = new Loader();
     this.gamePieces = [];
-    this.scene = new THREE.Scene();
-    this.scene.receiveShadow = true;
-
-    // Initialize the
-    this.initRenderer();
-    this.initCamera();
-    this.initLights();
-    this.createSpace();
+    this.createPhysicsWorld();
     this.createPlanet();
 
-    this.stats = new Stats();
-    this.stats.showPanel(0);
-    document.body.appendChild(this.stats.dom);
-
-    this.orbitControl = new OrbitControls(this.worldCamera, this.canvas);
-    window.addEventListener('resize', () => this.onWindowResize(), false);
-
-    //Creates the game Object
     this.game = new Game(
       this.scene,
       this.world,
@@ -64,64 +36,23 @@ class World {
       this.previousElapsedTime
     );
 
-    // Starts the actual World Loop -> Kept here and not in the game logic due to possible implementation of multiplayer later.
     this.tick();
   }
 
-  // Enable the Three Renderer with soft shadows and size
-  initRenderer() {
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  createGameWorld() {
+    switch (this.selectedWorld) {
+      case 'Morghol':
+        break;
+
+      case 'Velknaz':
+        break;
+
+      case 'Zetxaru':
+        break;
+    }
   }
 
-  // Create camera and set position
-  initCamera() {
-    this.worldCamera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      1.0,
-      1000
-    );
-    this.worldCamera.position.set(2, 200, 200);
-  }
-
-  initLights() {
-    const light = new THREE.DirectionalLight('white');
-    light.position.set(100, 100, 100);
-    light.target.position.set(0, 0, 0);
-    light.castShadow = true;
-    light.shadow.bias = -0.01;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.mapSize.height = 2048;
-    light.shadow.camera.near = 1.0;
-    light.shadow.camera.far = 500;
-    light.shadow.camera.left = 200;
-    light.shadow.camera.right = -200;
-    light.shadow.camera.top = 200;
-    light.shadow.camera.bottom = -200;
-    this.scene.add(light);
-
-    const ambientLight = new THREE.AmbientLight(0x404040);
-    this.scene.add(ambientLight);
-  }
-
-  startGame() {}
-
-  createSpace() {
-    const cubeLoader = this.loader.getCubeTextureLoader();
-    const texture = cubeLoader.load([
-      'textures/space/px.jpg',
-      'textures/space/nx.jpg',
-      'textures/space/py.jpg',
-      'textures/space/ny.jpg',
-      'textures/space/pz.jpg',
-      'textures/space/nz.jpg',
-    ]);
-    this.scene.background = texture;
-
+  createPhysicsWorld() {
     // Create physics world of space
     this.world = new CANNON.World();
     // Updates to not check colission of objects far apart from eachother
@@ -173,13 +104,7 @@ class World {
     this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
   }
 
-  onWindowResize() {
-    this.worldCamera.aspect = window.innerWidth / window.innerHeight;
-    this.worldCamera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-  }
-
-  tick() {
+  tick(): void {
     requestAnimationFrame(() => {
       this.stats.begin();
 
@@ -213,4 +138,4 @@ class World {
   }
 }
 
-export default World;
+export default GameScene;

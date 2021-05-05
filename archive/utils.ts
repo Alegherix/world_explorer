@@ -1,15 +1,3 @@
-const config = {
-  WINZONE_WIDTH: 50,
-  WINZONE_HEIGHT: 10,
-  WINZONE_DEPTH: 10,
-  BLOCK_DEPTH: 10,
-  WIN_PERCENTAGE_LIMIT: 80,
-  PLANET_WIDTH: 200,
-  PLANET_DEPTH: 200,
-};
-
-export default config;
-
 // TLDR -> Old functions, probably no need for them, but lets keep em safe here
 //  so I don't have to rewrite it, or pollute the other code
 // // Creates invisible physical boundries
