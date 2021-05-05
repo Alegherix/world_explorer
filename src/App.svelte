@@ -1,14 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import SigninScreen from './SigninScreen.svelte';
   import World from './World';
 
-  let canvas;
-  onMount(() => {
-    new World(canvas);
-  });
+  // let canvas;
+  // onMount(() => {
+  //   new World(canvas);
+  // });
 </script>
 
-<canvas class="webgl" bind:this={canvas} />
+<main>
+  <SigninScreen />
+  <!-- <canvas class="webgl" bind:this={canvas} /> -->
+</main>
 
 <style>
   canvas {
