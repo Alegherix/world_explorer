@@ -4,17 +4,18 @@
   const dispatch = createEventDispatcher<{
     setWorld: { planetName: string };
   }>();
-  import BaseScene from '../BaseScene';
+  import SelectionScene from '../SelectionScene';
+  import type { GameWorld } from '../utils/interfaces';
 
-  let canvas;
-  let planetName;
+  let canvas: HTMLCanvasElement;
+  let planetName: GameWorld;
 
   const updatePlanetName = (name) => {
     planetName = name;
   };
 
   onMount(() => {
-    new BaseScene(canvas, updatePlanetName);
+    new SelectionScene(canvas, updatePlanetName);
   });
 
   const setWorld = () => {

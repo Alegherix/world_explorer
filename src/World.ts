@@ -28,7 +28,7 @@ class World {
   private stats;
   // private orbitControl: OrbitControls;
 
-  constructor(canvas) {
+  constructor(canvas: HTMLCanvasElement, selectedWorld: string) {
     this.canvas = canvas;
     this.clock = new THREE.Clock();
     this.previousElapsedTime = 0;
@@ -38,7 +38,7 @@ class World {
     this.scene = new THREE.Scene();
     this.scene.receiveShadow = true;
 
-    // Initialize the
+    // Initialize the Scene
     this.initRenderer();
     this.initCamera();
     this.initLights();

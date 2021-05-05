@@ -1,10 +1,11 @@
 <script lang="ts">
-  import GameWorld from './components/GameWorld.svelte';
+  import Game from './components/Game.svelte';
   import SigninScreen from './components/SigninScreen.svelte';
   import WorldSelectionSelector from './components/WorldSelectionSelector.svelte';
+  import type { GameWorld } from './utils/interfaces';
 
   let username: string;
-  let selectedWorld: string;
+  let selectedWorld: GameWorld;
 
   const addUser = (event) => {
     username = event.detail.username;
@@ -17,7 +18,7 @@
 
 <main>
   {#if selectedWorld}
-    <GameWorld />
+    <Game {selectedWorld} />
   {:else if username}
     <WorldSelectionSelector on:setWorld={setSelectedWorld} />
   {:else}

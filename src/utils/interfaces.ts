@@ -10,3 +10,5 @@ export interface IPosition {
   y: number;
   z: number;
 }
+
+export type GameWorld = 'Morghol' | 'Velknaz' | 'Zetxaru';
