@@ -5,6 +5,7 @@ import BlockGeometry from './BlockGeometry';
 import type { IGamePiece, IPosition } from './interfaces';
 import type Loader from './Loader';
 import type Material from './Materials';
+import Ramp from './Ramp';
 import ThirdPersonCamera from './ThirdPersonCamera';
 import config from './utils';
 const {
@@ -53,7 +54,7 @@ class Game {
     this.thirdPersonCamera = new ThirdPersonCamera(this.camera);
     this.createOBlock();
     // this.createBounceArea();
-    this.createWinZone();
+    // this.createWinZone();
 
     window.addEventListener('keydown', this.steerDebugBox.bind(this));
   }
@@ -61,7 +62,6 @@ class Game {
   createOBlock() {
     const mesh = new THREE.Mesh(
       new SphereBufferGeometry(5, 64, 64),
-      // new MeshStandardMaterial({ color: 'yellow' })
       this.gamePieceMaterial
     );
     mesh.castShadow = true;
@@ -82,6 +82,7 @@ class Game {
     this.world.addBody(body);
     this.activeGamePieces.push({ mesh, body });
     this.currentGamePiece = { mesh, body };
+    const ramp = new Ramp(this.world, this.scene, this.material);
 
     this.thirdPersonCamera.setTracking({ mesh, body });
 
@@ -174,6 +175,7 @@ class Game {
           new Vec3(250, 0, 0),
           this.currentGamePiece.body.position
         );
+        break;
 
       case ' ':
         this.currentGamePiece.body.applyForce(
@@ -186,12 +188,6 @@ class Game {
 
   runGameLoop() {
     this.thirdPersonCamera.update();
-    // if (
-    //   this.currentGamePiece.mesh.name === 'idle' ||
-    //   this.currentGamePiece.body.position.y < -1
-    // )
-    //   // update score and whatever
-    //   this.createOBlock();
   }
 }
 

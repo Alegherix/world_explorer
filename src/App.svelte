@@ -1,18 +1,25 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import World from './World';
+  import GameWorld from './GameWorld.svelte';
+  import SigninScreen from './SigninScreen.svelte';
+  import WorldSelectionSelector from './WorldSelectionSelector.svelte';
 
-  let canvas;
-  onMount(() => {
-    new World(canvas);
-  });
+  let username;
+  let hasSelected = false;
+  let selectedWorld;
+
+  const addUser = (event) => {
+    hasSelected = true;
+    username = event.detail.username;
+    console.log(username);
+  };
 </script>
 
-<canvas class="webgl" bind:this={canvas} />
-
-<style>
-  canvas {
-    width: 100vw;
-    height: 100vh;
-  }
-</style>
+<main>
+  {#if hasSelected}
+    <GameWorld />
+    <!-- {:else if hasSelected}
+    <WorldSelectionSelector /> -->
+  {:else}
+    <SigninScreen {username} on:addUser={addUser} />
+  {/if}
+</main>

@@ -1,8 +1,17 @@
+@font-face {
+  font-family: 'alphacentauri-medium';
+  font-style: normal;
+  font-display: swap;
+  src: url('fonts/Alphacentauri.woff2') format('woff');
+}
+
 html,
 body {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  font-family: 'alphacentauri-medium';
 }
 
 body {
