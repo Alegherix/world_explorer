@@ -3,8 +3,6 @@
  * Alien Civilization
  */
 
-import Game from '../Game';
-
-class MultiPlayerWorld extends Game {}
+class MultiPlayerWorld {}
 
 export default MultiPlayerWorld;

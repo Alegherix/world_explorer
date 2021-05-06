@@ -2,12 +2,13 @@
  * @desc Used for creating the World Selection Scene, where a player decides which planet they want to play on
  */
 
+import type { ISkybox } from './../../shared/interfaces';
 import BaseScene from './BaseScene';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { GameWorld } from '../../shared/interfaces';
 
-class SelectionScene extends BaseScene {
+class SelectionScene extends BaseScene implements ISkybox {
   private raycaster: THREE.Raycaster;
   private cursor: THREE.Vector2;
   private intersects: THREE.Intersection[] = [];
@@ -20,6 +21,7 @@ class SelectionScene extends BaseScene {
     super(canvas);
     this.updatePlanetName = updatePlanetName;
     this.cursor = new THREE.Vector2(-1, -1);
+    this.createSkybox('space', '.jpg');
     this.raycaster = new THREE.Raycaster();
     this.createLavaPlanet(-170);
     this.createRockPlanet(0);
@@ -37,6 +39,19 @@ class SelectionScene extends BaseScene {
     window.addEventListener('click', this.updateClicked.bind(this));
 
     this.tick();
+  }
+
+  createSkybox(path: string, extension: string) {
+    const cubeLoader = this.loader.getCubeTextureLoader();
+    const texture = cubeLoader.load([
+      `textures/skybox/${path}/px${extension}`,
+      `textures/skybox/${path}/nx${extension}`,
+      `textures/skybox/${path}/py${extension}`,
+      `textures/skybox/${path}/ny${extension}`,
+      `textures/skybox/${path}/pz${extension}`,
+      `textures/skybox/${path}/nz${extension}`,
+    ]);
+    this.scene.background = texture;
   }
 
   createRockPlanet(x: number) {
