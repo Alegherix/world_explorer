@@ -1,7 +1,6 @@
 /**
  * @desc Used for creating the Game world of Morghol, an abandoned mineral planet
  */
-
 import type Material from '../utils/Materials';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
@@ -16,16 +15,7 @@ class MineralWorld extends Game {
     material: Material,
     camera: THREE.PerspectiveCamera
   ) {
-    super(
-      scene,
-      world,
-      loader,
-      material,
-      camera,
-      'mineral.jpg',
-      'space',
-      '.jpg'
-    );
+    super(scene, world, loader, material, camera, 'mineral.jpg', 'space', '.jpg');
 
     this.createStartingZone();
     this.addPhysicalStartingZone();
