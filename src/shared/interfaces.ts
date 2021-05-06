@@ -12,3 +12,7 @@ export interface IPosition {
 }
 
 export type GameWorld = 'Morghol' | 'Velknaz' | 'Zetxaru';
+
+export interface ISkybox {
+  createSkybox(path: string, extension: string);
+}

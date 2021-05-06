@@ -30,14 +30,11 @@ abstract class BaseScene {
     this.initRenderer();
     this.initCamera();
     this.initLights();
-    this.createSpace();
 
     this.stats = new Stats();
     this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
     window.addEventListener('resize', () => this.onWindowResize(), false);
-
-    // this.tick();
   }
 
   // Enable the Three Renderer with soft shadows and size
@@ -78,20 +75,6 @@ abstract class BaseScene {
 
     const ambientLight = new THREE.AmbientLight(0x404040);
     this.scene.add(ambientLight);
-  }
-
-  // TODO - Might wanna make this generic aswell
-  createSpace() {
-    const cubeLoader = this.loader.getCubeTextureLoader();
-    const texture = cubeLoader.load([
-      'textures/space/px.jpg',
-      'textures/space/nx.jpg',
-      'textures/space/py.jpg',
-      'textures/space/ny.jpg',
-      'textures/space/pz.jpg',
-      'textures/space/nz.jpg',
-    ]);
-    this.scene.background = texture;
   }
 
   onWindowResize() {
