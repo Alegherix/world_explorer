@@ -2,7 +2,6 @@ export interface IGamePiece {
   mesh: THREE.Mesh;
   body: CANNON.Body;
 }
-
 export type VecIntersection = THREE.Vector3 | CANNON.Vec3;
 
 export interface IPosition {

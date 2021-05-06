@@ -21,7 +21,7 @@ class GameScene extends BaseScene {
     this.createPhysicsWorld();
 
     // this.createGameWorld();
-    this.game = new MineralWorld(
+    this.game = new LavaWorld(
       this.scene,
       this.world,
       this.loader,

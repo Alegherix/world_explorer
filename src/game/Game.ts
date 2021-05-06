@@ -1,3 +1,4 @@
+import { IGamePiece } from './../shared/interfaces';
 import { Vec3 } from 'cannon';
 import type { IGamePiece, ISkybox } from '../shared/interfaces';
 import type Loader from './utils/Loader';
@@ -56,7 +57,7 @@ abstract class CommonGame implements ISkybox {
   }
 
   createPlayer() {
-    const startPosition = { x: 0, y: 150, z: 0 };
+    const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -80,6 +81,11 @@ abstract class CommonGame implements ISkybox {
     this.currentGamePiece = { mesh, body };
     this.gameCamera.setTracking(this.currentGamePiece);
     this.activeGamePieces.push(this.currentGamePiece);
+  }
+
+  addToWorld(gamePiece: IGamePiece) {
+    this.scene.add(gamePiece.mesh);
+    this.world.addBody(gamePiece.body);
   }
 
   // Steer the currently controlled GamePiece
