@@ -17,11 +17,12 @@
 </script>
 
 <main>
-  {#if selectedWorld}
+  <Game selectedWorld="Velknaz" />
+  <!-- {#if selectedWorld}
     <Game {selectedWorld} />
   {:else if username}
     <WorldSelectionSelector on:setWorld={setSelectedWorld} />
   {:else}
     <SigninScreen on:addUser={addUser} />
-  {/if}
+  {/if} -->
 </main>

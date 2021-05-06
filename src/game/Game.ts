@@ -1,13 +1,13 @@
 import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
 import { SphereBufferGeometry, Vector3 } from 'three';
-import BlockGeometry from './game/components/BlockGeometry';
-import Ramp from './game/components/Ramp';
-import ThirdPersonCamera from './game/utils/ThirdPersonCamera';
-import type { IGamePiece, IPosition } from './shared/interfaces';
-import type Loader from './game/utils/Loader';
-import type Material from './game/utils/Materials';
-import config from './game/utils/utils';
+import BlockGeometry from './components/BlockGeometry';
+import Ramp from './components/Ramp';
+import ThirdPersonCamera from './utils/ThirdPersonCamera';
+import type { IGamePiece, IPosition } from '../shared/interfaces';
+import type Loader from './utils/Loader';
+import type Material from './utils/Materials';
+import config from './utils/utils';
 const { WINZONE_HEIGHT, WINZONE_WIDTH } = config;
 
 class Game {
@@ -37,14 +37,14 @@ class Game {
     this.startPosition = { x: 0, y: 150, z: 0 };
     this.gamePieceTexture = this.loader
       .getTextureLoader()
-      .load('textures/test/wobbly.jpg');
+      .load('textures/lava.jpg');
     this.gamePieceMaterial = new THREE.MeshStandardMaterial({
       map: this.gamePieceTexture,
     });
 
     this.thirdPersonCamera = new ThirdPersonCamera(this.camera);
     this.createOBlock();
-    window.addEventListener('keydown', this.steerDebugBox.bind(this));
+    window.addEventListener('keydown', this.steer.bind(this));
   }
 
   createOBlock() {
@@ -129,9 +129,7 @@ class Game {
     this.timeDelta = delta;
   }
 
-  steerDebugBox(event) {
-    // console.log(this.currentGamePiece);
-    // console.log(this.currentGamePiece.body.sleepState === 2){}
+  steer(event: KeyboardEvent) {
     if (this.currentGamePiece.body.sleepState === 2)
       this.currentGamePiece.body.wakeUp();
 
@@ -176,8 +174,24 @@ class Game {
 
   runGameLoop() {
     this.thirdPersonCamera.update();
-    // console.log(this.currentGamePiece);
   }
 }
 
 export default Game;
+
+// Gemensamt
+// Third person Camera som följer det nuvarnade objektet man styr
+// En controller för att styra objektet man spelar med -> Behöver förbättras med kraftigare deacceleration
+// En WinZone
+// Components att bygga mapsen med
+
+// Unikt för varje Map
+// Winzone
+// Starting Area
+// Skybox
+// Textures
+// Banstruktur
+//
+
+// Inte gemensammt
+// GamePieces som måste uppdateras, Despawwna gamepieces om man förlorar

@@ -84,12 +84,12 @@ abstract class BaseScene {
   createSpace() {
     const cubeLoader = this.loader.getCubeTextureLoader();
     const texture = cubeLoader.load([
-      'textures/space/px.jpg',
-      'textures/space/nx.jpg',
-      'textures/space/py.jpg',
-      'textures/space/ny.jpg',
-      'textures/space/pz.jpg',
-      'textures/space/nz.jpg',
+      'skybox/space/px.jpg',
+      'skybox/space/nx.jpg',
+      'skybox/space/py.jpg',
+      'skybox/space/ny.jpg',
+      'skybox/space/pz.jpg',
+      'skybox/space/nz.jpg',
     ]);
     this.scene.background = texture;
   }

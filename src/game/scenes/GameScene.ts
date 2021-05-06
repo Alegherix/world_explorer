@@ -1,3 +1,4 @@
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 /**
  * @desc Used for creating the Game Scene, which is the scene which makes sure to render the actual game play inside
  */
@@ -6,7 +7,7 @@ import CANNON, { Vec3 } from 'cannon';
 import * as THREE from 'three';
 import type { Vector3 } from 'three/src/math/Vector3';
 import BaseScene from './BaseScene';
-import Game from '../../Game';
+import Game from '../Game';
 import type { GameWorld, IGamePiece } from '../../shared/interfaces';
 import Material from '../utils/Materials';
 
@@ -50,6 +51,19 @@ class GameScene extends BaseScene {
       case 'Zetxaru':
         break;
     }
+  }
+
+  createSpace() {
+    const cubeLoader = this.loader.getCubeTextureLoader();
+    const texture = cubeLoader.load([
+      'skybox/lava/px.png',
+      'skybox/lava/nx.png',
+      'skybox/lava/py.png',
+      'skybox/lava/ny.png', // Jobbig
+      'skybox/lava/pz.png',
+      'skybox/lava/nz.png',
+    ]);
+    this.scene.background = texture;
   }
 
   createPhysicsWorld() {
