@@ -1,3 +1,4 @@
+import type { IDimension, IPosition } from './../../shared/interfaces';
 import { Material, Vec3 } from 'cannon-es';
 import * as CANNON from 'cannon-es';
 
@@ -32,6 +33,18 @@ export function createBoundry(
   body.quaternion.setFromAxisAngle(new CANNON.Vec3(x1, y1, z1), rotation);
   body.position = new Vec3(x2, y2, z2);
   return body;
+}
+
+export function getDimensions(
+  width: number,
+  height: number,
+  depth: number
+): IDimension {
+  return { width, height, depth };
+}
+
+export function getPosition(x: number, y: number, z: number): IPosition {
+  return { x, y, z };
 }
 
 export default config;

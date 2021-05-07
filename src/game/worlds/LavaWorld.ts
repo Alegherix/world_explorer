@@ -1,9 +1,8 @@
+import type { IDimension } from './../../shared/interfaces';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
 
-// import CANNON from 'cannon';
-// import * as THREE from 'three';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import Game from '../Game';
@@ -11,6 +10,7 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import type * as CANNON from 'cannon-es';
 import cannonDebugger from 'cannon-es-debugger';
+import { getDimensions, getPosition } from '../utils/utils';
 
 class LavaWorld extends Game {
   constructor(
@@ -31,7 +31,7 @@ class LavaWorld extends Game {
       '.png'
       // true
     );
-    // cannonDebugger(this.scene, this.world.bodies);
+    cannonDebugger(this.scene, this.world.bodies);
     this.createStartingZone();
     this.createPlayer();
     this.createGameMap();
@@ -64,10 +64,12 @@ class LavaWorld extends Game {
     const roughnessMap = this.loader
       .getTextureLoader()
       .load('/textures/lavaPlanet/Lava004_1K_Roughness.jpg');
+
+    const basePlane: IDimension = { width: 200, height: 200, depth: 0.1 };
     const { mesh, body } = PlaneFactory.createPlane(
-      200,
-      200,
-      0.1,
+      basePlane,
+      this.material.getRockMaterial(),
+      { x: 0, y: 0, z: 0 },
       {
         map,
         roughnessMap,
@@ -76,34 +78,42 @@ class LavaWorld extends Game {
         displacementScale: 1.1,
         emissiveMap,
         emissiveIntensity: 2,
-      },
-      this.material.getRockMaterial()
+      }
     );
     this.scene.add(mesh);
     this.world.addBody(body);
   }
 
   createStairs() {
-    const stairway = PlaneFactory.createPlane(
-      40,
-      320,
-      1,
-      { color: 'rgb(0,12,64)', transparent: true, opacity: 0.4 },
+    const hallway = PlaneFactory.createPlane(
+      getDimensions(40, 320, 1),
       this.material.getGlassMaterial(),
-      { x: 0, y: 98, z: -505 }
+      getPosition(0, 98, -505)
     );
-    this.addToWorld(stairway);
+    this.addToWorld(hallway);
 
     const stairs = PlaneFactory.createPlane(
-      40,
-      160,
-      1,
-      { color: 'rgb(0,12,64)', transparent: true, opacity: 0.4 },
+      getDimensions(40, 160, 1),
       this.material.getGlassMaterial(),
-      { x: -89, y: 138, z: -645 }
+      getPosition(-89, 138, -646)
     );
-    PlaneFactory.slopePlane(stairs);
+    PlaneFactory.slopePlaneUpLeft(stairs);
     this.addToWorld(stairs);
+
+    const firstRestPlane = PlaneFactory.createPlane(
+      getDimensions(40, 40, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-179, 178, -646)
+    );
+    this.addToWorld(firstRestPlane);
+
+    const secondStairs = PlaneFactory.createPlane(
+      getDimensions(40, 160, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-179, 217, -560)
+    );
+    PlaneFactory.slopePlaneUpBack(secondStairs);
+    this.addToWorld(secondStairs);
   }
 }
 

@@ -12,6 +12,12 @@ export interface IPosition {
   z: number;
 }
 
+export interface IDimension {
+  width: number;
+  height: number;
+  depth: number;
+}
+
 export type GameWorld = 'Morghol' | 'Velknaz' | 'Zetxaru';
 
 export interface ISkybox {

@@ -21,7 +21,7 @@ class ThirdPersonCamera {
   }
 
   update() {
-    const offset = this.getCameraAngel(10, 100, 200);
+    const offset = this.getCameraAngel(0, 100, 200);
     const lookingAt = this.getCameraAngel(0, 10, 50);
 
     const lerpTime = 0.05;
