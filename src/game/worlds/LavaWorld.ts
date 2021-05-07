@@ -1,18 +1,22 @@
-import type { IDimension } from './../../shared/interfaces';
+import type * as CANNON from 'cannon-es';
+import cannonDebugger from 'cannon-es-debugger';
+import { Box3, Vector3 } from 'three';
+import CoinFactory from '../components/CoinFactory';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
-
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
-import type * as CANNON from 'cannon-es';
-import cannonDebugger from 'cannon-es-debugger';
 import { getDimensions, getPosition } from '../utils/utils';
+import type { IDimension } from './../../shared/interfaces';
 
 class LavaWorld extends Game {
+  coinFactory: CoinFactory;
+  coins: THREE.Mesh[] = [];
+
   constructor(
     scene: THREE.Scene,
     world: CANNON.World,
@@ -35,6 +39,8 @@ class LavaWorld extends Game {
     this.createStartingZone();
     this.createPlayer();
     this.createGameMap();
+    this.coinFactory = new CoinFactory(this.scene);
+    this.createGameCoins();
   }
 
   createGameMap() {
@@ -153,6 +159,39 @@ class LavaWorld extends Game {
       getPosition(550, 337, -470)
     );
     this.addToWorld(secondBridge);
+  }
+
+  createGameCoins() {
+    for (let index = 1; index <= 10; index++) {
+      this.coinFactory.createCoin(10, 10, 10 + index * 5);
+      // this.coins.push(coin);
+      // this.scene.add(coin);
+    }
+  }
+
+  // Run all game related Logic inside here
+  runGameLoop(timeDelta: number) {
+    this.gameCamera.update();
+    this.coinFactory.checkIfIntersects(this.currentGamePiece.mesh);
+    // const coinBox = new Box3();
+
+    // const characterBox = new Box3().setFromObject(this.currentGamePiece.mesh);
+    // for (const coin of this.coins) {
+    //   coinBox.setFromObject(coin);
+    //   if (characterBox.intersectsBox(coinBox)) {
+    //     this.scene.remove(coin);
+    //   }
+    // }
+
+    for (const gamePiece of this.activeGamePieces) {
+      gamePiece.mesh.position.copy(
+        (gamePiece.body.position as unknown) as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+      );
+    }
+    this.world.step(1 / 100, timeDelta);
   }
 }
 

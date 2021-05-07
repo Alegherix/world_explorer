@@ -70,6 +70,7 @@ abstract class Game implements ISkybox {
     );
     mesh.castShadow = true;
     mesh.position.copy(startPosition as Vector3);
+    mesh.geometry.computeBoundingSphere();
 
     // Create the physics object to match the mesh object
     const boxShape = new CANNON.Sphere(5);

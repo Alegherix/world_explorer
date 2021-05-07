@@ -14,7 +14,11 @@ class GameScene extends BaseScene {
   private world: CANNON.World;
   private game: Game;
   private material: Material;
-  constructor(canvas: HTMLCanvasElement, selectedWorld: GameWorld) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    selectedWorld: GameWorld,
+    points: number
+  ) {
     super(canvas);
     this.selectedWorld = selectedWorld;
     this.material = new Material();
