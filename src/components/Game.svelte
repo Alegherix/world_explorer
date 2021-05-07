@@ -12,7 +12,7 @@
 
   export let selectedWorld: GameWorld;
   onMount(() => {
-    new GameScene(canvas, selectedWorld, incrementPoints);
+    new GameScene(canvas, selectedWorld);
   });
 </script>
 
@@ -26,7 +26,6 @@
 
 <style>
   .scoreCounter {
-    /* background-color: black; */
     width: 200px;
     height: 100px;
     position: absolute;

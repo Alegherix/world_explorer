@@ -14,18 +14,11 @@ class GameScene extends BaseScene {
   private world: CANNON.World;
   private game: Game;
   private material: Material;
-  points: number;
-  incrementPoints: () => void;
-  constructor(
-    canvas: HTMLCanvasElement,
-    selectedWorld: GameWorld,
-    incrementPoints: () => void
-  ) {
+  constructor(canvas: HTMLCanvasElement, selectedWorld: GameWorld) {
     super(canvas);
     this.selectedWorld = selectedWorld;
     this.material = new Material();
     this.createPhysicsWorld();
-    this.incrementPoints = incrementPoints;
 
     // this.createGameWorld();
     this.game = new LavaWorld(
@@ -33,8 +26,7 @@ class GameScene extends BaseScene {
       this.world,
       this.loader,
       this.material,
-      this.worldCamera,
-      this.incrementPoints
+      this.worldCamera
     );
 
     this.tick();

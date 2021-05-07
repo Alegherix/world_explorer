@@ -1,7 +1,7 @@
 import { Box3, CylinderBufferGeometry, Mesh, MeshPhongMaterial } from 'three';
 import PointStore from '../../shared/PointStore';
 
-class CoinFactory {
+class ScoreKeeper {
   private geometry: CylinderBufferGeometry;
   private material: MeshPhongMaterial;
   private coins: Mesh[] = [];
@@ -25,23 +25,28 @@ class CoinFactory {
     mesh.name = 'coin';
     this.coins.push(mesh);
     this.scene.add(mesh);
+    console.log('Created coin at:', mesh.position);
   }
 
-  checkIfIntersects(player: Mesh) {
+  // If coin in within 3Vector units, compute if they actually intersect
+  // and if they do update score && remove from scene & array.
+  haveScored(player: Mesh) {
     this.playerBox.setFromObject(player);
     for (let index = 0; index < this.coins.length; index++) {
       let coin = this.coins[index];
-      this.coinBox.setFromObject(coin);
-      if (this.playerBox.intersectsBox(this.coinBox)) {
-        this.scene.remove(coin);
-        this.coins.splice(index, 1);
-        PointStore.update((value) => {
-          let score = (value.score += 1);
-          return { score };
-        });
+      if (coin.position.distanceTo(player.position) <= 3) {
+        this.coinBox.setFromObject(coin);
+        if (this.playerBox.intersectsBox(this.coinBox)) {
+          this.scene.remove(coin);
+          this.coins.splice(index, 1);
+          PointStore.update((value) => {
+            let score = (value.score += 1);
+            return { score };
+          });
+        }
       }
     }
   }
 }
 
-export default CoinFactory;
+export default ScoreKeeper;

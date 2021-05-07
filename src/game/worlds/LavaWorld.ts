@@ -1,12 +1,12 @@
 import type * as CANNON from 'cannon-es';
 import cannonDebugger from 'cannon-es-debugger';
-import { Box3, Vector3 } from 'three';
-import CoinFactory from '../components/CoinFactory';
+import type { Vector3 } from 'three';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
+import ScoreKeeper from '../components/ScoreKeeper';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
@@ -14,7 +14,7 @@ import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
 
 class LavaWorld extends Game {
-  private coinFactory: CoinFactory;
+  private scoreKeeper: ScoreKeeper;
 
   constructor(
     scene: THREE.Scene,
@@ -35,11 +35,11 @@ class LavaWorld extends Game {
       // true
     );
     cannonDebugger(this.scene, this.world.bodies);
+    this.scoreKeeper = new ScoreKeeper(this.scene);
     this.createStartingZone();
     this.createPlayer();
     this.createGameMap();
-    this.coinFactory = new CoinFactory(this.scene);
-    this.createGameCoins();
+    // this.createGameCoins();
   }
 
   createGameMap() {
@@ -97,6 +97,8 @@ class LavaWorld extends Game {
       getPosition(0, 98, -505)
     );
     this.addToWorld(hallway);
+
+    PlaneFactory.addPointsToPlane(hallway, this.scoreKeeper);
 
     const stairs = PlaneFactory.createPlane(
       getDimensions(40, 160, 1),
@@ -160,16 +162,16 @@ class LavaWorld extends Game {
     this.addToWorld(secondBridge);
   }
 
-  createGameCoins() {
-    for (let index = 1; index <= 20; index++) {
-      this.coinFactory.createCoin(0, 100, -360 - index * 15);
-    }
-  }
+  // createGameCoins() {
+  //   for (let index = 1; index <= 20; index++) {
+  //     this.scoreKeeper.createCoin(0, 100, -360 - index * 15);
+  //   }
+  // }
 
   // Run all game related Logic inside here
   runGameLoop(timeDelta: number) {
     this.gameCamera.update();
-    this.coinFactory.checkIfIntersects(this.currentGamePiece.mesh);
+    this.scoreKeeper.haveScored(this.currentGamePiece.mesh);
 
     for (const gamePiece of this.activeGamePieces) {
       gamePiece.mesh.position.copy(

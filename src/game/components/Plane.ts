@@ -1,11 +1,13 @@
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
 import {
+  Box3,
   BoxBufferGeometry,
   Float32BufferAttribute,
   Mesh,
   MeshStandardMaterial,
   MeshStandardMaterialParameters,
+  Vector3,
 } from 'three';
 import { createBoundry } from '../utils/utils';
 import type {
@@ -13,6 +15,7 @@ import type {
   IGamePiece,
   IPosition,
 } from './../../shared/interfaces';
+import type ScoreKeeper from './ScoreKeeper';
 
 class PlaneFactory {
   static createPlane(
@@ -58,6 +61,23 @@ class PlaneFactory {
     body.position.copy((mesh.position as unknown) as Vec3);
 
     return { mesh, body };
+  }
+
+  static addPointsToPlane(plane: IGamePiece, scoreKeeper: ScoreKeeper) {
+    const position = plane.body.position;
+    const { x, y, z } = new Box3()
+      .setFromObject(plane.mesh)
+      .getSize(new Vector3());
+    const activeAxesLength = x > z ? x : z;
+
+    const stepBetweenPoints = 15;
+
+    // Start at 5px from start of plane, end at latest 5px before end of plane
+    for (let index = 40; index < activeAxesLength; index += stepBetweenPoints) {
+      console.log(position.z);
+
+      scoreKeeper.createCoin(position.x, position.y + 5, -(z + index));
+    }
   }
 
   private static slopePlane(
