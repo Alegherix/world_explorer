@@ -97,35 +97,35 @@ abstract class Game implements ISkybox {
 
   // Steer the currently controlled GamePiece
   steer(event: KeyboardEvent) {
-    if (this.currentGamePiece.body.sleepState === 2)
-      this.currentGamePiece.body.wakeUp();
+    const { x, z } = this.gameCamera.getWorldDirection();
+    const force = 250;
 
-    // Needs to cast to unknown then to Vec3, due to type constraints, the conversion is as intended.
     switch (event.key) {
       case 'w':
+        // this.currentGamePiece.body.force.set(cameraDirection.x, 0, cameraDirection.z)
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(0, 0, -250),
+          new CANNON.Vec3(force * x, 0, z * force),
           this.currentGamePiece.body.position
         );
         break;
 
       case 'a':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(-500, 0, 0),
+          new CANNON.Vec3(force * z, 0, force * -x),
           this.currentGamePiece.body.position
         );
         break;
 
       case 's':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(0, 0, 250),
+          new CANNON.Vec3(force * -x, 0, force * -z),
           this.currentGamePiece.body.position
         );
         break;
 
       case 'd':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(250, 0, 0),
+          new CANNON.Vec3(force * -z, 0, force * x),
           this.currentGamePiece.body.position
         );
         break;
