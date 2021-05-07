@@ -14,8 +14,7 @@ import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
 
 class LavaWorld extends Game {
-  coinFactory: CoinFactory;
-  coins: THREE.Mesh[] = [];
+  private coinFactory: CoinFactory;
 
   constructor(
     scene: THREE.Scene,
@@ -162,10 +161,8 @@ class LavaWorld extends Game {
   }
 
   createGameCoins() {
-    for (let index = 1; index <= 10; index++) {
-      this.coinFactory.createCoin(10, 10, 10 + index * 5);
-      // this.coins.push(coin);
-      // this.scene.add(coin);
+    for (let index = 1; index <= 20; index++) {
+      this.coinFactory.createCoin(0, 100, -360 - index * 15);
     }
   }
 
@@ -173,15 +170,6 @@ class LavaWorld extends Game {
   runGameLoop(timeDelta: number) {
     this.gameCamera.update();
     this.coinFactory.checkIfIntersects(this.currentGamePiece.mesh);
-    // const coinBox = new Box3();
-
-    // const characterBox = new Box3().setFromObject(this.currentGamePiece.mesh);
-    // for (const coin of this.coins) {
-    //   coinBox.setFromObject(coin);
-    //   if (characterBox.intersectsBox(coinBox)) {
-    //     this.scene.remove(coin);
-    //   }
-    // }
 
     for (const gamePiece of this.activeGamePieces) {
       gamePiece.mesh.position.copy(

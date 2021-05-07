@@ -1,4 +1,5 @@
 import { Box3, CylinderBufferGeometry, Mesh, MeshPhongMaterial } from 'three';
+import PointStore from '../../shared/PointStore';
 
 class CoinFactory {
   private geometry: CylinderBufferGeometry;
@@ -34,6 +35,10 @@ class CoinFactory {
       if (this.playerBox.intersectsBox(this.coinBox)) {
         this.scene.remove(coin);
         this.coins.splice(index, 1);
+        PointStore.update((value) => {
+          let score = (value.score += 1);
+          return { score };
+        });
       }
     }
   }
