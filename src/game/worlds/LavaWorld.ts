@@ -139,6 +139,20 @@ class LavaWorld extends Game {
       getPosition(90, 337, -470)
     );
     this.addToWorld(bridge);
+
+    const bouncePlate = PlaneFactory.createPlane(
+      getDimensions(80, 80, 1),
+      this.material.getAdamantineMaterial(),
+      getPosition(310, 250, -470)
+    );
+    this.addToWorld(bouncePlate);
+
+    const secondBridge = PlaneFactory.createPlane(
+      getDimensions(220, 40, 1),
+      this.material.getGlassMaterial(),
+      getPosition(550, 337, -470)
+    );
+    this.addToWorld(secondBridge);
   }
 }
 

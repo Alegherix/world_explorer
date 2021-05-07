@@ -70,6 +70,9 @@ class GameScene extends BaseScene {
     this.world.addContactMaterial(this.material.getIceIceContactMaterial());
     this.world.addContactMaterial(this.material.getIceSpungeContactMaterial());
     this.world.addContactMaterial(this.material.getIceGlassContactMaterial());
+    this.world.addContactMaterial(
+      this.material.getIceAdamantineContactMaterial()
+    );
   }
 
   tick(): void {

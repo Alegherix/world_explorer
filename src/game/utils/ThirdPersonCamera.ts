@@ -30,7 +30,7 @@ class ThirdPersonCamera {
       {
         x: 90,
         y: 70,
-        z: 50,
+        z: 0,
       },
       {
         x: 0,
@@ -41,7 +41,7 @@ class ThirdPersonCamera {
       {
         x: -90,
         y: 70,
-        z: 50,
+        z: 0,
       },
     ];
 
@@ -76,7 +76,7 @@ class ThirdPersonCamera {
       this.cameraStates[this.currentCameraState].y,
       this.cameraStates[this.currentCameraState].z
     );
-    const lookingAt = this.getCameraAngel(0, 10, 50);
+    const lookingAt = this.getCameraAngel(0, 0, 0);
 
     const lerpTime = 0.05;
 
