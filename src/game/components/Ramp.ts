@@ -1,4 +1,5 @@
-import CANNON, { Vec3 } from 'cannon';
+import * as CANNON from 'cannon-es';
+import { Vec3 } from 'cannon-es';
 import * as THREE from 'three';
 import type Material from '../utils/Materials';
 
@@ -46,7 +47,7 @@ class Ramp {
   createRampLights(x: number) {
     const geometry = new THREE.BoxBufferGeometry(5, 200, 0.5);
     const material = new THREE.MeshStandardMaterial({
-      color: 'rgb(255,12,64)',
+      color: 0xddc707,
       transparent: true,
       opacity: 0.8,
     });
@@ -60,7 +61,7 @@ class Ramp {
   createRampMiddleLight(y: number, z: number) {
     const geometry = new THREE.BoxBufferGeometry(5, 20, 1);
     const material = new THREE.MeshStandardMaterial({
-      color: 'rgb(255,12,64)',
+      color: 0xddc707,
       transparent: true,
       opacity: 0.8,
     });
