@@ -132,6 +132,11 @@
   resolved "https://registry.yarnpkg.com/@types/three/-/three-0.127.1.tgz#0978054e5daa6485946a3f1518a76412186ae81f"
   integrity sha512-e90iYq3zde3axANg7BPZY0fKrez1AzveamIIFk23PMh9WtCx91geokDy+yEAIymdIldgUpvezAP6+zCV3oekXw==
 
+add@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/add/-/add-2.0.6.tgz#248f0a9f6e5a528ef2295dbeec30532130ae2235"
+  integrity sha1-JI8Kn25aUo7yKV2+7DBTITCuIjU=
+
 ansi-styles@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-3.2.1.tgz#41fbb20243e50b12be0f04b8dedbf07520ce841d"
@@ -194,10 +199,15 @@ callsites@^3.0.0:
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-3.1.0.tgz#b3630abd8943432f54b3f0519238e33cd7df2f73"
   integrity sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==
 
-cannon@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/cannon/-/cannon-0.6.2.tgz#1e7bc72dd5841982f3c104c2bc578bfa4fb1c572"
-  integrity sha1-HnvHLdWEGYLzwQTCvFeL+k+xxXI=
+cannon-es-debugger@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/cannon-es-debugger/-/cannon-es-debugger-0.1.2.tgz#c9673adeff1fe97f969b55d4706b6c6ba5422bfa"
+  integrity sha512-oAOQOS0tbst/cOTTFLcuOZg5a6SCycdpcAycz6xjTOEdukvz4+hUihA0CNEhppiBG81yPGiVxOU3S5uHxkZ1/Q==
+
+cannon-es@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/cannon-es/-/cannon-es-0.17.0.tgz#8ddf149000d3fbb1343410b2bc40880597c2cfd5"
+  integrity sha512-62ASeop8hqV2E/an8ChQUOmZHO0t/h1cVFqwZ3SOEhvwZEVk4uDqPIxN5ghW3dE9RERF6SKuQ865pdvy4vD+XA==
 
 chalk@^2.0.0:
   version "2.4.2"
@@ -807,3 +817,8 @@ ws@^7.4.3:
   version "7.4.5"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.5.tgz#a484dd851e9beb6fdb420027e3885e8ce48986c1"
   integrity sha512-xzyu3hFvomRfXKH8vOFMU3OguG6oOvhXMo3xsGy3xWExqaM2dxBbVxuD99O7m3ZUFMvvscsZDqxfgMaRr/Nr1g==
+
+yarn@^1.22.10:
+  version "1.22.10"
+  resolved "https://registry.yarnpkg.com/yarn/-/yarn-1.22.10.tgz#c99daa06257c80f8fa2c3f1490724e394c26b18c"
+  integrity sha512-IanQGI9RRPAN87VGTF7zs2uxkSyQSrSPsju0COgbsKQOOXr5LtcVPeyXWgwVa0ywG3d8dg6kSYKGBuYK021qeA==

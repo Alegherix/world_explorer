@@ -1,5 +1,5 @@
-import CANNON, { Vec3 } from 'cannon';
-import type { IGamePiece, IPosition } from './../../shared/interfaces';
+import * as CANNON from 'cannon-es';
+import { Vec3 } from 'cannon-es';
 import {
   BoxBufferGeometry,
   Float32BufferAttribute,
@@ -8,6 +8,7 @@ import {
   MeshStandardMaterialParameters,
 } from 'three';
 import { createBoundry } from '../utils/utils';
+import type { IGamePiece, IPosition } from './../../shared/interfaces';
 
 class PlaneFactory {
   static createPlane(
@@ -49,6 +50,30 @@ class PlaneFactory {
     body.position.copy((mesh.position as unknown) as Vec3);
 
     return { mesh, body };
+  }
+
+  static slopePlane(plane: IGamePiece) {
+    plane.mesh.rotation.x = -Math.PI / 2;
+    plane.mesh.rotation.y = Math.PI / 6;
+    plane.mesh.rotation.z = Math.PI / 2;
+
+    const angleX = Math.PI / 2;
+    const angleY = Math.PI / 6;
+    const angleZ = Math.PI / 2;
+
+    const quatX = new CANNON.Quaternion();
+    const quatY = new CANNON.Quaternion();
+    const quatZ = new CANNON.Quaternion();
+
+    quatX.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), angleX);
+    quatY.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), angleY);
+    quatZ.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), angleZ);
+
+    const quaternion = quatX.mult(quatY).mult(quatZ);
+
+    plane.body.quaternion = quaternion;
+
+    plane.body.position.copy((plane.mesh.position as unknown) as Vec3);
   }
 }
 

@@ -1,4 +1,5 @@
-import CANNON, { Material, Vec3 } from 'cannon';
+import { Material, Vec3 } from 'cannon-es';
+import * as CANNON from 'cannon-es';
 
 const config = {
   WINZONE_WIDTH: 50,

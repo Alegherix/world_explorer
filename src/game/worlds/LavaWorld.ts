@@ -9,8 +9,34 @@ import Ramp from '../components/Ramp';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
+import type * as CANNON from 'cannon-es';
+import cannonDebugger from 'cannon-es-debugger';
 
 class LavaWorld extends Game {
+  constructor(
+    scene: THREE.Scene,
+    world: CANNON.World,
+    loader: Loader,
+    material: Material,
+    camera: THREE.PerspectiveCamera
+  ) {
+    super(
+      scene,
+      world,
+      loader,
+      material,
+      camera,
+      'lava.jpg',
+      'lava',
+      '.png'
+      // true
+    );
+    // cannonDebugger(this.scene, this.world.bodies);
+    this.createStartingZone();
+    this.createPlayer();
+    this.createGameMap();
+  }
+
   createGameMap() {
     this.createStairs();
   }
@@ -58,7 +84,7 @@ class LavaWorld extends Game {
   }
 
   createStairs() {
-    const { mesh, body } = PlaneFactory.createPlane(
+    const stairway = PlaneFactory.createPlane(
       40,
       320,
       1,
@@ -66,23 +92,18 @@ class LavaWorld extends Game {
       this.material.getGlassMaterial(),
       { x: 0, y: 98, z: -505 }
     );
-    console.log(body);
+    this.addToWorld(stairway);
 
-    this.scene.add(mesh);
-    this.world.addBody(body);
-  }
-
-  constructor(
-    scene: THREE.Scene,
-    world: CANNON.World,
-    loader: Loader,
-    material: Material,
-    camera: THREE.PerspectiveCamera
-  ) {
-    super(scene, world, loader, material, camera, 'lava.jpg', 'lava', '.png');
-    this.createStartingZone();
-    this.createPlayer();
-    this.createGameMap();
+    const stairs = PlaneFactory.createPlane(
+      40,
+      160,
+      1,
+      { color: 'rgb(0,12,64)', transparent: true, opacity: 0.4 },
+      this.material.getGlassMaterial(),
+      { x: -89, y: 138, z: -645 }
+    );
+    PlaneFactory.slopePlane(stairs);
+    this.addToWorld(stairs);
   }
 }
 

@@ -1,4 +1,5 @@
-import CANNON from 'cannon';
+// import CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 
 class Material {
   private iceMaterial: CANNON.Material;

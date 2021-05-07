@@ -5,7 +5,8 @@ import type Material from '../utils/Materials';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import * as THREE from 'three';
-import CANNON, { Vec3 } from 'cannon';
+import * as CANNON from 'cannon-es';
+import { Vec3 } from 'cannon-es';
 
 class MineralWorld extends Game {
   constructor(
@@ -15,7 +16,16 @@ class MineralWorld extends Game {
     material: Material,
     camera: THREE.PerspectiveCamera
   ) {
-    super(scene, world, loader, material, camera, 'mineral.jpg', 'space', '.jpg');
+    super(
+      scene,
+      world,
+      loader,
+      material,
+      camera,
+      'mineral.jpg',
+      'space',
+      '.jpg'
+    );
 
     this.createStartingZone();
     this.addPhysicalStartingZone();

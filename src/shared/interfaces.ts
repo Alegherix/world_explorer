@@ -1,3 +1,5 @@
+import type * as CANNON from 'cannon-es';
+
 export interface IGamePiece {
   mesh: THREE.Mesh;
   body: CANNON.Body;

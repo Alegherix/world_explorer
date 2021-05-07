@@ -1,14 +1,14 @@
-import { IGamePiece } from './../shared/interfaces';
-import { Vec3 } from 'cannon';
-import type { IGamePiece, ISkybox } from '../shared/interfaces';
+import * as CANNON from 'cannon-es';
+import type { Vector3 } from 'three';
+import * as THREE from 'three';
+import type { ISkybox } from '../shared/interfaces';
+import type { IGamePiece } from './../shared/interfaces';
 import type Loader from './utils/Loader';
 import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
-import * as THREE from 'three';
-import type { Vector3 } from 'three';
-import CANNON from 'cannon';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-abstract class CommonGame implements ISkybox {
+abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
   protected activeGamePieces: IGamePiece[] = [];
   protected gamePieceTexture: THREE.Texture;
@@ -22,13 +22,19 @@ abstract class CommonGame implements ISkybox {
     protected camera: THREE.PerspectiveCamera,
     protected playerTextureName: string,
     protected skyboxFolderName: string,
-    protected skyboxExtension: string
+    protected skyboxExtension: string,
+    protected useOrbitCamera?: boolean
   ) {
     this.scene = scene;
     this.world = world;
     this.loader = loader;
     this.material = material;
-    this.gameCamera = new ThirdPersonCamera(camera);
+    if (this.useOrbitCamera) {
+      new OrbitControls(this.camera, document.querySelector('canvas'));
+    } else {
+      this.gameCamera = new ThirdPersonCamera(camera);
+    }
+
     this.gamePieceTexture = this.loader
       .getTextureLoader()
       .load(`textures/playerTextures/${playerTextureName}`);
@@ -69,18 +75,19 @@ abstract class CommonGame implements ISkybox {
     const boxShape = new CANNON.Sphere(5);
     const body = new CANNON.Body({
       mass: 1,
-      position: new Vec3(5, 160, 0),
+      position: new CANNON.Vec3(5, 160, 0),
       shape: boxShape,
       material: this.material.getIceMaterial(),
     });
-    body.position.copy(startPosition as Vec3);
+    body.position.copy(startPosition as CANNON.Vec3);
 
     // Add entities to the world
     this.scene.add(mesh);
     this.world.addBody(body);
     this.currentGamePiece = { mesh, body };
-    this.gameCamera.setTracking(this.currentGamePiece);
     this.activeGamePieces.push(this.currentGamePiece);
+    if (!this.useOrbitCamera)
+      this.gameCamera.setTracking(this.currentGamePiece);
   }
 
   addToWorld(gamePiece: IGamePiece) {
@@ -97,35 +104,35 @@ abstract class CommonGame implements ISkybox {
     switch (event.key) {
       case 'w':
         this.currentGamePiece.body.applyForce(
-          new Vec3(0, 0, -250),
+          new CANNON.Vec3(0, 0, -250),
           this.currentGamePiece.body.position
         );
         break;
 
       case 'a':
         this.currentGamePiece.body.applyForce(
-          new Vec3(-500, 0, 0),
+          new CANNON.Vec3(-500, 0, 0),
           this.currentGamePiece.body.position
         );
         break;
 
       case 's':
         this.currentGamePiece.body.applyForce(
-          new Vec3(0, 0, 250),
+          new CANNON.Vec3(0, 0, 250),
           this.currentGamePiece.body.position
         );
         break;
 
       case 'd':
         this.currentGamePiece.body.applyForce(
-          new Vec3(250, 0, 0),
+          new CANNON.Vec3(250, 0, 0),
           this.currentGamePiece.body.position
         );
         break;
 
       case ' ':
         this.currentGamePiece.body.applyForce(
-          new Vec3(0, 2500, 0),
+          new CANNON.Vec3(0, 2500, 0),
           this.currentGamePiece.body.position
         );
         break;
@@ -140,13 +147,13 @@ abstract class CommonGame implements ISkybox {
       material: this.material.getRockMaterial(),
     });
     body.quaternion.setFromAxisAngle(new CANNON.Vec3(x1, y1, z1), rotation);
-    body.position = new Vec3(x2, y2, z2);
+    body.position = new CANNON.Vec3(x2, y2, z2);
     this.world.addBody(body);
   }
 
   // Run all game related Logic inside here
   runGameLoop(timeDelta: number) {
-    this.gameCamera.update();
+    if (!this.useOrbitCamera) this.gameCamera.update();
 
     for (const gamePiece of this.activeGamePieces) {
       gamePiece.mesh.position.copy(
@@ -160,4 +167,4 @@ abstract class CommonGame implements ISkybox {
   }
 }
 
-export default CommonGame;
+export default Game;
