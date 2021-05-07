@@ -39,6 +39,7 @@ class LavaWorld extends Game {
 
   createGameMap() {
     this.createStairs();
+    this.createBridge();
   }
   createFinishZone() {
     throw new Error('Method not implemented.');
@@ -114,6 +115,30 @@ class LavaWorld extends Game {
     );
     PlaneFactory.slopePlaneUpBack(secondStairs);
     this.addToWorld(secondStairs);
+
+    const secondRestPlane = PlaneFactory.createPlane(
+      getDimensions(40, 40, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-179, 257, -470)
+    );
+    this.addToWorld(secondRestPlane);
+
+    const thirdStairs = PlaneFactory.createPlane(
+      getDimensions(40, 160, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-90, 297, -470)
+    );
+    PlaneFactory.slopePlaneUpRight(thirdStairs);
+    this.addToWorld(thirdStairs);
+  }
+
+  createBridge() {
+    const bridge = PlaneFactory.createPlane(
+      getDimensions(220, 40, 1),
+      this.material.getGlassMaterial(),
+      getPosition(90, 337, -470)
+    );
+    this.addToWorld(bridge);
   }
 }
 
