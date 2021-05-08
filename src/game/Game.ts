@@ -63,7 +63,8 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer() {
-    const startPosition = { x: 550, y: 340, z: -470 };
+    const startPosition = { x: 0, y: 15, z: 0 };
+    // const startPosition = { x: 90, y: 340, z: -470 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -153,7 +154,7 @@ abstract class Game implements ISkybox {
   }
 
   // Run all game related Logic inside here
-  runGameLoop(timeDelta: number) {
+  runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
 
     for (const gamePiece of this.activeGamePieces) {

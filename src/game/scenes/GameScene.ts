@@ -86,7 +86,7 @@ class GameScene extends BaseScene {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
-      this.game.runGameLoop(timeDelta);
+      this.game.runGameLoop(timeDelta, elapsedTime);
       this.stats.end();
       this.tick();
     });

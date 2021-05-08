@@ -1,3 +1,4 @@
+import cannonDebugger from 'cannon-es-debugger';
 import type * as CANNON from 'cannon-es';
 import type { MeshStandardMaterialParameters, Vector3 } from 'three';
 /**
@@ -10,13 +11,17 @@ import TubeFactory from '../components/Tube';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
+import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
+import type { Vec3 } from 'cannon-es';
+import PushBlock from '../components/PushBlock';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
   private defaultConfig: MeshStandardMaterialParameters;
   private bouncePadConfig: MeshStandardMaterialParameters;
+  private pushBlocks: PushBlock[] = [];
 
   constructor(
     scene: THREE.Scene,
@@ -36,7 +41,7 @@ class LavaWorld extends Game {
       '.png'
       // true
     );
-    // cannonDebugger(this.scene, this.world.bodies);
+    cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
     this.initializeTextures();
     this.createStartingZone();
@@ -44,6 +49,8 @@ class LavaWorld extends Game {
     this.createGameMap();
     this.createTube();
     this.createElevator();
+    this.createHallwayOfSuprises();
+    this.createPushBlocks();
   }
 
   initializeTextures() {
@@ -245,10 +252,38 @@ class LavaWorld extends Game {
     this.addToWorld(jumpBlock);
   }
 
+  createPushBlocks() {
+    const pushBlock1 = new PushBlock(
+      getDimensions(200, 80, 80),
+      this.material,
+      getPosition(2480, 640, -800),
+      this.defaultConfig,
+      true
+    );
+    console.log(pushBlock1);
+
+    this.addToWorld(pushBlock1.getBlock());
+    this.pushBlocks.push(pushBlock1);
+
+    const pushBlock2 = new PushBlock(
+      getDimensions(200, 80, 80),
+      this.material,
+      getPosition(2480, 640, -1000),
+      this.defaultConfig,
+      false
+    );
+    this.addToWorld(pushBlock2.getBlock());
+    this.pushBlocks.push(pushBlock2);
+  }
+
   // Run all game related Logic inside here
-  runGameLoop(timeDelta: number) {
+  runGameLoop(timeDelta: number, elapsedTime: number) {
     this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
+
+    for (const pushBlock of this.pushBlocks) {
+      pushBlock.moveBlock(elapsedTime);
+    }
 
     for (const gamePiece of this.activeGamePieces) {
       gamePiece.mesh.position.copy(
@@ -258,7 +293,19 @@ class LavaWorld extends Game {
         (gamePiece.body.quaternion as unknown) as THREE.Quaternion
       );
     }
+    // this.movePushBlocks(timeDelta);
     this.world.step(1 / 100, timeDelta);
+  }
+
+  createHallwayOfSuprises() {
+    const hallway = PlaneFactory.createPlane(
+      getDimensions(60, 500, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2480, 600, -800),
+      this.defaultConfig,
+      this.scoreKeeper
+    );
+    this.addToWorld(hallway);
   }
 }
 
