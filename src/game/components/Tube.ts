@@ -19,7 +19,7 @@ class TubeFactory {
     configObj?: MeshStandardMaterialParameters
   ): IGamePiece {
     const { x, y, z } = position;
-    const geometry = new TorusBufferGeometry(400, 20, 18, 10, 2);
+    const geometry = new TorusBufferGeometry(400, 20, 18, 10, 2.5);
     const material = new MeshStandardMaterial(configObj);
     const mesh = new Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -30,7 +30,7 @@ class TubeFactory {
     // mesh.position.set(1200, 0, -470);
     // this.scene.add(mesh);
 
-    const shape = Trimesh.createTorus(400, 20, 18, 10, 2);
+    const shape = Trimesh.createTorus(400, 20, 18, 10, 2.7);
     const body = new Body({
       mass: 0,
       position: new Vec3(5, 160, 0),

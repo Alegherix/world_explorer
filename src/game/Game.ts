@@ -1,12 +1,12 @@
 import * as CANNON from 'cannon-es';
-import type { Vector3 } from 'three';
 import * as THREE from 'three';
+import type { Vector3 } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { ISkybox } from '../shared/interfaces';
 import type { IGamePiece } from './../shared/interfaces';
 import type Loader from './utils/Loader';
 import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -63,7 +63,7 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer() {
-    const startPosition = { x: 0, y: 180, z: 0 };
+    const startPosition = { x: 550, y: 340, z: -470 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })

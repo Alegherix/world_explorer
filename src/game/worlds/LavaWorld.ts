@@ -1,6 +1,4 @@
 import type * as CANNON from 'cannon-es';
-import { Body, Quaternion, Trimesh, Vec3 } from 'cannon-es';
-import cannonDebugger from 'cannon-es-debugger';
 import type { MeshStandardMaterialParameters, Vector3 } from 'three';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
@@ -18,6 +16,7 @@ import type { IDimension } from './../../shared/interfaces';
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
   private defaultConfig: MeshStandardMaterialParameters;
+  private bouncePadConfig: MeshStandardMaterialParameters;
 
   constructor(
     scene: THREE.Scene,
@@ -39,17 +38,39 @@ class LavaWorld extends Game {
     );
     // cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
+    this.initializeTextures();
     this.createStartingZone();
     this.createPlayer();
     this.createGameMap();
-    this.defaultConfig;
     this.createTube();
+    this.createElevator();
+  }
+
+  initializeTextures() {
+    const loader = this.loader.getTextureLoader();
+    const map = loader.load('/textures/lavaPlanet/MP_color.jpg');
+    const normal = loader.load('/textures/lavaPlanet/MP_normal.jpg');
+    const displacement = loader.load('/textures/lavaPlanet/MP_height.png');
+    const ambientocclusion = loader.load('/textures/lavaPlanet/MP_ao.jpg');
+    const metallic = loader.load('/textures/lavaPlanet/MP_metallic.jpg');
+
+    const roughness = loader.load('/textures/lavaPlanet/MP_roughness.jpg');
+
+    this.bouncePadConfig = {
+      map,
+      normalMap: normal,
+      displacementMap: displacement,
+      aoMap: ambientocclusion,
+      roughnessMap: roughness,
+      metalnessMap: metallic,
+    };
   }
 
   createGameMap() {
     this.createStairs();
     this.createBridge();
   }
+
   createFinishZone() {
     throw new Error('Method not implemented.');
   }
@@ -174,7 +195,7 @@ class LavaWorld extends Game {
       getDimensions(80, 80, 1),
       this.material.getAdamantineMaterial(),
       getPosition(310, 250, -470),
-      this.defaultConfig
+      this.bouncePadConfig
     );
     this.addToWorld(bouncePlate);
 
@@ -195,6 +216,33 @@ class LavaWorld extends Game {
       this.defaultConfig
     );
     this.addToWorld(tube);
+  }
+
+  createElevator() {
+    const backplate = PlaneFactory.createPlane(
+      getDimensions(1, 360, 360),
+      this.material.getGlassMaterial(),
+      getPosition(2600, 300, -470),
+      this.defaultConfig
+    );
+    this.addToWorld(backplate);
+
+    const fallbackBlock = PlaneFactory.createPlane(
+      getDimensions(80, 40, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2400, 240, -470),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpLeft(fallbackBlock);
+    this.addToWorld(fallbackBlock);
+
+    const jumpBlock = PlaneFactory.createPlane(
+      getDimensions(40, 40, 1),
+      this.material.getMithrilMaterial(),
+      getPosition(2480, 200, -470),
+      this.bouncePadConfig
+    );
+    this.addToWorld(jumpBlock);
   }
 
   // Run all game related Logic inside here
