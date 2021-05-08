@@ -23,7 +23,7 @@ class PlaneFactory {
     phyicsMaterial: CANNON.Material,
     position?: IPosition,
     configObj?: MeshStandardMaterialParameters,
-    rotation?: number
+    scoreKeeper?: ScoreKeeper
   ): IGamePiece {
     const { width, height, depth } = dimensions;
     const geometry = new BoxBufferGeometry(width, height, depth, 64, 64);
@@ -34,7 +34,7 @@ class PlaneFactory {
     );
     const mesh = new Mesh(geometry, material);
     mesh.receiveShadow = true;
-    mesh.rotation.x = rotation ? rotation : -Math.PI * 0.5;
+    mesh.rotation.x = -Math.PI * 0.5;
     mesh.geometry.setAttribute(
       'uv2',
       new Float32BufferAttribute(mesh.geometry.attributes.uv.array, 2)
@@ -43,6 +43,10 @@ class PlaneFactory {
     if (position) {
       const { x, y, z } = position;
       mesh.position.set(x, y, z);
+    }
+
+    if (scoreKeeper) {
+      this.addPointsToPlane(dimensions, position, scoreKeeper);
     }
 
     const shape = new CANNON.Box(new Vec3(width / 2, height / 2, depth / 2));
@@ -54,7 +58,7 @@ class PlaneFactory {
       0,
       0,
       0,
-      rotation ? rotation : Math.PI * 0.5,
+      Math.PI * 0.5,
       shape,
       phyicsMaterial
     );
@@ -63,20 +67,37 @@ class PlaneFactory {
     return { mesh, body };
   }
 
-  static addPointsToPlane(plane: IGamePiece, scoreKeeper: ScoreKeeper) {
-    const position = plane.body.position;
-    const { x, y, z } = new Box3()
-      .setFromObject(plane.mesh)
-      .getSize(new Vector3());
-    const activeAxesLength = x > z ? x : z;
+  // Used for adding points to the plane
+  private static addPointsToPlane(
+    dimension: IDimension,
+    position: IPosition,
+    scoreKeeper: ScoreKeeper
+  ) {
+    const { width, height } = dimension;
+    const { x, y, z } = position;
+    const spaceBetweenPoints = 15;
+    const offset = 5;
+    // Since position is based on middle of plane, we need to add half plane at start of iteration
+    let appendage = height > width ? height / 2 : width / 2;
 
-    const stepBetweenPoints = 15;
-
-    // Start at 5px from start of plane, end at latest 5px before end of plane
-    for (let index = 40; index < activeAxesLength; index += stepBetweenPoints) {
-      console.log(position.z);
-
-      scoreKeeper.createCoin(position.x, position.y + 5, -(z + index));
+    // Create coins at earliest 5px near the closest edge of plane
+    if (height > width) {
+      appendage = height / 2;
+      for (
+        let index = offset;
+        index < height - offset;
+        index += spaceBetweenPoints
+      ) {
+        scoreKeeper.createCoin(x, y + offset, z - appendage + index);
+      }
+    } else {
+      for (
+        let index = offset;
+        index < width - offset;
+        index += spaceBetweenPoints
+      ) {
+        scoreKeeper.createCoin(x - appendage + index, y + offset, z);
+      }
     }
   }
 

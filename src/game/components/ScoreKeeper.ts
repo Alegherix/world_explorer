@@ -25,12 +25,11 @@ class ScoreKeeper {
     mesh.name = 'coin';
     this.coins.push(mesh);
     this.scene.add(mesh);
-    console.log('Created coin at:', mesh.position);
   }
 
   // If coin in within 3Vector units, compute if they actually intersect
   // and if they do update score && remove from scene & array.
-  haveScored(player: Mesh) {
+  private haveScored(player: Mesh) {
     this.playerBox.setFromObject(player);
     for (let index = 0; index < this.coins.length; index++) {
       let coin = this.coins[index];
@@ -46,6 +45,17 @@ class ScoreKeeper {
         }
       }
     }
+  }
+
+  private spinCoins() {
+    for (const coin of this.coins) {
+      coin.rotation.z += 0.01;
+    }
+  }
+
+  watchScore(player: Mesh) {
+    this.haveScored(player);
+    this.spinCoins();
   }
 }
 

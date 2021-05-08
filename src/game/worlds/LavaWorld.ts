@@ -39,7 +39,6 @@ class LavaWorld extends Game {
     this.createStartingZone();
     this.createPlayer();
     this.createGameMap();
-    // this.createGameCoins();
   }
 
   createGameMap() {
@@ -49,6 +48,7 @@ class LavaWorld extends Game {
   createFinishZone() {
     throw new Error('Method not implemented.');
   }
+
   createStartingZone() {
     new Ramp(this.world, this.scene, this.material);
     this.createStartingPlane();
@@ -94,11 +94,11 @@ class LavaWorld extends Game {
     const hallway = PlaneFactory.createPlane(
       getDimensions(40, 320, 1),
       this.material.getGlassMaterial(),
-      getPosition(0, 98, -505)
+      getPosition(0, 98, -505),
+      null,
+      this.scoreKeeper
     );
     this.addToWorld(hallway);
-
-    PlaneFactory.addPointsToPlane(hallway, this.scoreKeeper);
 
     const stairs = PlaneFactory.createPlane(
       getDimensions(40, 160, 1),
@@ -143,7 +143,9 @@ class LavaWorld extends Game {
     const bridge = PlaneFactory.createPlane(
       getDimensions(220, 40, 1),
       this.material.getGlassMaterial(),
-      getPosition(90, 337, -470)
+      getPosition(90, 337, -470),
+      null,
+      this.scoreKeeper
     );
     this.addToWorld(bridge);
 
@@ -157,21 +159,17 @@ class LavaWorld extends Game {
     const secondBridge = PlaneFactory.createPlane(
       getDimensions(220, 40, 1),
       this.material.getGlassMaterial(),
-      getPosition(550, 337, -470)
+      getPosition(550, 337, -470),
+      null,
+      this.scoreKeeper
     );
     this.addToWorld(secondBridge);
   }
 
-  // createGameCoins() {
-  //   for (let index = 1; index <= 20; index++) {
-  //     this.scoreKeeper.createCoin(0, 100, -360 - index * 15);
-  //   }
-  // }
-
   // Run all game related Logic inside here
   runGameLoop(timeDelta: number) {
     this.gameCamera.update();
-    this.scoreKeeper.haveScored(this.currentGamePiece.mesh);
+    this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
 
     for (const gamePiece of this.activeGamePieces) {
       gamePiece.mesh.position.copy(
