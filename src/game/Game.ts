@@ -14,6 +14,7 @@ abstract class Game implements ISkybox {
   protected activeGamePieces: IGamePiece[] = [];
   protected gamePieceTexture: THREE.Texture;
   protected gameCamera: ThirdPersonCamera;
+  protected orbitCamera: OrbitControls;
 
   constructor(
     protected scene: THREE.Scene,
@@ -31,7 +32,10 @@ abstract class Game implements ISkybox {
     this.loader = loader;
     this.material = material;
     if (this.useOrbitCamera) {
-      new OrbitControls(this.camera, document.querySelector('canvas'));
+      this.orbitCamera = new OrbitControls(
+        this.camera,
+        document.querySelector('canvas')
+      );
     } else {
       this.gameCamera = new ThirdPersonCamera(camera);
     }

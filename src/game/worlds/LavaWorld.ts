@@ -4,7 +4,7 @@
 
 import type * as CANNON from 'cannon-es';
 import cannonDebugger from 'cannon-es-debugger';
-import type { MeshStandardMaterialParameters } from 'three';
+import { MeshStandardMaterialParameters, Vector3 } from 'three';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -83,7 +83,8 @@ class LavaWorld extends Game {
     this.createTube();
     // this.createElevator();
     this.createHallwayOfSuprises();
-    this.createPushBlocks();
+    this.createBounceWayToHeaven();
+    this.createHeavenMaze();
   }
 
   createFinishZone() {
@@ -270,8 +271,6 @@ class LavaWorld extends Game {
     this.addToWorld(jumpBlock);
   }
 
-  createPushBlocks() {}
-
   createHallwayOfSuprises() {
     const hallway = PlaneFactory.createPlane(
       getDimensions(600, 60, 1),
@@ -302,6 +301,87 @@ class LavaWorld extends Game {
       this.addToWorld(pb);
       this.activeGamePieces.push(pb);
     }
+
+    const hallwayStairs = PlaneFactory.createPlane(
+      getDimensions(60, 180, 1),
+      this.material.getGlassMaterial(),
+      getPosition(3275, 245, -470),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpRight(hallwayStairs);
+    this.addToWorld(hallwayStairs);
+
+    const bouncePlate = PlaneFactory.createPlane(
+      getDimensions(80, 80, 1),
+      this.material.getAdamantineMaterial(),
+      getPosition(3395, 290, -470),
+      this.bouncePadConfig
+    );
+    this.activeGamePieces.push(bouncePlate);
+    this.addToWorld(bouncePlate);
+  }
+
+  createBounceWayToHeaven() {
+    const platform = PlaneFactory.createPlane(
+      getDimensions(100, 100, 1),
+      this.material.getAdamantineMaterial(),
+      getPosition(3400, 550, -700),
+      this.defaultConfig
+    );
+    this.addToWorld(platform);
+
+    const platform2 = PlaneFactory.createPlane(
+      getDimensions(100, 100, 1),
+      this.material.getAdamantineMaterial(),
+      getPosition(3200, 800, -700),
+      this.defaultConfig
+    );
+    this.addToWorld(platform2);
+
+    const platform3 = PlaneFactory.createPlane(
+      getDimensions(100, 100, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2700, 1200, -700),
+      this.defaultConfig
+    );
+    this.addToWorld(platform3);
+  }
+
+  createHeavenMaze() {
+    // getPosition(2700, 1200, -700),
+    const platform = PlaneFactory.createPlane(
+      getDimensions(50, 200, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2700, 1200, -850),
+      this.defaultConfig,
+      this.scoreKeeper
+    );
+    this.addToWorld(platform);
+
+    const platform2 = PlaneFactory.createPlane(
+      getDimensions(300, 40, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2575, 1200, -1000),
+      this.defaultConfig,
+      this.scoreKeeper
+    );
+    this.addToWorld(platform2);
+
+    // Camera debugging
+    const debugPosition = { x: 2700, y: 1250, z: -700 };
+    if (this.useOrbitCamera) {
+      this.orbitCamera.target.set(
+        debugPosition.x,
+        debugPosition.y,
+        debugPosition.z
+      );
+      this.orbitCamera.update();
+    }
+    this.currentGamePiece.body.position.set(
+      debugPosition.x,
+      debugPosition.y,
+      debugPosition.z
+    );
   }
 }
 
