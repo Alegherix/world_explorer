@@ -19,8 +19,6 @@
   });
 
   const setWorld = () => {
-    console.log('Pressing the set world button');
-
     dispatch('setWorld', { planetName });
   };
 </script>

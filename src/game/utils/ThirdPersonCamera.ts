@@ -47,8 +47,6 @@ class ThirdPersonCamera {
 
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       if (event.key === 'r') {
-        console.log(this.getWorldDirection());
-
         if (this.currentCameraState >= this.cameraStates.length - 1) {
           this.currentCameraState = 0;
         } else {

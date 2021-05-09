@@ -7,6 +7,7 @@ import type { IGamePiece } from './../shared/interfaces';
 import type Loader from './utils/Loader';
 import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
+import Pointstore from '../shared/PointStore';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -151,6 +152,13 @@ abstract class Game implements ISkybox {
     body.quaternion.setFromAxisAngle(new CANNON.Vec3(x1, y1, z1), rotation);
     body.position = new CANNON.Vec3(x2, y2, z2);
     this.world.addBody(body);
+  }
+
+  // Used for keeping score of how long a game have been running
+  updatePlaytime(elapsedTime: number) {
+    Pointstore.update((store) => {
+      return { ...store, elapsedTime };
+    });
   }
 
   // Run all game related Logic inside here

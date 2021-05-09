@@ -5,10 +5,12 @@
   import Pointstore from '../shared/PointStore';
 
   let canvas;
-  let incrementPoints = () => {
-    score++;
-  };
-  let score = 0;
+  // let incrementPoints = () => {
+  //   score++;
+  // };
+  // let score = 0;
+
+  $: elapsedTime = $Pointstore.elapsedTime;
 
   export let selectedWorld: GameWorld;
   onMount(() => {
@@ -18,19 +20,30 @@
 
 <main>
   <canvas class="webgl" bind:this={canvas} />
-  <div class="scoreCounter">
-    <h2>Points</h2>
-    <h3>{$Pointstore.score}</h3>
-  </div>
+  <section>
+    <div class="scoreCounter">
+      <h2>Points</h2>
+      <h3>{$Pointstore.score}</h3>
+    </div>
+    <div class="playtimeContainer">
+      <h2>Time played</h2>
+      <h3>{elapsedTime.toFixed(2)}</h3>
+    </div>
+  </section>
 </main>
 
 <style>
-  .scoreCounter {
-    width: 200px;
-    height: 100px;
+  section {
+    display: flex;
+    flex-direction: row-reverse;
     position: absolute;
     right: 0;
     top: 0;
+  }
+
+  .scoreCounter {
+    width: 200px;
+    height: 100px;
   }
   h2 {
     text-align: center;
@@ -44,5 +57,10 @@
     color: #f4cd04;
     font-size: 52px;
     margin: 0;
+  }
+
+  .playTimeContainer {
+    width: 200px;
+    height: 100px;
   }
 </style>

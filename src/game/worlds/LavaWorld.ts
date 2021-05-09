@@ -260,8 +260,6 @@ class LavaWorld extends Game {
       this.defaultConfig,
       true
     );
-    console.log(pushBlock1);
-
     this.addToWorld(pushBlock1.getBlock());
     this.pushBlocks.push(pushBlock1);
 
@@ -280,6 +278,7 @@ class LavaWorld extends Game {
   runGameLoop(timeDelta: number, elapsedTime: number) {
     this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
+    this.updatePlaytime(elapsedTime);
 
     for (const pushBlock of this.pushBlocks) {
       pushBlock.moveBlock(elapsedTime);

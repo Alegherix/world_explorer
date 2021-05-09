@@ -38,9 +38,8 @@ class ScoreKeeper {
         if (this.playerBox.intersectsBox(this.coinBox)) {
           this.scene.remove(coin);
           this.coins.splice(index, 1);
-          PointStore.update((value) => {
-            let score = (value.score += 1);
-            return { score };
+          PointStore.update((store) => {
+            return { ...store, score: store.score + 1 };
           });
         }
       }
