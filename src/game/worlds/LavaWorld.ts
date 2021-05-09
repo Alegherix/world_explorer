@@ -1,10 +1,16 @@
+import { MeshPhongMaterial } from 'three';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
 
 import type * as CANNON from 'cannon-es';
 import cannonDebugger from 'cannon-es-debugger';
-import type { MeshStandardMaterialParameters } from 'three';
+import {
+  Mesh,
+  MeshBasicMaterial,
+  MeshStandardMaterialParameters,
+  OctahedronBufferGeometry,
+} from 'three';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -13,12 +19,13 @@ import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getPosition } from '../utils/utils';
-import type { IDimension } from './../../shared/interfaces';
+import type { IDimension, IGamePiece } from './../../shared/interfaces';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
   private defaultConfig: MeshStandardMaterialParameters;
   private bouncePadConfig: MeshStandardMaterialParameters;
+  private testArray: IGamePiece[] = [];
 
   constructor(
     scene: THREE.Scene,
@@ -43,6 +50,7 @@ class LavaWorld extends Game {
 
     this.createStartingZone();
     this.createGameMap();
+    this.createFinishZone();
   }
 
   initializeTextures() {
@@ -74,6 +82,10 @@ class LavaWorld extends Game {
       this.move(gamePiece, elapsedTime);
     }
 
+    for (const testObj of this.testArray) {
+      this.rotate(testObj, elapsedTime);
+    }
+
     this.world.step(1 / 100, timeDelta);
   }
 
@@ -85,10 +97,106 @@ class LavaWorld extends Game {
     this.createBounceWayToHeaven();
     this.createHeavenMaze();
     this.createHeavenStairway();
+    this.createSpinTraps();
   }
 
   createFinishZone() {
-    throw new Error('Method not implemented.');
+    const walls = [
+      {
+        x: 1016,
+        y: 2095,
+        z: -840,
+        h: 300,
+        w: 1,
+        d: 200,
+      },
+      {
+        x: 1016,
+        y: 2095,
+        z: -540,
+        h: 300,
+        w: 1,
+        d: 200,
+      },
+      {
+        x: 1016,
+        y: 2195,
+        z: -690,
+        h: 300,
+        w: 300,
+        d: 1,
+      },
+      {
+        x: 866,
+        y: 2095,
+        z: -690,
+        h: 1,
+        w: 300,
+        d: 200,
+      },
+    ];
+    const platform = PlaneFactory.createPlane(
+      getDimensions(300, 300, 1),
+      this.material.getGlassMaterial(),
+      getPosition(1016, 1995, -690),
+      this.defaultConfig
+    );
+    this.addToWorld(platform);
+
+    for (const { x, y, z, h, w, d } of walls) {
+      const firstWall = PlaneFactory.createPlane(
+        getDimensions(h, w, d),
+        this.material.getGlassMaterial(),
+        getPosition(x, y, z),
+        { color: 0x1987ee, transparent: true, opacity: 0.4 }
+      );
+      this.addToWorld(firstWall);
+    }
+
+    // const roof = PlaneFactory.createPlane(
+    //   getDimensions(300, 300, 1),
+    //   this.material.getGlassMaterial(),
+    //   getPosition(1016, 2195, -690),
+    //   { color: 0x1987ee, transparent: true, opacity: 0.4 }
+    // );
+    // this.addToWorld(roof);
+
+    // const firstWall = PlaneFactory.createPlane(
+    //   getDimensions(300, 1, 400),
+    //   this.material.getGlassMaterial(),
+    //   getPosition(1016, 1995, -840),
+    //   { color: 0x1987ee, transparent: true, opacity: 0.4 }
+    // );
+    // this.addToWorld(firstWall);
+
+    const lootGeometry = new OctahedronBufferGeometry(12, 0);
+    const lootMaterial = new MeshPhongMaterial({
+      color: 0x98b1c4,
+      emissive: 0x0,
+      emissiveIntensity: 0.2,
+      shininess: 52,
+    });
+    const lootMesh = new Mesh(lootGeometry, lootMaterial);
+    lootMesh.receiveShadow = true;
+    lootMesh.castShadow = true;
+    lootMesh.position.set(1016, 2015, -690);
+    this.scene.add(lootMesh);
+
+    // Camera debugging
+    const debugPosition = { x: 1395, y: 1900, z: -690 };
+    if (this.useOrbitCamera) {
+      this.orbitCamera.target.set(
+        debugPosition.x,
+        debugPosition.y,
+        debugPosition.z
+      );
+      this.orbitCamera.update();
+    }
+    this.currentGamePiece.body.position.set(
+      debugPosition.x,
+      debugPosition.y,
+      debugPosition.z
+    );
   }
 
   createStartingZone() {
@@ -380,6 +488,7 @@ class LavaWorld extends Game {
     this.addToWorld(elevator);
   }
 
+  // Create config object and loop out from it instead
   createHeavenStairway() {
     const platform = PlaneFactory.createPlane(
       getDimensions(50, 50, 1),
@@ -422,22 +531,45 @@ class LavaWorld extends Game {
       this.defaultConfig
     );
     this.addToWorld(platform3);
+  }
 
-    // Camera debugging
-    const debugPosition = { x: 2355, y: 1605, z: -1000 };
-    if (this.useOrbitCamera) {
-      this.orbitCamera.target.set(
-        debugPosition.x,
-        debugPosition.y,
-        debugPosition.z
+  createSpinTraps() {
+    for (let index = 1; index < 4; index++) {
+      const positionOffset = index * 200;
+      const platform = PlaneFactory.createPlane(
+        getDimensions(200, 50, 1),
+        this.material.getGlassMaterial(),
+        getPosition(2120 - positionOffset, 1895, -690),
+        this.defaultConfig
       );
-      this.orbitCamera.update();
+      platform.movementType = {
+        start: 'sin',
+        direction: 'z',
+        distance: 20,
+        positionOffset: -690,
+        speed: 0.02,
+      };
+      platform.mesh.name = 'test';
+      this.testArray.push(platform);
+      this.addToWorld(platform);
     }
-    this.currentGamePiece.body.position.set(
-      debugPosition.x,
-      debugPosition.y,
-      debugPosition.z
+
+    const platform = PlaneFactory.createPlane(
+      getDimensions(80, 100, 1),
+      this.material.getGlassMaterial(),
+      getPosition(1380, 1895, -690),
+      this.defaultConfig
     );
+    this.addToWorld(platform);
+
+    const stairs = PlaneFactory.createPlane(
+      getDimensions(40, 200, 1),
+      this.material.getGlassMaterial(),
+      getPosition(1253, 1945, -690),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpLeft(stairs);
+    this.addToWorld(stairs);
   }
 }
 

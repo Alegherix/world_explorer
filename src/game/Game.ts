@@ -8,6 +8,7 @@ import type Loader from './utils/Loader';
 import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
 import GameStore from '../shared/GameStore';
+import type { Vec3 } from 'cannon-es';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -68,8 +69,8 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer() {
-    // const startPosition = { x: 0, y: 15, z: 0 };
-    const startPosition = { x: 490, y: 340, z: -470 };
+    const startPosition = { x: 0, y: 15, z: 0 };
+    // const startPosition = { x: 490, y: 340, z: -470 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -140,6 +141,42 @@ abstract class Game implements ISkybox {
           gamePiece.body.position.z = movement;
           break;
       }
+    }
+  };
+
+  rotate = (gamePiece: IGamePiece, estimatedTime: number): void => {
+    if (!gamePiece.movementType) {
+      gamePiece.mesh.position.copy(
+        (gamePiece.body.position as unknown) as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+      );
+    } else {
+      const {
+        distance,
+        speed,
+        positionOffset,
+        direction,
+      } = gamePiece.movementType;
+      const movement =
+        Math.sin(estimatedTime * speed) * distance + positionOffset;
+
+      switch (direction) {
+        case 'x':
+          gamePiece.mesh.rotation.x = movement;
+          break;
+        case 'y':
+          gamePiece.mesh.rotation.y = movement;
+          break;
+
+        case 'z':
+          gamePiece.mesh.rotation.z = movement;
+          break;
+      }
+      gamePiece.body.quaternion.copy(
+        (gamePiece.mesh.quaternion as unknown) as CANNON.Quaternion
+      );
     }
   };
 
