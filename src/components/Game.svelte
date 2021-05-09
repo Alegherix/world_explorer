@@ -1,21 +1,20 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
-  import type { GameWorld } from '../shared/interfaces';
-  import Pointstore from '../shared/PointStore';
+  import GameStore from '../shared/GameStore';
 
   let canvas;
-  // let incrementPoints = () => {
-  //   score++;
-  // };
-  // let score = 0;
+  $: elapsedTime = $GameStore.elapsedTime;
 
-  $: elapsedTime = $Pointstore.elapsedTime;
-
-  export let selectedWorld: GameWorld;
   onMount(() => {
-    new GameScene(canvas, selectedWorld);
+    new GameScene(canvas, $GameStore.world);
   });
+
+  const handleMenu = () => {
+    GameStore.update((store) => {
+      return { ...store, world: null };
+    });
+  };
 </script>
 
 <main>
@@ -23,13 +22,14 @@
   <section>
     <div class="scoreCounter">
       <h2>Points</h2>
-      <h3>{$Pointstore.score}</h3>
+      <h3>{$GameStore.score}</h3>
     </div>
     <div class="playtimeContainer">
       <h2>Time played</h2>
       <h3>{elapsedTime.toFixed(2)}</h3>
     </div>
   </section>
+  <!-- <button on:click={handleMenu}>Back to MainMenu</button> -->
 </main>
 
 <style>
@@ -41,7 +41,8 @@
     top: 0;
   }
 
-  .scoreCounter {
+  .scoreCounter,
+  .playtimeContainer {
     width: 200px;
     height: 100px;
   }
@@ -59,8 +60,15 @@
     margin: 0;
   }
 
-  .playTimeContainer {
-    width: 200px;
-    height: 100px;
+  button {
+    position: absolute;
+    top: 4rem;
+    left: 2rem;
+    border: solid #1987ee 2px;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    background-color: black;
+    color: #1987ee;
+    font-size: 2rem;
   }
 </style>

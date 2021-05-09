@@ -1,5 +1,5 @@
 import { Box3, CylinderBufferGeometry, Mesh, MeshPhongMaterial } from 'three';
-import PointStore from '../../shared/PointStore';
+import GameStore from '../../shared/GameStore';
 
 class ScoreKeeper {
   private geometry: CylinderBufferGeometry;
@@ -38,7 +38,7 @@ class ScoreKeeper {
         if (this.playerBox.intersectsBox(this.coinBox)) {
           this.scene.remove(coin);
           this.coins.splice(index, 1);
-          PointStore.update((store) => {
+          GameStore.update((store) => {
             return { ...store, score: store.score + 1 };
           });
         }

@@ -7,7 +7,7 @@ import type { IGamePiece } from './../shared/interfaces';
 import type Loader from './utils/Loader';
 import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
-import Pointstore from '../shared/PointStore';
+import GameStore from '../shared/GameStore';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -156,7 +156,7 @@ abstract class Game implements ISkybox {
 
   // Used for keeping score of how long a game have been running
   updatePlaytime(elapsedTime: number) {
-    Pointstore.update((store) => {
+    GameStore.update((store) => {
       return { ...store, elapsedTime };
     });
   }

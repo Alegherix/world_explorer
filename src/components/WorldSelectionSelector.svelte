@@ -1,16 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher<{
-    setWorld: { planetName: string };
-  }>();
   import SelectionScene from '../game/scenes/SelectionScene';
   import type { GameWorld } from '../shared/interfaces';
+  import GameStore from '../shared/GameStore';
 
   let canvas: HTMLCanvasElement;
   let planetName: GameWorld;
 
-  const updatePlanetName = (name) => {
+  const updatePlanetName = (name: GameWorld) => {
     planetName = name;
   };
 
@@ -19,7 +16,9 @@
   });
 
   const setWorld = () => {
-    dispatch('setWorld', { planetName });
+    GameStore.update((store) => {
+      return { ...store, world: planetName };
+    });
   };
 </script>
 

@@ -3,6 +3,7 @@
   import SigninScreen from './SigninScreen.svelte';
   import WorldSelectionSelector from './WorldSelectionSelector.svelte';
   import type { GameWorld } from '../shared/interfaces';
+  import GameStore from '../shared/GameStore';
 
   let username: string;
   let selectedWorld: GameWorld;
@@ -10,18 +11,14 @@
   const addUser = (event) => {
     username = event.detail.username;
   };
-
-  const setSelectedWorld = (event) => {
-    selectedWorld = event.detail.planetName;
-  };
 </script>
 
 <main>
-  <Game selectedWorld="Velknaz" />
-  <!-- {#if selectedWorld}
-    <Game {selectedWorld} />
+  <Game />
+  <!-- {#if $GameStore.world}
+    <Game />
   {:else if username}
-    <WorldSelectionSelector on:setWorld={setSelectedWorld} />
+    <WorldSelectionSelector />
   {:else}
     <SigninScreen on:addUser={addUser} />
   {/if} -->
