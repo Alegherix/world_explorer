@@ -4,7 +4,7 @@
 
 import type * as CANNON from 'cannon-es';
 import cannonDebugger from 'cannon-es-debugger';
-import { MeshStandardMaterialParameters, Vector3 } from 'three';
+import type { MeshStandardMaterialParameters } from 'three';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -35,8 +35,8 @@ class LavaWorld extends Game {
       camera,
       'lava.jpg',
       'lava',
-      '.png'
-      // true
+      '.png',
+      true
     );
     cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
@@ -81,10 +81,10 @@ class LavaWorld extends Game {
     this.createStairs();
     this.createBridge();
     this.createTube();
-    // this.createElevator();
     this.createHallwayOfSuprises();
     this.createBounceWayToHeaven();
     this.createHeavenMaze();
+    this.createHeavenStairway();
   }
 
   createFinishZone() {
@@ -222,7 +222,6 @@ class LavaWorld extends Game {
       speed: 0.5,
       direction: 'z',
     };
-    this.activeGamePieces.push(bouncePlate);
     this.addToWorld(bouncePlate);
 
     const secondBridge = PlaneFactory.createPlane(
@@ -299,7 +298,6 @@ class LavaWorld extends Game {
         direction: 'z',
       };
       this.addToWorld(pb);
-      this.activeGamePieces.push(pb);
     }
 
     const hallwayStairs = PlaneFactory.createPlane(
@@ -317,7 +315,6 @@ class LavaWorld extends Game {
       getPosition(3395, 290, -470),
       this.bouncePadConfig
     );
-    this.activeGamePieces.push(bouncePlate);
     this.addToWorld(bouncePlate);
   }
 
@@ -367,8 +364,67 @@ class LavaWorld extends Game {
     );
     this.addToWorld(platform2);
 
+    const elevator = PlaneFactory.createPlane(
+      getDimensions(40, 40, 250),
+      this.material.getGlassMaterial(),
+      getPosition(2400, 1200, -1000),
+      this.defaultConfig
+    );
+    elevator.movementType = {
+      start: 'sin',
+      direction: 'y',
+      distance: 200,
+      positionOffset: 1272,
+      speed: 0.4,
+    };
+    this.addToWorld(elevator);
+  }
+
+  createHeavenStairway() {
+    const platform = PlaneFactory.createPlane(
+      getDimensions(50, 50, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2355, 1595, -1000),
+      this.defaultConfig
+    );
+    this.addToWorld(platform);
+
+    const stairway = PlaneFactory.createPlane(
+      getDimensions(50, 300, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2355, 1670, -845),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpBack(stairway);
+    this.addToWorld(stairway);
+
+    const platform2 = PlaneFactory.createPlane(
+      getDimensions(50, 50, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2355, 1745, -690),
+      this.defaultConfig
+    );
+    this.addToWorld(platform2);
+
+    const stairway2 = PlaneFactory.createPlane(
+      getDimensions(50, 300, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2200, 1820, -690),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpLeft(stairway2);
+    this.addToWorld(stairway2);
+
+    const platform3 = PlaneFactory.createPlane(
+      getDimensions(50, 50, 1),
+      this.material.getGlassMaterial(),
+      getPosition(2045, 1895, -690),
+      this.defaultConfig
+    );
+    this.addToWorld(platform3);
+
     // Camera debugging
-    const debugPosition = { x: 2700, y: 1250, z: -700 };
+    const debugPosition = { x: 2355, y: 1605, z: -1000 };
     if (this.useOrbitCamera) {
       this.orbitCamera.target.set(
         debugPosition.x,

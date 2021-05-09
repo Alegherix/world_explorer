@@ -99,6 +99,7 @@ abstract class Game implements ISkybox {
   addToWorld(gamePiece: IGamePiece) {
     this.scene.add(gamePiece.mesh);
     this.world.addBody(gamePiece.body);
+    if (gamePiece.movementType) this.activeGamePieces.push(gamePiece);
   }
 
   // Used to move a gamepiece
