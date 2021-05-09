@@ -64,8 +64,8 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer() {
-    const startPosition = { x: 0, y: 15, z: 0 };
-    // const startPosition = { x: 90, y: 340, z: -470 };
+    // const startPosition = { x: 0, y: 15, z: 0 };
+    const startPosition = { x: 90, y: 340, z: -470 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -97,6 +97,38 @@ abstract class Game implements ISkybox {
     this.scene.add(gamePiece.mesh);
     this.world.addBody(gamePiece.body);
   }
+
+  // Used to move a gamepiece
+  move = (gamePiece: IGamePiece, estimatedTime: number): void => {
+    const {
+      start,
+      distance,
+      speed,
+      positionOffset,
+      direction,
+    } = gamePiece.movementType;
+    const movement =
+      start === 'sin'
+        ? Math.sin(estimatedTime * speed) * distance + positionOffset
+        : Math.cos(Math.PI / 2 + estimatedTime * speed) * distance +
+          positionOffset;
+
+    switch (direction) {
+      case 'x':
+        gamePiece.mesh.position.x = movement;
+        gamePiece.body.position.x = movement;
+        break;
+      case 'y':
+        gamePiece.mesh.position.y = movement;
+        gamePiece.body.position.y = movement;
+        break;
+
+      case 'z':
+        gamePiece.mesh.position.z = movement;
+        gamePiece.body.position.z = movement;
+        break;
+    }
+  };
 
   // Steer the currently controlled GamePiece
   steer(event: KeyboardEvent) {

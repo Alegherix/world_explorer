@@ -6,7 +6,6 @@
   import GameStore from '../shared/GameStore';
 
   let username: string;
-  let selectedWorld: GameWorld;
 
   const addUser = (event) => {
     username = event.detail.username;

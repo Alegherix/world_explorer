@@ -1,27 +1,26 @@
-import cannonDebugger from 'cannon-es-debugger';
 import type * as CANNON from 'cannon-es';
+import cannonDebugger from 'cannon-es-debugger';
 import type { MeshStandardMaterialParameters, Vector3 } from 'three';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
 import PlaneFactory from '../components/Plane';
+import PushBlock from '../components/PushBlock';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
 import TubeFactory from '../components/Tube';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
-import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import { getDimensions, getPosition } from '../utils/utils';
-import type { IDimension } from './../../shared/interfaces';
-import type { Vec3 } from 'cannon-es';
-import PushBlock from '../components/PushBlock';
+import type { IDimension, IGamePiece } from './../../shared/interfaces';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
   private defaultConfig: MeshStandardMaterialParameters;
   private bouncePadConfig: MeshStandardMaterialParameters;
   private pushBlocks: PushBlock[] = [];
+  private movables: IGamePiece[] = [];
 
   constructor(
     scene: THREE.Scene,
@@ -204,6 +203,14 @@ class LavaWorld extends Game {
       getPosition(310, 250, -470),
       this.bouncePadConfig
     );
+    bouncePlate.movementType = {
+      start: 'sin',
+      distance: 100,
+      positionOffset: -470,
+      speed: 0.5,
+      direction: 'z',
+    };
+    this.movables.push(bouncePlate);
     this.addToWorld(bouncePlate);
 
     const secondBridge = PlaneFactory.createPlane(
@@ -282,6 +289,10 @@ class LavaWorld extends Game {
 
     for (const pushBlock of this.pushBlocks) {
       pushBlock.moveBlock(elapsedTime);
+    }
+
+    for (const moveable of this.movables) {
+      this.move(moveable, elapsedTime);
     }
 
     for (const gamePiece of this.activeGamePieces) {

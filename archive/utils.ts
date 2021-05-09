@@ -39,3 +39,11 @@
 //     this.activeCubes.splice(index[0], 1);
 //   }
 // }
+
+// if (start === 'sin') {
+//   return Math.sin(estimatedtime * speed) * distance + positionOffset;
+// } else {
+//   return (
+//     Math.cos(Math.PI / 2 + estimatedtime * speed) * distance + positionOffset
+//   );
+// }
