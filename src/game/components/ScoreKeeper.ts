@@ -19,7 +19,6 @@ class ScoreKeeper {
   createCoin(x: number, y: number, z: number) {
     const mesh = new Mesh(this.geometry, this.material);
     mesh.position.set(x, y, z);
-    mesh.geometry.computeBoundingBox();
     mesh.rotation.x = Math.PI / 2;
     mesh.castShadow = true;
     mesh.name = 'coin';
@@ -27,21 +26,16 @@ class ScoreKeeper {
     this.scene.add(mesh);
   }
 
-  // If coin in within 3Vector units, compute if they actually intersect
   // and if they do update score && remove from scene & array.
   private haveScored(player: Mesh) {
-    this.playerBox.setFromObject(player);
     for (let index = 0; index < this.coins.length; index++) {
       let coin = this.coins[index];
-      if (coin.position.distanceTo(player.position) <= 3) {
-        this.coinBox.setFromObject(coin);
-        if (this.playerBox.intersectsBox(this.coinBox)) {
-          this.scene.remove(coin);
-          this.coins.splice(index, 1);
-          GameStore.update((store) => {
-            return { ...store, score: store.score + 1 };
-          });
-        }
+      if (coin.position.distanceTo(player.position) <= 10) {
+        this.scene.remove(coin);
+        this.coins.splice(index, 1);
+        GameStore.update((store) => {
+          return { ...store, score: store.score + 1 };
+        });
       }
     }
   }

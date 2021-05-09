@@ -72,7 +72,6 @@ abstract class Game implements ISkybox {
     );
     mesh.castShadow = true;
     mesh.position.copy(startPosition as Vector3);
-    mesh.geometry.computeBoundingSphere();
 
     // Create the physics object to match the mesh object
     const boxShape = new CANNON.Sphere(5);
@@ -100,33 +99,42 @@ abstract class Game implements ISkybox {
 
   // Used to move a gamepiece
   move = (gamePiece: IGamePiece, estimatedTime: number): void => {
-    const {
-      start,
-      distance,
-      speed,
-      positionOffset,
-      direction,
-    } = gamePiece.movementType;
-    const movement =
-      start === 'sin'
-        ? Math.sin(estimatedTime * speed) * distance + positionOffset
-        : Math.cos(Math.PI / 2 + estimatedTime * speed) * distance +
-          positionOffset;
+    if (!gamePiece.movementType) {
+      gamePiece.mesh.position.copy(
+        (gamePiece.body.position as unknown) as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+      );
+    } else {
+      const {
+        start,
+        distance,
+        speed,
+        positionOffset,
+        direction,
+      } = gamePiece.movementType;
+      const movement =
+        start === 'sin'
+          ? Math.sin(estimatedTime * speed) * distance + positionOffset
+          : Math.cos(Math.PI / 2 + estimatedTime * speed) * distance +
+            positionOffset;
 
-    switch (direction) {
-      case 'x':
-        gamePiece.mesh.position.x = movement;
-        gamePiece.body.position.x = movement;
-        break;
-      case 'y':
-        gamePiece.mesh.position.y = movement;
-        gamePiece.body.position.y = movement;
-        break;
+      switch (direction) {
+        case 'x':
+          gamePiece.mesh.position.x = movement;
+          gamePiece.body.position.x = movement;
+          break;
+        case 'y':
+          gamePiece.mesh.position.y = movement;
+          gamePiece.body.position.y = movement;
+          break;
 
-      case 'z':
-        gamePiece.mesh.position.z = movement;
-        gamePiece.body.position.z = movement;
-        break;
+        case 'z':
+          gamePiece.mesh.position.z = movement;
+          gamePiece.body.position.z = movement;
+          break;
+      }
     }
   };
 

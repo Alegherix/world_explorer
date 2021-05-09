@@ -59,7 +59,6 @@ class LavaWorld extends Game {
     const displacement = loader.load('/textures/lavaPlanet/MP_height.png');
     const ambientocclusion = loader.load('/textures/lavaPlanet/MP_ao.jpg');
     const metallic = loader.load('/textures/lavaPlanet/MP_metallic.jpg');
-
     const roughness = loader.load('/textures/lavaPlanet/MP_roughness.jpg');
 
     this.bouncePadConfig = {
@@ -210,7 +209,7 @@ class LavaWorld extends Game {
       speed: 0.5,
       direction: 'z',
     };
-    this.movables.push(bouncePlate);
+    this.activeGamePieces.push(bouncePlate);
     this.addToWorld(bouncePlate);
 
     const secondBridge = PlaneFactory.createPlane(
@@ -291,18 +290,22 @@ class LavaWorld extends Game {
       pushBlock.moveBlock(elapsedTime);
     }
 
-    for (const moveable of this.movables) {
-      this.move(moveable, elapsedTime);
+    for (const gamePiece of this.activeGamePieces) {
+      this.move(gamePiece, elapsedTime);
     }
 
-    for (const gamePiece of this.activeGamePieces) {
-      gamePiece.mesh.position.copy(
-        (gamePiece.body.position as unknown) as Vector3
-      );
-      gamePiece.mesh.quaternion.copy(
-        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
-      );
-    }
+    // for (const moveable of this.movables) {
+    //   this.move(moveable, elapsedTime);
+    // }
+
+    // for (const gamePiece of this.activeGamePieces) {
+    //   gamePiece.mesh.position.copy(
+    //     (gamePiece.body.position as unknown) as Vector3
+    //   );
+    //   gamePiece.mesh.quaternion.copy(
+    //     (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+    //   );
+    // }
     // this.movePushBlocks(timeDelta);
     this.world.step(1 / 100, timeDelta);
   }
