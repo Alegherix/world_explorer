@@ -1,4 +1,3 @@
-import { IConnected } from './../../../server/worldConnection';
 /**
  * @desc Used for creating the Game world of Morghol, an abandoned mineral planet
  */
@@ -11,7 +10,11 @@ import { Vec3 } from 'cannon-es';
 import type { Vector3 } from 'three';
 import Gamestore from '../../shared/GameStore';
 import { get } from 'svelte/store';
-import type { ISocketMessage } from '../../shared/interfaces';
+import type {
+  IConnected,
+  ICurrentUsers,
+  ISocketMessage,
+} from '../../shared/interfaces';
 
 class MultiplayerWorld extends Game {
   private server: WebSocket;
@@ -84,7 +87,9 @@ class MultiplayerWorld extends Game {
     this.server.addEventListener(
       'open',
       () => this.server.send(JSON.stringify(connectionMessage)),
-      { once: true }
+      {
+        once: true,
+      }
     );
   }
 
@@ -94,14 +99,18 @@ class MultiplayerWorld extends Game {
 
   // Sorts Messages based on info
   handleServerMsg(event: MessageEvent) {
-    const { msg }: ISocketMessage = JSON.parse(event.data);
-    console.log(msg);
+    const data = JSON.parse(event.data);
+    const { msg }: ISocketMessage = data;
+    console.log(data);
 
     switch (msg) {
+      case 'currentUsers':
+        this.spawnExistingPlayers(data);
+
       case 'connected':
-        this.spawnOtherPlayers(event.data);
+        this.spawnOtherPlayers(data);
         break;
-      case 'connected':
+      case 'update':
         break;
 
       default:
@@ -110,11 +119,17 @@ class MultiplayerWorld extends Game {
     }
   }
 
+  spawnExistingPlayers(data: ICurrentUsers) {
+    console.log(data.users);
+  }
+
   spawnOtherPlayers(data: IConnected) {
-    // Makes sure not to spawn ball when self connecting
-    if (this.userName === data.username) return;
     console.log(`Svelte username ${this.userName}`);
     console.log(`Server username ${data.username}`);
+    // Makes sure not to spawn ball when self connecting
+    if (this.userName === data.username) return;
+
+    console.log("Spawning ball is runing, even if it shouldn't");
 
     const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(
@@ -137,8 +152,7 @@ class MultiplayerWorld extends Game {
     // Add entities to the world
     this.scene.add(mesh);
     this.world.addBody(body);
-    this.currentGamePiece = { mesh, body };
-    this.activeGamePieces.push(this.currentGamePiece);
+    this.activeGamePieces.push({ mesh, body });
   }
 }
 

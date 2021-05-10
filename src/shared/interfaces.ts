@@ -37,7 +37,11 @@ export interface ISkybox {
 // This is the same as in the socket server, can't rly share
 // Since they won't share same hosting and codebase in prod
 export interface ISocketMessage {
-  msg: 'connected' | 'update';
+  msg: 'currentUsers' | 'connected' | 'update';
+}
+
+export interface ICurrentUsers extends ISocketMessage {
+  users: string[];
 }
 
 export interface IConnected extends ISocketMessage {
