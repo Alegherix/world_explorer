@@ -12,8 +12,6 @@ const server = serve({ port });
 console.log(`Starting socket server at: http://localhost:${port}`);
 
 for await (const req of server) {
-  console.log('Incomming user to server');
-
   if (req.url === '/ws' && acceptable(req)) {
     acceptWebSocket({
       conn: req.conn,

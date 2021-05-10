@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import GameStore from '../shared/GameStore';
 
-  const dispatch = createEventDispatcher<{ addUser: { username: string } }>();
   let username;
-
   const handleSubmit = () => {
-    dispatch('addUser', {
-      username,
+    GameStore.update((store) => {
+      return { ...store, username };
     });
   };
 </script>
@@ -14,7 +12,7 @@
 <main>
   <div class="container">
     <h1>World Explorer</h1>
-    <input type="text" placeholder="Nickname" bind:value={username} />
+    <input type="text" placeholder="Username" bind:value={username} />
     {#if username && username.length >= 2}
       <button on:click={handleSubmit}>Play</button>
     {/if}

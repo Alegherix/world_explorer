@@ -1,3 +1,4 @@
+import { IConnected } from './../../../server/worldConnection';
 /**
  * @desc Used for creating the Game world of Morghol, an abandoned mineral planet
  */
@@ -8,9 +9,13 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
 import type { Vector3 } from 'three';
+import Gamestore from '../../shared/GameStore';
+import { get } from 'svelte/store';
+import type { ISocketMessage } from '../../shared/interfaces';
 
 class MultiplayerWorld extends Game {
   private server: WebSocket;
+  private userName: string;
 
   constructor(
     scene: THREE.Scene,
@@ -29,7 +34,9 @@ class MultiplayerWorld extends Game {
       'space',
       '.jpg'
     );
-
+    this.userName = get(Gamestore).username;
+    this.createServerConnection();
+    this.startListeningToIncomingServerEvents();
     this.createStartingZone();
     this.addPhysicalStartingZone();
     this.createPlayer();
@@ -70,12 +77,45 @@ class MultiplayerWorld extends Game {
     this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
   }
 
-  handleServerMsg() {
-    // Spawna en ny boll om vi får ett inkommande meddelande ifrån servern
-    this.spawnOtherPlayers();
+  // Send that the user has connected to server
+  createServerConnection() {
+    this.server = new WebSocket('ws://localhost:8000/ws');
+    const connectionMessage = { msg: 'connected', username: this.userName };
+    this.server.addEventListener(
+      'open',
+      () => this.server.send(JSON.stringify(connectionMessage)),
+      { once: true }
+    );
   }
 
-  spawnOtherPlayers() {
+  startListeningToIncomingServerEvents() {
+    this.server.addEventListener('message', this.handleServerMsg.bind(this));
+  }
+
+  // Sorts Messages based on info
+  handleServerMsg(event: MessageEvent) {
+    const { msg }: ISocketMessage = JSON.parse(event.data);
+    console.log(msg);
+
+    switch (msg) {
+      case 'connected':
+        this.spawnOtherPlayers(event.data);
+        break;
+      case 'connected':
+        break;
+
+      default:
+        console.log('Something went wrong');
+        break;
+    }
+  }
+
+  spawnOtherPlayers(data: IConnected) {
+    // Makes sure not to spawn ball when self connecting
+    if (this.userName === data.username) return;
+    console.log(`Svelte username ${this.userName}`);
+    console.log(`Server username ${data.username}`);
+
     const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
@@ -99,12 +139,6 @@ class MultiplayerWorld extends Game {
     this.world.addBody(body);
     this.currentGamePiece = { mesh, body };
     this.activeGamePieces.push(this.currentGamePiece);
-  }
-
-  createServerConnection() {
-    this.server = new WebSocket('ws://localhost:8000');
-
-    this.server.addEventListener('message', this.handleServerMsg.bind(this));
   }
 }
 

@@ -33,3 +33,13 @@ export type GameWorld = 'Morghol' | 'Velknaz' | 'Zetxaru';
 export interface ISkybox {
   createSkybox(path: string, extension: string);
 }
+
+// This is the same as in the socket server, can't rly share
+// Since they won't share same hosting and codebase in prod
+export interface ISocketMessage {
+  msg: 'connected' | 'update';
+}
+
+export interface IConnected extends ISocketMessage {
+  username: string;
+}

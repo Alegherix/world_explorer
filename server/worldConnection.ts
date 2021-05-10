@@ -9,7 +9,7 @@ interface ISocketMessage {
 }
 
 interface IConnected extends ISocketMessage {
-  user: string;
+  username: string;
 }
 
 // Create a map with all the currently connected players
@@ -23,7 +23,13 @@ const broadcastCloseEvent = (uuid: string) => {
 
 // Used for broadcasting that another user has connected to the world
 const broadcastConnect = (obj: IConnected) => {
+  console.log(`${obj.username} has connected to the server`);
+
   sockets.forEach((ws: WebSocket) => {
+    const msg = JSON.stringify(obj);
+    console.log(`Trying to send ${obj}`);
+    console.log(`msg is ${msg}`);
+
     ws.send(JSON.stringify(obj));
   });
 };
@@ -46,16 +52,14 @@ const filterIncommingMessages = (obj: ISocketMessage) => {
 };
 
 export const worldConnection = async (ws: WebSocket) => {
-  for await (const ev of ws) {
-    // Create an unique id for each connected client
-    const uuid: string = v4.generate();
-    sockets.set(uuid, ws);
+  // Add the new websocket connection to map to keep track of all connected users
+  const uuid: string = v4.generate();
+  sockets.set(uuid, ws);
 
+  for await (const ev of ws) {
     if (isWebSocketCloseEvent(ev)) {
       broadcastCloseEvent(uuid);
-    }
-
-    if (typeof ev === 'string') {
+    } else if (typeof ev === 'string') {
       let evObj = JSON.parse(ev);
       filterIncommingMessages(evObj);
     }
