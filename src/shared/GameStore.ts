@@ -10,7 +10,7 @@ interface IScore {
 const GameStore = writable<IScore>({
   score: 0,
   elapsedTime: 0,
-  world: 'Velknaz',
+  world: null,
 });
 
 export default GameStore;

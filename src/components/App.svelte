@@ -13,12 +13,12 @@
 </script>
 
 <main>
-  <Game />
-  <!-- {#if $GameStore.world}
+  <!-- <Game /> -->
+  {#if $GameStore.world}
     <Game />
   {:else if username}
     <WorldSelectionSelector />
   {:else}
     <SigninScreen on:addUser={addUser} />
-  {/if} -->
+  {/if}
 </main>

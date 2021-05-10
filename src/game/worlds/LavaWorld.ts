@@ -42,10 +42,10 @@ class LavaWorld extends Game {
       camera,
       'lava.jpg',
       'lava',
-      '.png',
-      true
+      '.png'
+      // true
     );
-    cannonDebugger(this.scene, this.world.bodies);
+    // cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
 
     this.createStartingZone();
@@ -135,6 +135,7 @@ class LavaWorld extends Game {
         d: 200,
       },
     ];
+
     const platform = PlaneFactory.createPlane(
       getDimensions(300, 300, 1),
       this.material.getGlassMaterial(),
@@ -153,22 +154,6 @@ class LavaWorld extends Game {
       this.addToWorld(firstWall);
     }
 
-    // const roof = PlaneFactory.createPlane(
-    //   getDimensions(300, 300, 1),
-    //   this.material.getGlassMaterial(),
-    //   getPosition(1016, 2195, -690),
-    //   { color: 0x1987ee, transparent: true, opacity: 0.4 }
-    // );
-    // this.addToWorld(roof);
-
-    // const firstWall = PlaneFactory.createPlane(
-    //   getDimensions(300, 1, 400),
-    //   this.material.getGlassMaterial(),
-    //   getPosition(1016, 1995, -840),
-    //   { color: 0x1987ee, transparent: true, opacity: 0.4 }
-    // );
-    // this.addToWorld(firstWall);
-
     const lootGeometry = new OctahedronBufferGeometry(12, 0);
     const lootMaterial = new MeshPhongMaterial({
       color: 0x98b1c4,
@@ -181,22 +166,6 @@ class LavaWorld extends Game {
     lootMesh.castShadow = true;
     lootMesh.position.set(1016, 2015, -690);
     this.scene.add(lootMesh);
-
-    // Camera debugging
-    const debugPosition = { x: 1395, y: 1900, z: -690 };
-    if (this.useOrbitCamera) {
-      this.orbitCamera.target.set(
-        debugPosition.x,
-        debugPosition.y,
-        debugPosition.z
-      );
-      this.orbitCamera.update();
-    }
-    this.currentGamePiece.body.position.set(
-      debugPosition.x,
-      debugPosition.y,
-      debugPosition.z
-    );
   }
 
   createStartingZone() {

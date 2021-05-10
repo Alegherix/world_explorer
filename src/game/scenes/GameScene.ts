@@ -7,6 +7,7 @@ import type Game from '../Game';
 import Material from '../utils/Materials';
 import LavaWorld from '../worlds/LavaWorld';
 import MineralWorld from '../worlds/MineralWorld';
+import MultiplayerWorld from '../worlds/MultiplayerWorld';
 import BaseScene from './BaseScene';
 
 class GameScene extends BaseScene {
@@ -20,14 +21,14 @@ class GameScene extends BaseScene {
     this.material = new Material();
     this.createPhysicsWorld();
 
-    // this.createGameWorld();
-    this.game = new LavaWorld(
-      this.scene,
-      this.world,
-      this.loader,
-      this.material,
-      this.worldCamera
-    );
+    this.createGameWorld();
+    // this.game = new LavaWorld(
+    //   this.scene,
+    //   this.world,
+    //   this.loader,
+    //   this.material,
+    //   this.worldCamera
+    // );
 
     this.tick();
   }
@@ -56,6 +57,13 @@ class GameScene extends BaseScene {
         break;
 
       case 'Zetxaru':
+        this.game = new MultiplayerWorld(
+          this.scene,
+          this.world,
+          this.loader,
+          this.material,
+          this.worldCamera
+        );
         break;
     }
   }

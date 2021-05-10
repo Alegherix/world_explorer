@@ -6,7 +6,8 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear -p 3000",
-    "validate": "svelte-check"
+    "validate": "svelte-check",
+    "server": "cd server && denon run --allow-net --allow-read app.ts"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
