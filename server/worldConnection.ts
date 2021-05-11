@@ -47,18 +47,23 @@ const broadcastConnect = (obj: IConnected) => {
 // Atm broadcasts an array of all connected players and their position whenever an incomming update is sent from client
 const broadcastUpdateState = (uuid: string, obj: IUpdate) => {
   try {
-    const userSendingUpdate = sockets.get(uuid);
-    const userAndPosition: any[] = [];
-    sockets.forEach((value, key) => {
-      if (key !== uuid) {
-        // don't send websocket info to client
-        const { websocket, ...relevant } = value;
-        userAndPosition.push(relevant);
-      }
+    // Update position based on the update sent
+    sockets.get(uuid)!.position = obj.position;
+
+    // O(2n) atm
+    // Populate array with all users and their position
+    const update: any[] = [];
+    sockets.forEach((player) => {
+      // don't send websocket info to client
+      const { websocket, ...relevant } = player;
+      update.push(relevant);
     });
-    userSendingUpdate?.websocket.send(
-      JSON.stringify({ msg: 'update', userAndPosition })
-    );
+
+    const updateMsg = { msg: 'update', update };
+    // Send all positions to every client, let them filter it themselves
+    sockets.forEach((player) => {
+      player.websocket.send(JSON.stringify(updateMsg));
+    });
   } catch (error) {
     console.log(error);
   }

@@ -14,6 +14,7 @@ import type {
   IConnected,
   ICurrentUsers,
   ISocketMessage,
+  IUpdate,
 } from '../../shared/interfaces';
 
 class MultiplayerWorld extends Game {
@@ -45,7 +46,7 @@ class MultiplayerWorld extends Game {
     this.startListeningToIncomingServerEvents();
     this.createStartingZone();
     this.addPhysicalStartingZone();
-    this.createPlayer();
+    this.createPlayer(this.userName);
   }
 
   createGameMap() {
@@ -120,15 +121,17 @@ class MultiplayerWorld extends Game {
   handleServerMsg(event: MessageEvent) {
     const data = JSON.parse(event.data);
     const { msg }: ISocketMessage = data;
+    console.log(event.data);
 
     switch (msg) {
       case 'currentUsers':
         this.spawnExistingPlayers(data);
 
       case 'connected':
-        this.spawnOtherPlayers(data);
+        // this.spawnOtherPlayers(data);
         break;
       case 'update':
+        this.updateGameState(data);
         break;
 
       default:
@@ -174,6 +177,7 @@ class MultiplayerWorld extends Game {
     );
     mesh.castShadow = true;
     mesh.position.copy(startPosition as Vector3);
+    mesh.name = data.username;
 
     // Create the physics object to match the mesh object
     const boxShape = new CANNON.Sphere(5);
@@ -189,6 +193,25 @@ class MultiplayerWorld extends Game {
     this.scene.add(mesh);
     this.world.addBody(body);
     this.activeGamePieces.push({ mesh, body });
+  }
+
+  // Uppdatera att använda UUID ist så att inte användare med samma namn får varandras position
+  updateGameState(data: IUpdate) {
+    const { update } = data;
+
+    update.forEach(({ username, position }) => {
+      if (username && this.userName !== username) {
+        const { x, y, z } = position;
+        console.log(`Position of ${username}: x:${x} y:${y} z:${z}`);
+        const pieceToUpdate = this.activeGamePieces.find(
+          (piece) => piece.mesh.name === username
+        );
+        pieceToUpdate.mesh.position.set(x, y, z);
+        pieceToUpdate.body.position.copy(
+          pieceToUpdate.mesh.position as unknown as Vec3
+        );
+      }
+    });
   }
 }
 

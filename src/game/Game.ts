@@ -68,7 +68,7 @@ abstract class Game implements ISkybox {
     this.scene.background = texture;
   }
 
-  createPlayer() {
+  createPlayer(name?: string) {
     const startPosition = { x: 0, y: 15, z: 0 };
     // const startPosition = { x: 490, y: 340, z: -470 };
     const mesh = new THREE.Mesh(
@@ -77,6 +77,8 @@ abstract class Game implements ISkybox {
     );
     mesh.castShadow = true;
     mesh.position.copy(startPosition as Vector3);
+    mesh.name = name ? name : '';
+    console.log('Created mesh with name: ', mesh.name);
 
     // Create the physics object to match the mesh object
     const boxShape = new CANNON.Sphere(5);

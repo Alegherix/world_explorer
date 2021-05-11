@@ -40,6 +40,8 @@ export interface ISocketMessage {
   msg: 'currentUsers' | 'connected' | 'update';
 }
 
+export type Update = { username: string; position: IPosition };
+
 export interface ICurrentUsers extends ISocketMessage {
   users: string[];
 }
@@ -48,8 +50,6 @@ export interface IConnected extends ISocketMessage {
   username: string;
 }
 
-export type Update = { username: string; position: IPosition };
-
-export interface IUpdate {
+export interface IUpdate extends ISocketMessage {
   update: Update[];
 }
