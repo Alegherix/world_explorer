@@ -10,6 +10,13 @@ export interface IDimension {
   depth: number;
 }
 
+export interface ICylinderDimension {
+  radiusTop: number;
+  radiusBottom: number;
+  height: number;
+  radialSegments: number;
+}
+
 // This is the same as in the socket server, can't rly share
 // Since they won't share same hosting and codebase in prod
 export interface ISocketMessage {

@@ -1,83 +1,81 @@
-import * as THREE from 'three';
-import { MeshPhongMaterial, Object3D } from 'three';
-import CANNON, { Vec3 } from 'cannon';
-import type Material from '../utils/Materials';
+import * as CANNON from 'cannon-es';
+import {
+  CylinderBufferGeometry,
+  BoxBufferGeometry,
+  Float32BufferAttribute,
+  Mesh,
+  MeshPhongMaterial,
+  MeshPhongMaterialParameters,
+  MeshStandardMaterial,
+  MeshStandardMaterialParameters,
+} from 'three';
+import { createBoundry } from '../utils/utils';
+import type { IGamePiece } from '../../shared/frontendInterfaces';
+import type { ICylinderDimension, IDimension, IPosition } from './../../shared/interfaces';
 
 class Platform {
-  constructor(private world: CANNON.World, private scene: THREE.Scene, private material: Material) {
-    this.world = world;
-    this.scene = scene;
-    this.material = material;
-
-    this.createPlatform();
-    this.createRandomPlatforms();
-  }
-
-  createPlatform() {
+  static createCylinderPlatform(
+    dimensions: ICylinderDimension,
+    phyicsMaterial: CANNON.Material,
+    position?: IPosition,
+    configObj?: MeshPhongMaterialParameters,
+    rotation?: number
+  ): IGamePiece {
     const randomColor = () => {
       let n = (Math.random() * 0xfffff * 1000000).toString(16);
       return '#' + n.slice(0, 6);
     };
 
-    const geometry = new THREE.CylinderBufferGeometry(20, 20, 4, 32);
-    const material = new THREE.MeshPhongMaterial({
-      color: randomColor(),
-      emissive: 0x0,
-      shininess: 40,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(-150, 10, -20);
-
+    const { radiusTop, radiusBottom, height, radialSegments } = dimensions;
+    const geometry = new CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments);
+    const material = new MeshPhongMaterial(
+      configObj ? configObj : { color: randomColor(), emissive: 0x0, shininess: 40 }
+    );
+    const mesh = new Mesh(geometry, material);
     mesh.receiveShadow = true;
-    this.scene.add(mesh);
+    mesh.geometry.setAttribute('uv2', new Float32BufferAttribute(mesh.geometry.attributes.uv.array, 2));
 
-    const shape = new CANNON.Cylinder(20, 20, 4, 32);
-    const body = new CANNON.Body({
-      mass: 0,
-      shape,
-      material: this.material.getSpungeMaterial(),
-    });
+    if (position) {
+      const { x, y, z } = position;
+      mesh.position.set(x, y, z);
+    }
 
-    body.position.copy((mesh.position as unknown) as Vec3);
-    this.world.addBody(body);
-    body.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
+    const shape = new CANNON.Cylinder(radiusTop, radiusBottom, height, radialSegments);
+    const body = createBoundry(-1, 0, 0, 0, 0, 0, rotation ? rotation : Math.PI, shape, phyicsMaterial);
+    body.position.copy(mesh.position as unknown as CANNON.Vec3);
+
+    return { mesh, body };
   }
 
-  createRandomPlatforms() {
-    const randomPlatforms = new THREE.Group();
-    this.scene.add(randomPlatforms);
-
+  static createPlanePlatform(
+    dimensions: IDimension,
+    phyicsMaterial: CANNON.Material,
+    position?: IPosition,
+    configObj?: MeshStandardMaterialParameters,
+    rotation?: number
+  ): IGamePiece {
     const randomColor = () => {
       let n = (Math.random() * 0xfffff * 1000000).toString(16);
       return '#' + n.slice(0, 6);
     };
 
-    for (let i = 0; i < 40; i++) {
-      const geometry = new THREE.CylinderBufferGeometry(20, 20, 4, 32);
-      const material = new MeshPhongMaterial({
-        color: randomColor(),
-        emissive: 0x0,
-        shininess: 40,
-      });
+    const { width, height, depth } = dimensions;
+    const geometry = new BoxBufferGeometry(width, height, depth, 64, 64);
+    const material = new MeshStandardMaterial(configObj ? configObj : { color: randomColor() });
+    const mesh = new Mesh(geometry, material);
+    mesh.receiveShadow = true;
+    mesh.geometry.setAttribute('uv2', new Float32BufferAttribute(mesh.geometry.attributes.uv.array, 2));
 
-      const x = Math.random() * 501 - 250;
-      const y = Math.random() * 101 - 50;
-      const z = Math.random() * 1100 - 1701;
-
-      const randomPlatform = new THREE.Mesh(geometry, material);
-      randomPlatform.position.set(x, y, z);
-      randomPlatforms.add(randomPlatform);
-
-      const cylinderShape = new CANNON.Cylinder(20, 20, 4, 32);
-      const body = new CANNON.Body({
-        mass: 0,
-        shape: cylinderShape,
-        material: this.material.getSpungeMaterial(),
-      });
-      body.position.copy((randomPlatform.position as unknown) as Vec3);
-      this.world.addBody(body);
-      body.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
+    if (position) {
+      const { x, y, z } = position;
+      mesh.position.set(x, y, z);
     }
+
+    const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
+    const body = createBoundry(-1, 0, 0, 0, 0, 0, rotation ? rotation : Math.PI, shape, phyicsMaterial);
+    body.position.copy(mesh.position as unknown as CANNON.Vec3);
+
+    return { mesh, body };
   }
 }
 
