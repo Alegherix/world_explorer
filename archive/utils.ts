@@ -39,3 +39,27 @@
 //     this.activeCubes.splice(index[0], 1);
 //   }
 // }
+
+// if (start === 'sin') {
+//   return Math.sin(estimatedtime * speed) * distance + positionOffset;
+// } else {
+//   return (
+//     Math.cos(Math.PI / 2 + estimatedtime * speed) * distance + positionOffset
+//   );
+// }
+
+// Camera debugging
+// const debugPosition = { x: 1395, y: 1900, z: -690 };
+// if (this.useOrbitCamera) {
+//   this.orbitCamera.target.set(
+//     debugPosition.x,
+//     debugPosition.y,
+//     debugPosition.z
+//   );
+//   this.orbitCamera.update();
+// }
+// this.currentGamePiece.body.position.set(
+//   debugPosition.x,
+//   debugPosition.y,
+//   debugPosition.z
+// );

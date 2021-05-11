@@ -1,18 +1,18 @@
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
 import {
+  Box3,
   BoxBufferGeometry,
   Float32BufferAttribute,
   Mesh,
   MeshStandardMaterial,
   MeshStandardMaterialParameters,
+  Vector3,
 } from 'three';
 import { createBoundry } from '../utils/utils';
-import type {
-  IDimension,
-  IGamePiece,
-  IPosition,
-} from './../../shared/interfaces';
+import type { IDimension, IPosition } from './../../shared/interfaces';
+import type { IGamePiece } from './../../shared/frontendInterfaces';
+import type ScoreKeeper from './ScoreKeeper';
 
 class PlaneFactory {
   static createPlane(
@@ -20,7 +20,7 @@ class PlaneFactory {
     phyicsMaterial: CANNON.Material,
     position?: IPosition,
     configObj?: MeshStandardMaterialParameters,
-    rotation?: number
+    scoreKeeper?: ScoreKeeper
   ): IGamePiece {
     const { width, height, depth } = dimensions;
     const geometry = new BoxBufferGeometry(width, height, depth, 64, 64);
@@ -31,7 +31,7 @@ class PlaneFactory {
     );
     const mesh = new Mesh(geometry, material);
     mesh.receiveShadow = true;
-    mesh.rotation.x = rotation ? rotation : -Math.PI * 0.5;
+    mesh.rotation.x = -Math.PI * 0.5;
     mesh.geometry.setAttribute(
       'uv2',
       new Float32BufferAttribute(mesh.geometry.attributes.uv.array, 2)
@@ -40,6 +40,10 @@ class PlaneFactory {
     if (position) {
       const { x, y, z } = position;
       mesh.position.set(x, y, z);
+    }
+
+    if (scoreKeeper) {
+      this.addPointsToPlane(dimensions, position, scoreKeeper);
     }
 
     const shape = new CANNON.Box(new Vec3(width / 2, height / 2, depth / 2));
@@ -51,38 +55,48 @@ class PlaneFactory {
       0,
       0,
       0,
-      rotation ? rotation : Math.PI * 0.5,
+      Math.PI * 0.5,
       shape,
       phyicsMaterial
     );
-    body.position.copy((mesh.position as unknown) as Vec3);
+    body.position.copy(mesh.position as unknown as Vec3);
 
     return { mesh, body };
   }
 
-  // static slopePlane(plane: IGamePiece) {
-  //   plane.mesh.rotation.x = -Math.PI / 2;
-  //   plane.mesh.rotation.y = Math.PI / 6;
-  //   plane.mesh.rotation.z = Math.PI / 2;
+  // Used for adding points to the plane
+  private static addPointsToPlane(
+    dimension: IDimension,
+    position: IPosition,
+    scoreKeeper: ScoreKeeper
+  ) {
+    const { width, height } = dimension;
+    const { x, y, z } = position;
+    const spaceBetweenPoints = 15;
+    const offset = 5;
+    // Since position is based on middle of plane, we need to add half plane at start of iteration
+    let appendage = height > width ? height / 2 : width / 2;
 
-  //   const angleX = Math.PI / 2;
-  //   const angleY = Math.PI / 6;
-  //   const angleZ = Math.PI / 2;
-
-  //   const quatX = new CANNON.Quaternion();
-  //   const quatY = new CANNON.Quaternion();
-  //   const quatZ = new CANNON.Quaternion();
-
-  //   quatX.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), angleX);
-  //   quatY.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), angleY);
-  //   quatZ.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), angleZ);
-
-  //   const quaternion = quatX.mult(quatY).mult(quatZ);
-
-  //   plane.body.quaternion = quaternion;
-
-  //   plane.body.position.copy((plane.mesh.position as unknown) as Vec3);
-  // }
+    // Create coins at earliest 5px near the closest edge of plane
+    if (height > width) {
+      appendage = height / 2;
+      for (
+        let index = offset;
+        index < height - offset;
+        index += spaceBetweenPoints
+      ) {
+        scoreKeeper.createCoin(x, y + offset, z - appendage + index);
+      }
+    } else {
+      for (
+        let index = offset;
+        index < width - offset;
+        index += spaceBetweenPoints
+      ) {
+        scoreKeeper.createCoin(x - appendage + index, y + offset, z);
+      }
+    }
+  }
 
   private static slopePlane(
     plane: IGamePiece,
@@ -110,7 +124,7 @@ class PlaneFactory {
 
     plane.body.quaternion = quaternion;
 
-    plane.body.position.copy((plane.mesh.position as unknown) as Vec3);
+    plane.body.position.copy(plane.mesh.position as unknown as Vec3);
   }
 
   static slopePlaneUpRight(plane: IGamePiece) {

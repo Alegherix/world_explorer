@@ -1,14 +1,74 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  // import World from '../World';
   import GameScene from '../game/scenes/GameScene';
-  import type { GameWorld } from '../shared/interfaces';
+  import GameStore from '../shared/GameStore';
 
   let canvas;
-  export let selectedWorld: GameWorld;
+  $: elapsedTime = $GameStore.elapsedTime;
+
   onMount(() => {
-    new GameScene(canvas, selectedWorld);
+    new GameScene(canvas, $GameStore.world);
   });
+
+  const handleMenu = () => {
+    GameStore.update((store) => {
+      return { ...store, world: null };
+    });
+  };
 </script>
 
-<canvas class="webgl" bind:this={canvas} />
+<main>
+  <canvas class="webgl" bind:this={canvas} />
+  <section>
+    <div class="scoreCounter">
+      <h2>Points</h2>
+      <h3>{$GameStore.score}</h3>
+    </div>
+    <div class="playtimeContainer">
+      <h2>Time played</h2>
+      <h3>{elapsedTime.toFixed(2)}</h3>
+    </div>
+  </section>
+  <!-- <button on:click={handleMenu}>Back to MainMenu</button> -->
+</main>
+
+<style>
+  section {
+    display: flex;
+    flex-direction: row-reverse;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .scoreCounter,
+  .playtimeContainer {
+    width: 200px;
+    height: 100px;
+  }
+  h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+  }
+
+  h3 {
+    text-align: center;
+    color: #f4cd04;
+    font-size: 52px;
+    margin: 0;
+  }
+
+  button {
+    position: absolute;
+    top: 4rem;
+    left: 2rem;
+    border: solid #1987ee 2px;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    background-color: black;
+    color: #1987ee;
+    font-size: 2rem;
+  }
+</style>

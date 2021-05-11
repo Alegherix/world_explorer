@@ -2,11 +2,12 @@
  * @desc Used for creating the Game Scene, which is the scene which makes sure to render the actual game play inside
  */
 import * as CANNON from 'cannon-es';
-import type { GameWorld } from '../../shared/interfaces';
+import type { GameWorld } from '../../shared/frontendInterfaces';
 import type Game from '../Game';
 import Material from '../utils/Materials';
 import LavaWorld from '../worlds/LavaWorld';
 import MineralWorld from '../worlds/MineralWorld';
+import MultiplayerWorld from '../worlds/MultiplayerWorld';
 import BaseScene from './BaseScene';
 
 class GameScene extends BaseScene {
@@ -20,14 +21,14 @@ class GameScene extends BaseScene {
     this.material = new Material();
     this.createPhysicsWorld();
 
-    // this.createGameWorld();
-    this.game = new MineralWorld(
-      this.scene,
-      this.world,
-      this.loader,
-      this.material,
-      this.worldCamera
-    );
+    this.createGameWorld();
+    // this.game = new LavaWorld(
+    //   this.scene,
+    //   this.world,
+    //   this.loader,
+    //   this.material,
+    //   this.worldCamera
+    // );
 
     this.tick();
   }
@@ -56,6 +57,13 @@ class GameScene extends BaseScene {
         break;
 
       case 'Zetxaru':
+        this.game = new MultiplayerWorld(
+          this.scene,
+          this.world,
+          this.loader,
+          this.material,
+          this.worldCamera
+        );
         break;
     }
   }
@@ -70,6 +78,10 @@ class GameScene extends BaseScene {
     this.world.addContactMaterial(this.material.getIceIceContactMaterial());
     this.world.addContactMaterial(this.material.getIceSpungeContactMaterial());
     this.world.addContactMaterial(this.material.getIceGlassContactMaterial());
+    this.world.addContactMaterial(this.material.getIceMithrilContactMaterial());
+    this.world.addContactMaterial(
+      this.material.getIceAdamantineContactMaterial()
+    );
   }
 
   tick(): void {
@@ -82,7 +94,7 @@ class GameScene extends BaseScene {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
-      this.game.runGameLoop(timeDelta);
+      this.game.runGameLoop(timeDelta, elapsedTime);
       this.stats.end();
       this.tick();
     });

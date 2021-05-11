@@ -6,10 +6,15 @@ class Material {
   private rockMaterial: CANNON.Material;
   private spungeMaterial: CANNON.Material;
   private glassMaterial: CANNON.Material;
+  private adamantineMaterial: CANNON.Material;
+  private mithrilMaterial: CANNON.Material;
+
   private iceRockContactMaterial: CANNON.ContactMaterial;
   private iceIceContactMaterial: CANNON.ContactMaterial;
   private iceSpungeContactMaterial: CANNON.ContactMaterial;
   private iceGlassContactMaterial: CANNON.ContactMaterial;
+  private iceAdamantineContactMaterial: CANNON.ContactMaterial;
+  private iceMithrilContactMaterial: CANNON.ContactMaterial;
 
   getIceMaterial(): CANNON.Material {
     if (!this.iceMaterial) this.iceMaterial = new CANNON.Material('ice');
@@ -30,6 +35,18 @@ class Material {
     if (!this.spungeMaterial)
       this.spungeMaterial = new CANNON.Material('spunge');
     return this.spungeMaterial;
+  }
+
+  getAdamantineMaterial(): CANNON.Material {
+    if (!this.adamantineMaterial)
+      this.adamantineMaterial = new CANNON.Material('adamantine');
+    return this.adamantineMaterial;
+  }
+
+  getMithrilMaterial(): CANNON.Material {
+    if (!this.mithrilMaterial)
+      this.mithrilMaterial = new CANNON.Material('mithril');
+    return this.mithrilMaterial;
   }
 
   getIceRockContactMaterial = (): CANNON.ContactMaterial => {
@@ -87,11 +104,43 @@ class Material {
         this.getSpungeMaterial(),
         {
           friction: 2,
-          restitution: 1.2,
+          restitution: 2.4,
         }
       );
     }
     return this.iceSpungeContactMaterial;
+  };
+
+  getIceAdamantineContactMaterial = (): CANNON.ContactMaterial => {
+    if (!this.iceAdamantineContactMaterial) {
+      this.iceAdamantineContactMaterial = new CANNON.ContactMaterial(
+        this.getIceMaterial(),
+        this.getAdamantineMaterial(),
+        {
+          friction: 0,
+          restitution: 1.6,
+          contactEquationRelaxation: 4,
+          frictionEquationRelaxation: 10,
+        }
+      );
+    }
+    return this.iceAdamantineContactMaterial;
+  };
+
+  getIceMithrilContactMaterial = (): CANNON.ContactMaterial => {
+    if (!this.iceMithrilContactMaterial) {
+      this.iceMithrilContactMaterial = new CANNON.ContactMaterial(
+        this.getIceMaterial(),
+        this.getMithrilMaterial(),
+        {
+          friction: 0,
+          restitution: 4.2,
+          contactEquationRelaxation: 4,
+          frictionEquationRelaxation: 10,
+        }
+      );
+    }
+    return this.iceMithrilContactMaterial;
   };
 }
 

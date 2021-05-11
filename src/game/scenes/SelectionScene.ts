@@ -2,11 +2,10 @@
  * @desc Used for creating the World Selection Scene, where a player decides which planet they want to play on
  */
 
-import type { ISkybox } from './../../shared/interfaces';
+import type { ISkybox, GameWorld } from './../../shared/frontendInterfaces';
 import BaseScene from './BaseScene';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import type { GameWorld } from '../../shared/interfaces';
 
 class SelectionScene extends BaseScene implements ISkybox {
   private raycaster: THREE.Raycaster;

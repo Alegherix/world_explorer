@@ -52,7 +52,7 @@ abstract class BaseScene {
       75,
       window.innerWidth / window.innerHeight,
       1.0,
-      1000
+      5000
     );
     this.worldCamera.position.set(2, 80, 260);
   }
