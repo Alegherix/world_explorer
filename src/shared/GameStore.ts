@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 import { writable } from 'svelte/store';
-import type { GameWorld } from './interfaces';
+import type { GameWorld } from './frontendInterfaces';
 
 interface IScore {
   username: string;

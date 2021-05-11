@@ -1,27 +1,21 @@
 import {
+  ISocketMessage,
+  IPosition,
+  IConnected,
+  IClientUpdate,
+  IUpdate,
+  Update,
+} from '../src/shared/interfaces.ts';
+import {
   WebSocket,
   isWebSocketCloseEvent,
 } from 'https://deno.land/std@0.95.0/ws/mod.ts';
 import { v4 } from 'https://deno.land/std@0.95.0/uuid/mod.ts';
 
-interface ISocketMessage {
-  msg: 'connected' | 'update';
-}
-
-type Position = { x: number; y: number; z: number };
-
 interface IActivePlayer {
   username: string;
   websocket: WebSocket;
-  position: Position;
-}
-
-interface IConnected extends ISocketMessage {
-  username: string;
-}
-
-interface IUpdate extends IConnected {
-  position: Position;
+  position: IPosition;
 }
 
 // Create a map with all the currently connected players
@@ -30,7 +24,15 @@ let sockets = new Map<string, IActivePlayer>();
 // Remove closed client to not send updates to clients no longer connected
 // Send a message to the client to remove that player from world
 const broadcastCloseEvent = (uuid: string) => {
+  const username = sockets.get(uuid)?.username;
   sockets.delete(uuid);
+  const disconnectMsg: IConnected = {
+    msg: 'disconnect',
+    username: username || '',
+  };
+  sockets.forEach((player) => {
+    player.websocket.send(JSON.stringify(disconnectMsg));
+  });
 };
 
 // Used for broadcasting that another user has connected to the world
@@ -45,21 +47,21 @@ const broadcastConnect = (obj: IConnected) => {
 // Used for broadcasting new game state changes to everyone connected etc
 // TODO -> MIGHT wanna make this on a tick rate instead of whenever an update is passed from client
 // Atm broadcasts an array of all connected players and their position whenever an incomming update is sent from client
-const broadcastUpdateState = (uuid: string, obj: IUpdate) => {
+const broadcastUpdateState = (uuid: string, obj: IClientUpdate) => {
   try {
     // Update position based on the update sent
     sockets.get(uuid)!.position = obj.position;
 
     // O(2n) atm
     // Populate array with all users and their position
-    const update: any[] = [];
+    const update: Update[] = [];
     sockets.forEach((player) => {
       // don't send websocket info to client
       const { websocket, ...relevant } = player;
       update.push(relevant);
     });
 
-    const updateMsg = { msg: 'update', update };
+    const updateMsg: IUpdate = { msg: 'update', update };
     // Send all positions to every client, let them filter it themselves
     sockets.forEach((player) => {
       player.websocket.send(JSON.stringify(updateMsg));
@@ -100,7 +102,7 @@ const filterIncommingMessages = (obj: ISocketMessage, uuid: string) => {
       broadcastConnect(obj as IConnected);
       break;
     case 'update':
-      broadcastUpdateState(uuid, obj as IUpdate);
+      broadcastUpdateState(uuid, obj as IClientUpdate);
       break;
     default:
       console.log('Something went wrong, msg was sent improperly');

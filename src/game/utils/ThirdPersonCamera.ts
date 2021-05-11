@@ -1,5 +1,5 @@
 import type { IPosition } from './../../shared/interfaces';
-import type { IGamePiece } from '../../shared/interfaces';
+import type { IGamePiece } from '../../shared/frontendInterfaces';
 import { Vector, Vector3 } from 'three';
 
 class ThirdPersonCamera {

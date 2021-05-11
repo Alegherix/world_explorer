@@ -2,7 +2,7 @@
  * @desc Used for creating the Game Scene, which is the scene which makes sure to render the actual game play inside
  */
 import * as CANNON from 'cannon-es';
-import type { GameWorld } from '../../shared/interfaces';
+import type { GameWorld } from '../../shared/frontendInterfaces';
 import type Game from '../Game';
 import Material from '../utils/Materials';
 import LavaWorld from '../worlds/LavaWorld';

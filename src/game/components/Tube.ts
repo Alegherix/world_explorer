@@ -6,11 +6,8 @@ import {
   MeshStandardMaterialParameters,
   TorusBufferGeometry,
 } from 'three';
-import type {
-  IDimension,
-  IGamePiece,
-  IPosition,
-} from '../../shared/interfaces';
+import type { IDimension, IPosition } from '../../shared/interfaces';
+import type { IGamePiece } from '../../shared/frontendInterfaces';
 
 class TubeFactory {
   static createTube(
@@ -48,7 +45,7 @@ class TubeFactory {
 
     const quaternion = quatX.mult(quatY).mult(quatZ);
     body.quaternion = quaternion;
-    body.position.copy((mesh.position as unknown) as Vec3);
+    body.position.copy(mesh.position as unknown as Vec3);
 
     return { mesh, body };
   }

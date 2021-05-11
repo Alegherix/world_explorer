@@ -19,7 +19,8 @@ import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getPosition } from '../utils/utils';
-import type { IDimension, IGamePiece } from './../../shared/interfaces';
+import type { IDimension } from './../../shared/interfaces';
+import type { IGamePiece } from '../../shared/frontendInterfaces';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;

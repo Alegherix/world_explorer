@@ -121,7 +121,6 @@ class MultiplayerWorld extends Game {
   handleServerMsg(event: MessageEvent) {
     const data = JSON.parse(event.data);
     const { msg }: ISocketMessage = data;
-    console.log(event.data);
 
     switch (msg) {
       case 'currentUsers':
@@ -132,6 +131,10 @@ class MultiplayerWorld extends Game {
         break;
       case 'update':
         this.updateGameState(data);
+        break;
+
+      case 'disconnect':
+        this.removeDisconnectedUser(data);
         break;
 
       default:
@@ -195,6 +198,22 @@ class MultiplayerWorld extends Game {
     this.activeGamePieces.push({ mesh, body });
   }
 
+  removeDisconnectedUser(data: IConnected) {
+    console.log(
+      `${data.username} has disconnected, should remove player from being rendered`
+    );
+
+    for (let index = 0; index < this.activeGamePieces.length; index++) {
+      const gamepiece = this.activeGamePieces[index];
+      if (gamepiece.mesh.name === data.username) {
+        this.activeGamePieces.splice(index, 1);
+        this.scene.remove(gamepiece.mesh);
+        this.world.removeBody(gamepiece.body);
+        break;
+      }
+    }
+  }
+
   // Uppdatera att använda UUID ist så att inte användare med samma namn får varandras position
   updateGameState(data: IUpdate) {
     const { update } = data;
@@ -202,7 +221,7 @@ class MultiplayerWorld extends Game {
     update.forEach(({ username, position }) => {
       if (username && this.userName !== username) {
         const { x, y, z } = position;
-        console.log(`Position of ${username}: x:${x} y:${y} z:${z}`);
+        // console.log(`Position of ${username}: x:${x} y:${y} z:${z}`);
         const pieceToUpdate = this.activeGamePieces.find(
           (piece) => piece.mesh.name === username
         );

@@ -10,11 +10,8 @@ import {
   Vector3,
 } from 'three';
 import { createBoundry } from '../utils/utils';
-import type {
-  IDimension,
-  IGamePiece,
-  IPosition,
-} from './../../shared/interfaces';
+import type { IDimension, IPosition } from './../../shared/interfaces';
+import type { IGamePiece } from './../../shared/frontendInterfaces';
 import type ScoreKeeper from './ScoreKeeper';
 
 class PlaneFactory {
@@ -62,7 +59,7 @@ class PlaneFactory {
       shape,
       phyicsMaterial
     );
-    body.position.copy((mesh.position as unknown) as Vec3);
+    body.position.copy(mesh.position as unknown as Vec3);
 
     return { mesh, body };
   }
@@ -127,7 +124,7 @@ class PlaneFactory {
 
     plane.body.quaternion = quaternion;
 
-    plane.body.position.copy((plane.mesh.position as unknown) as Vec3);
+    plane.body.position.copy(plane.mesh.position as unknown as Vec3);
   }
 
   static slopePlaneUpRight(plane: IGamePiece) {
