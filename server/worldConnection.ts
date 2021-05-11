@@ -20,18 +20,22 @@ interface IActivePlayer {
 
 // Create a map with all the currently connected players
 let sockets = new Map<string, IActivePlayer>();
+let elapsedTime: number = new Date().getTime();
+const TICK_RATE = 30;
 
 // Remove closed client to not send updates to clients no longer connected
 // Send a message to the client to remove that player from world
 const broadcastCloseEvent = (uuid: string) => {
+  console.log('Trying to send disconnect');
+
   const username = sockets.get(uuid)?.username;
   sockets.delete(uuid);
   const disconnectMsg: IConnected = {
     msg: 'disconnect',
     username: username || '',
   };
-  sockets.forEach((player) => {
-    player.websocket.send(JSON.stringify(disconnectMsg));
+  sockets.forEach(async (player) => {
+    await player.websocket.send(JSON.stringify(disconnectMsg));
   });
 };
 
@@ -39,21 +43,22 @@ const broadcastCloseEvent = (uuid: string) => {
 const broadcastConnect = (obj: IConnected) => {
   console.log(`${obj.username} has connected to the server`);
 
-  sockets.forEach((ws: IActivePlayer) => {
-    ws.websocket.send(JSON.stringify(obj));
+  sockets.forEach(async (ws: IActivePlayer) => {
+    try {
+      await ws.websocket.send(JSON.stringify(obj));
+    } catch {
+      console.log('error from broadcasting connection');
+    }
   });
 };
 
-// Used for broadcasting new game state changes to everyone connected etc
-// TODO -> MIGHT wanna make this on a tick rate instead of whenever an update is passed from client
-// Atm broadcasts an array of all connected players and their position whenever an incomming update is sent from client
+// Broadcasts the current state of the game based on the Tick rate of server
 const broadcastUpdateState = (uuid: string, obj: IClientUpdate) => {
-  try {
-    // Update position based on the update sent
-    sockets.get(uuid)!.position = obj.position;
+  // Update position for whenever an update is sent from client
+  sockets.get(uuid)!.position = obj.position;
 
-    // O(2n) atm
-    // Populate array with all users and their position
+  const currentTime = new Date().getTime();
+  if (currentTime > elapsedTime + TICK_RATE) {
     const update: Update[] = [];
     sockets.forEach((player) => {
       // don't send websocket info to client
@@ -61,37 +66,43 @@ const broadcastUpdateState = (uuid: string, obj: IClientUpdate) => {
       update.push(relevant);
     });
 
-    const updateMsg: IUpdate = { msg: 'update', update };
-    // Send all positions to every client, let them filter it themselves
-    sockets.forEach((player) => {
-      player.websocket.send(JSON.stringify(updateMsg));
-    });
-  } catch (error) {
-    console.log(error);
+    const msg: IUpdate = { msg: 'update', update };
+    try {
+      sockets.forEach(async (player) => {
+        if (!player.websocket.isClosed)
+          await player.websocket.send(JSON.stringify(msg));
+      });
+    } catch (error) {
+      console.log('Something went wrong when updating state: ', error);
+    }
+
+    // update the elapsed time
+    elapsedTime = currentTime;
   }
 };
 
 // Sends out the currently active players name atm
 // Should send out more later such as color, position, velocity etc...
 // Might wanna make this into an async call to chain
-const broadcastActivePlayers = (uuid: string, obj: IConnected) => {
+const broadcastActivePlayers = async (uuid: string, obj: IConnected) => {
   const newlyJoinedUser = sockets.get(uuid);
-  try {
-    newlyJoinedUser!.username = obj.username;
-    if (sockets.size > 1) {
-      console.log('Broadcasting active players');
-      const usernames: string[] = [];
-      sockets.forEach((value, key) => {
-        if (key !== uuid) {
-          usernames.push(value.username);
-        }
-      });
-      newlyJoinedUser?.websocket.send(
+  newlyJoinedUser!.username = obj.username;
+
+  if (sockets.size > 1) {
+    console.log('Broadcasting active players');
+    const usernames: string[] = [];
+    sockets.forEach((value, key) => {
+      if (key !== uuid) {
+        usernames.push(value.username);
+      }
+    });
+    try {
+      await newlyJoinedUser?.websocket.send(
         JSON.stringify({ msg: 'currentUsers', users: usernames })
       );
+    } catch {
+      console.log('Error caused by broadcasting active players');
     }
-  } catch (error) {
-    console.log('No such user');
   }
 };
 

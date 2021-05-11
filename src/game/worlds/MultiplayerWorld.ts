@@ -23,6 +23,7 @@ class MultiplayerWorld extends Game {
 
   // Used for testing, and making sure to only send current state to server n amount of times each second.
   private counter: number = 0;
+  private haveConnectedToServer: boolean = false;
 
   constructor(
     scene: THREE.Scene,
@@ -106,7 +107,10 @@ class MultiplayerWorld extends Game {
     const connectionMessage = { msg: 'connected', username: this.userName };
     this.server.addEventListener(
       'open',
-      () => this.server.send(JSON.stringify(connectionMessage)),
+      () => {
+        this.server.send(JSON.stringify(connectionMessage));
+        this.haveConnectedToServer = true;
+      },
       {
         once: true,
       }
@@ -127,7 +131,7 @@ class MultiplayerWorld extends Game {
         this.spawnExistingPlayers(data);
 
       case 'connected':
-        // this.spawnOtherPlayers(data);
+        this.spawnOtherPlayers(data);
         break;
       case 'update':
         this.updateGameState(data);
@@ -148,7 +152,8 @@ class MultiplayerWorld extends Game {
     this.counter++;
 
     // Only send 6 updates / second
-    if (this.counter % 10 === 0) {
+    // if (this.counter % 10 === 0) {
+    if (this.haveConnectedToServer && this.counter % 2 === 0) {
       const updateMsg = {
         msg: 'update',
         username: this.userName,
@@ -160,6 +165,7 @@ class MultiplayerWorld extends Game {
       };
       this.server.send(JSON.stringify(updateMsg));
     }
+    // }
   }
 
   // need to pass position etc
@@ -171,7 +177,9 @@ class MultiplayerWorld extends Game {
 
   spawnOtherPlayers(data: IConnected) {
     // Makes sure not to spawn ball when self connecting
-    if (this.userName === data.username) return;
+
+    if (!data.username || this.userName === data.username) return;
+    console.log(data.username, 'should be added to the scene');
 
     const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(
