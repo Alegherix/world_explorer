@@ -30,6 +30,8 @@ class GameScene extends BaseScene {
     //   this.worldCamera
     // );
 
+    // this.game = new MineralWorld(this.scene, this.world, this.loader, this.material, this.worldCamera);
+
     this.tick();
   }
 
@@ -37,33 +39,15 @@ class GameScene extends BaseScene {
   createGameWorld() {
     switch (this.selectedWorld) {
       case 'Morghol':
-        this.game = new MineralWorld(
-          this.scene,
-          this.world,
-          this.loader,
-          this.material,
-          this.worldCamera
-        );
+        this.game = new MineralWorld(this.scene, this.world, this.loader, this.material, this.worldCamera);
         break;
 
       case 'Velknaz':
-        this.game = new LavaWorld(
-          this.scene,
-          this.world,
-          this.loader,
-          this.material,
-          this.worldCamera
-        );
+        this.game = new LavaWorld(this.scene, this.world, this.loader, this.material, this.worldCamera);
         break;
 
       case 'Zetxaru':
-        this.game = new MultiplayerWorld(
-          this.scene,
-          this.world,
-          this.loader,
-          this.material,
-          this.worldCamera
-        );
+        this.game = new MultiplayerWorld(this.scene, this.world, this.loader, this.material, this.worldCamera);
         break;
     }
   }
@@ -79,9 +63,7 @@ class GameScene extends BaseScene {
     this.world.addContactMaterial(this.material.getIceSpungeContactMaterial());
     this.world.addContactMaterial(this.material.getIceGlassContactMaterial());
     this.world.addContactMaterial(this.material.getIceMithrilContactMaterial());
-    this.world.addContactMaterial(
-      this.material.getIceAdamantineContactMaterial()
-    );
+    this.world.addContactMaterial(this.material.getIceAdamantineContactMaterial());
   }
 
   tick(): void {
