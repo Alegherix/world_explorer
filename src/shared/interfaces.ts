@@ -47,3 +47,9 @@ export interface ICurrentUsers extends ISocketMessage {
 export interface IConnected extends ISocketMessage {
   username: string;
 }
+
+export type Update = { username: string; position: IPosition };
+
+export interface IUpdate {
+  update: Update[];
+}

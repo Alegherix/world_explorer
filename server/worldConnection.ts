@@ -8,17 +8,20 @@ interface ISocketMessage {
   msg: 'connected' | 'update';
 }
 
+type Position = { x: number; y: number; z: number };
+
 interface IActivePlayer {
   username: string;
   websocket: WebSocket;
-}
-
-interface IServerActivePlayer extends IActivePlayer {
-  websocket: WebSocket;
+  position: Position;
 }
 
 interface IConnected extends ISocketMessage {
   username: string;
+}
+
+interface IUpdate extends IConnected {
+  position: Position;
 }
 
 // Create a map with all the currently connected players
@@ -39,8 +42,27 @@ const broadcastConnect = (obj: IConnected) => {
   });
 };
 
-// Used for broadcasting new game state changes to everyone connected
-const broadcastUpdateState = (obj: unknown) => {};
+// Used for broadcasting new game state changes to everyone connected etc
+// TODO -> MIGHT wanna make this on a tick rate instead of whenever an update is passed from client
+// Atm broadcasts an array of all connected players and their position whenever an incomming update is sent from client
+const broadcastUpdateState = (uuid: string, obj: IUpdate) => {
+  try {
+    const userSendingUpdate = sockets.get(uuid);
+    const userAndPosition: any[] = [];
+    sockets.forEach((value, key) => {
+      if (key !== uuid) {
+        // don't send websocket info to client
+        const { websocket, ...relevant } = value;
+        userAndPosition.push(relevant);
+      }
+    });
+    userSendingUpdate?.websocket.send(
+      JSON.stringify({ msg: 'update', userAndPosition })
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // Sends out the currently active players name atm
 // Should send out more later such as color, position, velocity etc...
@@ -73,7 +95,7 @@ const filterIncommingMessages = (obj: ISocketMessage, uuid: string) => {
       broadcastConnect(obj as IConnected);
       break;
     case 'update':
-      broadcastUpdateState(obj);
+      broadcastUpdateState(uuid, obj as IUpdate);
       break;
     default:
       console.log('Something went wrong, msg was sent improperly');
@@ -84,7 +106,11 @@ const filterIncommingMessages = (obj: ISocketMessage, uuid: string) => {
 export const worldConnection = async (ws: WebSocket) => {
   // Add the new websocket connection to map to keep track of all connected users
   const uuid: string = v4.generate();
-  sockets.set(uuid, { username: 'anonymous', websocket: ws });
+  sockets.set(uuid, {
+    username: 'anonymous',
+    websocket: ws,
+    position: { x: 0, y: 5, z: 0 },
+  });
 
   for await (const ev of ws) {
     if (isWebSocketCloseEvent(ev)) {

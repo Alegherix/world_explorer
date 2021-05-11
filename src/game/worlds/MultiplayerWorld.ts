@@ -20,6 +20,9 @@ class MultiplayerWorld extends Game {
   private server: WebSocket;
   private userName: string;
 
+  // Used for testing, and making sure to only send current state to server n amount of times each second.
+  private counter: number = 0;
+
   constructor(
     scene: THREE.Scene,
     world: CANNON.World,
@@ -74,6 +77,22 @@ class MultiplayerWorld extends Game {
     this.scene.add(plane);
   }
 
+  // Run all game related Logic inside here
+  runGameLoop(timeDelta: number, elapsedTime: number) {
+    if (!this.useOrbitCamera) this.gameCamera.update();
+
+    for (const gamePiece of this.activeGamePieces) {
+      gamePiece.mesh.position.copy(
+        gamePiece.body.position as unknown as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
+      );
+    }
+    this.updateServerOfState();
+    this.world.step(1 / 100, timeDelta);
+  }
+
   // Physical plane of starting zone
   addPhysicalStartingZone() {
     const floorShape = new CANNON.Box(new Vec3(100, 100, 0.1));
@@ -101,7 +120,6 @@ class MultiplayerWorld extends Game {
   handleServerMsg(event: MessageEvent) {
     const data = JSON.parse(event.data);
     const { msg }: ISocketMessage = data;
-    console.log(data);
 
     switch (msg) {
       case 'currentUsers':
@@ -119,17 +137,35 @@ class MultiplayerWorld extends Game {
     }
   }
 
+  // Send Updates of current gamepiece to server
+  updateServerOfState() {
+    this.counter++;
+
+    // Only send 6 updates / second
+    if (this.counter % 10 === 0) {
+      const updateMsg = {
+        msg: 'update',
+        username: this.userName,
+        position: {
+          x: this.currentGamePiece.mesh.position.x,
+          y: this.currentGamePiece.mesh.position.y,
+          z: this.currentGamePiece.mesh.position.z,
+        },
+      };
+      this.server.send(JSON.stringify(updateMsg));
+    }
+  }
+
+  // need to pass position etc
   spawnExistingPlayers(data: ICurrentUsers) {
-    console.log(data.users);
+    data.users.forEach((username) =>
+      this.spawnOtherPlayers({ msg: 'connected', username })
+    );
   }
 
   spawnOtherPlayers(data: IConnected) {
-    console.log(`Svelte username ${this.userName}`);
-    console.log(`Server username ${data.username}`);
     // Makes sure not to spawn ball when self connecting
     if (this.userName === data.username) return;
-
-    console.log("Spawning ball is runing, even if it shouldn't");
 
     const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(

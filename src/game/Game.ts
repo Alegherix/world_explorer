@@ -107,19 +107,14 @@ abstract class Game implements ISkybox {
   move = (gamePiece: IGamePiece, estimatedTime: number): void => {
     if (!gamePiece.movementType) {
       gamePiece.mesh.position.copy(
-        (gamePiece.body.position as unknown) as Vector3
+        gamePiece.body.position as unknown as Vector3
       );
       gamePiece.mesh.quaternion.copy(
-        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
       );
     } else {
-      const {
-        start,
-        distance,
-        speed,
-        positionOffset,
-        direction,
-      } = gamePiece.movementType;
+      const { start, distance, speed, positionOffset, direction } =
+        gamePiece.movementType;
       const movement =
         start === 'sin'
           ? Math.sin(estimatedTime * speed) * distance + positionOffset
@@ -147,18 +142,14 @@ abstract class Game implements ISkybox {
   rotate = (gamePiece: IGamePiece, estimatedTime: number): void => {
     if (!gamePiece.movementType) {
       gamePiece.mesh.position.copy(
-        (gamePiece.body.position as unknown) as Vector3
+        gamePiece.body.position as unknown as Vector3
       );
       gamePiece.mesh.quaternion.copy(
-        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
       );
     } else {
-      const {
-        distance,
-        speed,
-        positionOffset,
-        direction,
-      } = gamePiece.movementType;
+      const { distance, speed, positionOffset, direction } =
+        gamePiece.movementType;
       const movement =
         Math.sin(estimatedTime * speed) * distance + positionOffset;
 
@@ -175,7 +166,7 @@ abstract class Game implements ISkybox {
           break;
       }
       gamePiece.body.quaternion.copy(
-        (gamePiece.mesh.quaternion as unknown) as CANNON.Quaternion
+        gamePiece.mesh.quaternion as unknown as CANNON.Quaternion
       );
     }
   };
@@ -183,11 +174,10 @@ abstract class Game implements ISkybox {
   // Steer the currently controlled GamePiece
   steer(event: KeyboardEvent) {
     const { x, z } = this.gameCamera.getWorldDirection();
-    const force = 250;
+    const force = 120;
 
     switch (event.key) {
       case 'w':
-        // this.currentGamePiece.body.force.set(cameraDirection.x, 0, cameraDirection.z)
         this.currentGamePiece.body.applyForce(
           new CANNON.Vec3(force * x, 0, z * force),
           this.currentGamePiece.body.position
@@ -249,10 +239,10 @@ abstract class Game implements ISkybox {
 
     for (const gamePiece of this.activeGamePieces) {
       gamePiece.mesh.position.copy(
-        (gamePiece.body.position as unknown) as Vector3
+        gamePiece.body.position as unknown as Vector3
       );
       gamePiece.mesh.quaternion.copy(
-        (gamePiece.body.quaternion as unknown) as THREE.Quaternion
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
       );
     }
     this.world.step(1 / 100, timeDelta);
