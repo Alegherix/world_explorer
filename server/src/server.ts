@@ -10,17 +10,23 @@
 // });
 import http from 'http';
 import { Server } from 'socket.io';
+import { IConnected } from '../../src/shared/interfaces';
+import GameServer from './GameServer';
 const httpServer = http.createServer();
 const io = new Server(httpServer, {
   cors: { origin: '*' },
 });
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
+const gameServer = new GameServer();
 
-  socket.on('userConnected', (message) => {
-    console.log(message);
-    io.emit('userConnected', message);
+io.on('connection', (socket) => {
+  socket.on('userConnected', (message: IConnected) => {
+    gameServer.addSocket(socket, message.username);
+    gameServer.broadcastIncomingUser(socket, message.username);
+  });
+
+  socket.on('disconnect', async () => {
+    io.sockets.emit('userDisconnect', { username: socket.id });
   });
 });
 
