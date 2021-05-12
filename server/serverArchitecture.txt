@@ -1,0 +1,18 @@
+Alla inkommande calls uppdaterar en map med k:v, där v innehåller meddelandet.
+Viktigt att ha preccedence på meddelandena så att man skickar ut allting samtidigt
+
+1) Disconnect
+2) Connect
+3) Update
+
+
+Utskick till klienterna sker Varje Tick_rate, 
+
+Alt ha en Map för: 
+De som disconnectat
+De som connectat
+De som är aktiva
+
+Om disconnected.length > 0, skicka uppdateringen till alla som inte finns i den mappen
+Om connected.length > 0, skicka uppdateringen till ActivePlayers.
+
