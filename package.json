@@ -7,7 +7,8 @@
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear -p 3000",
     "validate": "svelte-check",
-    "server": "cd server && denon run --allow-net --allow-read app.ts"
+    "server": "cd server && denon run --allow-net --allow-read app.ts",
+    "test": "node ./src/tests/test.js"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -16,9 +17,11 @@
     "@tsconfig/svelte": "^1.0.10",
     "@types/cannon": "^0.1.5",
     "@types/dat.gui": "^0.7.6",
+    "@types/node": "^15.0.2",
     "@types/three": "^0.127.1",
     "add": "^2.0.6",
     "cannon-es-debugger": "^0.1.2",
+    "playwright": "^1.11.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",

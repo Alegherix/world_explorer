@@ -4,6 +4,7 @@
     "emitDecoratorMetadata": true,
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
+  
  
 
   "include": ["src/**/*"],

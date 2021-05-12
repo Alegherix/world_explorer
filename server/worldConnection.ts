@@ -35,7 +35,8 @@ const broadcastCloseEvent = (uuid: string) => {
     username: username || '',
   };
   sockets.forEach(async (player) => {
-    await player.websocket.send(JSON.stringify(disconnectMsg));
+    if (!player.websocket.isClosed)
+      await player.websocket.send(JSON.stringify(disconnectMsg));
   });
 };
 

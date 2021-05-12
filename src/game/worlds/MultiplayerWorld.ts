@@ -233,9 +233,9 @@ class MultiplayerWorld extends Game {
         const pieceToUpdate = this.activeGamePieces.find(
           (piece) => piece.mesh.name === username
         );
-        pieceToUpdate.mesh.position.set(x, y, z);
-        pieceToUpdate.body.position.copy(
-          pieceToUpdate.mesh.position as unknown as Vec3
+        pieceToUpdate?.mesh.position.set(x, y, z);
+        pieceToUpdate?.body.position.copy(
+          pieceToUpdate?.mesh.position as unknown as Vec3
         );
       }
     });
