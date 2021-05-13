@@ -13,19 +13,23 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const interfaces_1 = require("../../src/shared/interfaces");
 class GameServer {
-    constructor() {
+    constructor(server) {
         this.TICK_RATE = 30;
         this.sockets = new Map();
+        this.elapsedTime = new Date().getTime();
+        this.server = server;
     }
     // Adds socket to constructor
     addSocket(socket, username) {
         console.log(username + ' has connected to the server');
         const defaultPosition = { x: 0, y: 5, z: 0 };
+        const velocity = null;
         this.sockets.set(socket.id, {
             username,
             id: socket.id,
             socket,
             position: defaultPosition,
+            velocity,
         });
     }
     broadcastIncomingUser(incomingSocket, username) {
@@ -45,9 +49,29 @@ class GameServer {
             incomingSocket.emit(interfaces_1.SocketEvent.CURRENT_USERS, currentUsersArray);
         }
     }
-    removeSocket(io, id) {
+    removeSocket(id) {
         this.sockets.delete(id);
-        io.sockets.emit(interfaces_1.SocketEvent.USER_DISCONNECTED, id);
+        this.server.sockets.emit(interfaces_1.SocketEvent.USER_DISCONNECTED, id);
+    }
+    updateState(id, { position, velocity }) {
+        const player = this.sockets.get(id);
+        player.position = position;
+        player.velocity = velocity;
+        this.broadcastStateUpdates();
+    }
+    // // Broadcasts state updates every 30ms, and only if >1 player on server
+    broadcastStateUpdates() {
+        const currentTime = new Date().getTime();
+        if (currentTime > this.elapsedTime + this.TICK_RATE &&
+            this.sockets.size > 1) {
+            const updateArray = [];
+            this.sockets.forEach((player) => {
+                const { socket } = player, rest = __rest(player, ["socket"]);
+                updateArray.push(rest);
+            });
+            this.server.sockets.emit(interfaces_1.SocketEvent.UPDATE_STATE, updateArray);
+            this.elapsedTime = currentTime;
+        }
     }
 }
 exports.default = GameServer;

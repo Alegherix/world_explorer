@@ -10,14 +10,18 @@
 // });
 import http from 'http';
 import { Server } from 'socket.io';
-import { IConnected, SocketEvent } from '../../src/shared/interfaces';
+import {
+  IConnected,
+  IStateUpdate,
+  SocketEvent,
+} from '../../src/shared/interfaces';
 import GameServer from './GameServer';
 const httpServer = http.createServer();
 const io = new Server(httpServer, {
   cors: { origin: '*' },
 });
 
-const gameServer = new GameServer();
+const gameServer = new GameServer(io);
 
 io.on('connection', (socket) => {
   socket.on('userConnected', (message: IConnected) => {
@@ -25,8 +29,12 @@ io.on('connection', (socket) => {
     gameServer.broadcastIncomingUser(socket, message.username);
   });
 
-  socket.on('disconnect', async () => {
-    gameServer.removeSocket(io, socket.id);
+  socket.on('disconnect', () => {
+    gameServer.removeSocket(socket.id);
+  });
+
+  socket.on(SocketEvent.UPDATE_STATE, (state: IStateUpdate) => {
+    gameServer.updateState(socket.id, state);
   });
 });
 

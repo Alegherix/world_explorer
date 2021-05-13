@@ -1,25 +1,22 @@
 /**
  * @desc Used for creating the Game world of Morghol, an abandoned mineral planet
  */
-import type Material from '../utils/Materials';
-import Game from '../Game';
-import type Loader from '../utils/Loader';
-import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
-import type { Vector3 } from 'three';
-import Gamestore from '../../shared/GameStore';
+import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
-import type {
-  IConnected,
-  ICurrentUsers,
-  ISocketMessage,
-  IUpdate,
-} from '../../shared/interfaces';
+import type { Vector3 } from 'three';
+import * as THREE from 'three';
+import type { IActivePlayer } from '../../shared/frontendInterfaces';
+import Gamestore from '../../shared/GameStore';
+import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
+import Game from '../Game';
+import type Loader from '../utils/Loader';
+import type Material from '../utils/Materials';
 
 class MultiplayerWorld extends Game {
-  private server: WebSocket;
   private userName: string;
+  private socket: Socket;
 
   // Used for testing, and making sure to only send current state to server n amount of times each second.
   private counter: number = 0;
@@ -43,8 +40,9 @@ class MultiplayerWorld extends Game {
       '.jpg'
     );
     this.userName = get(Gamestore).username;
-    this.createServerConnection();
-    this.startListeningToIncomingServerEvents();
+    this.socket = io('ws://localhost:8000').connect();
+
+    this.listenForEvents();
     this.createStartingZone();
     this.addPhysicalStartingZone();
     this.createPlayer(this.userName);
@@ -91,7 +89,9 @@ class MultiplayerWorld extends Game {
         gamePiece.body.quaternion as unknown as THREE.Quaternion
       );
     }
-    this.updateServerOfState();
+    console.log(this.currentGamePiece.body.angularVelocity);
+
+    this.sendCurrentGameState();
     this.world.step(1 / 100, timeDelta);
   }
 
@@ -101,85 +101,40 @@ class MultiplayerWorld extends Game {
     this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
   }
 
-  // Send that the user has connected to server
-  createServerConnection() {
-    this.server = new WebSocket('ws://localhost:8000/ws');
-    const connectionMessage = { msg: 'connected', username: this.userName };
-    this.server.addEventListener(
-      'open',
-      () => {
-        this.server.send(JSON.stringify(connectionMessage));
-        this.haveConnectedToServer = true;
-      },
-      {
-        once: true,
+  listenForEvents() {
+    this.socket.on('connect', () => {
+      this.socket.emit('userConnected', { username: this.userName });
+    });
+
+    this.socket.on(SocketEvent.USER_CONNECTED, ({ username, id }) => {
+      this.spawnOtherPlayers(username, id);
+    });
+
+    this.socket.on(
+      SocketEvent.CURRENT_USERS,
+      (activePlayers: IActivePlayer[]) => {
+        this.spawnExistingPlayers(activePlayers);
       }
     );
-  }
 
-  startListeningToIncomingServerEvents() {
-    this.server.addEventListener('message', this.handleServerMsg.bind(this));
-  }
+    this.socket.on(SocketEvent.USER_DISCONNECTED, (id) =>
+      this.removeDisconnectedUser(id)
+    );
 
-  // Sorts Messages based on info
-  handleServerMsg(event: MessageEvent) {
-    const data = JSON.parse(event.data);
-    const { msg }: ISocketMessage = data;
-
-    switch (msg) {
-      case 'currentUsers':
-        this.spawnExistingPlayers(data);
-
-      case 'connected':
-        this.spawnOtherPlayers(data);
-        break;
-      case 'update':
-        this.updateGameState(data);
-        break;
-
-      case 'disconnect':
-        this.removeDisconnectedUser(data);
-        break;
-
-      default:
-        console.log('Something went wrong');
-        break;
-    }
-  }
-
-  // Send Updates of current gamepiece to server
-  updateServerOfState() {
-    this.counter++;
-
-    // Only send 6 updates / second
-    // if (this.counter % 10 === 0) {
-    if (this.haveConnectedToServer && this.counter % 2 === 0) {
-      const updateMsg = {
-        msg: 'update',
-        username: this.userName,
-        position: {
-          x: this.currentGamePiece.mesh.position.x,
-          y: this.currentGamePiece.mesh.position.y,
-          z: this.currentGamePiece.mesh.position.z,
-        },
-      };
-      this.server.send(JSON.stringify(updateMsg));
-    }
-    // }
+    this.socket.on(SocketEvent.UPDATE_STATE, (update: IActivePlayer[]) => {
+      this.updateGameState(update);
+    });
   }
 
   // need to pass position etc
-  spawnExistingPlayers(data: ICurrentUsers) {
-    data.users.forEach((username) =>
-      this.spawnOtherPlayers({ msg: 'connected', username })
-    );
+  spawnExistingPlayers(activePlayers: IActivePlayer[]) {
+    activePlayers.forEach(({ username, id }) => {
+      this.spawnOtherPlayers(username, id);
+    });
   }
 
-  spawnOtherPlayers(data: IConnected) {
-    // Makes sure not to spawn ball when self connecting
-
-    if (!data.username || this.userName === data.username) return;
-    console.log(data.username, 'should be added to the scene');
+  spawnOtherPlayers(username: string, id: string) {
+    console.log(username, 'should be added to the scene');
 
     const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(
@@ -188,7 +143,8 @@ class MultiplayerWorld extends Game {
     );
     mesh.castShadow = true;
     mesh.position.copy(startPosition as Vector3);
-    mesh.name = data.username;
+    mesh.name = username;
+    mesh.userData.clientId = id;
 
     // Create the physics object to match the mesh object
     const boxShape = new CANNON.Sphere(5);
@@ -206,14 +162,10 @@ class MultiplayerWorld extends Game {
     this.activeGamePieces.push({ mesh, body });
   }
 
-  removeDisconnectedUser(data: IConnected) {
-    console.log(
-      `${data.username} has disconnected, should remove player from being rendered`
-    );
-
+  removeDisconnectedUser(id: string) {
     for (let index = 0; index < this.activeGamePieces.length; index++) {
       const gamepiece = this.activeGamePieces[index];
-      if (gamepiece.mesh.name === data.username) {
+      if (gamepiece.mesh.userData.clientId === id) {
         this.activeGamePieces.splice(index, 1);
         this.scene.remove(gamepiece.mesh);
         this.world.removeBody(gamepiece.body);
@@ -222,20 +174,38 @@ class MultiplayerWorld extends Game {
     }
   }
 
-  // Uppdatera att använda UUID ist så att inte användare med samma namn får varandras position
-  updateGameState(data: IUpdate) {
-    const { update } = data;
+  // Send Updates of current gamepiece to server
+  sendCurrentGameState() {
+    this.counter++;
+    if (this.socket.connected && this.counter % 2 === 0) {
+      const updateMsg: IStateUpdate = {
+        position: {
+          x: this.currentGamePiece.mesh.position.x,
+          y: this.currentGamePiece.mesh.position.y,
+          z: this.currentGamePiece.mesh.position.z,
+        },
+        velocity: this.currentGamePiece.body.angularVelocity as IPosition,
+      };
+      this.socket.emit(SocketEvent.UPDATE_STATE, updateMsg);
+    }
+  }
 
-    update.forEach(({ username, position }) => {
-      if (username && this.userName !== username) {
-        const { x, y, z } = position;
-        // console.log(`Position of ${username}: x:${x} y:${y} z:${z}`);
-        const pieceToUpdate = this.activeGamePieces.find(
-          (piece) => piece.mesh.name === username
+  // Updates the world based on Server Response
+  updateGameState(update: IActivePlayer[]) {
+    update.forEach(({ id, position, velocity }) => {
+      const { x, y, z } = position;
+      const pieceToUpdate = this.activeGamePieces.find(
+        (piece) => piece.mesh.userData.clientId === id
+      );
+      if (pieceToUpdate) {
+        pieceToUpdate.mesh.position.set(x, y, z);
+        pieceToUpdate.body.angularVelocity.set(
+          velocity.x,
+          velocity.y,
+          velocity.z
         );
-        pieceToUpdate?.mesh.position.set(x, y, z);
-        pieceToUpdate?.body.position.copy(
-          pieceToUpdate?.mesh.position as unknown as Vec3
+        pieceToUpdate.body.position.copy(
+          pieceToUpdate.mesh.position as unknown as Vec3
         );
       }
     });

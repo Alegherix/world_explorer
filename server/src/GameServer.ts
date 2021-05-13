@@ -1,31 +1,41 @@
-import { IPosition, SocketEvent } from '../../src/shared/interfaces';
-import { v4 } from 'uuid';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import {
+  IPosition,
+  IStateUpdate,
+  SocketEvent,
+} from '../../src/shared/interfaces';
 
 interface IActivePlayer {
   username: string;
   id: string;
   socket: Socket;
   position: IPosition;
+  velocity: IPosition;
 }
 
 class GameServer {
   private sockets: Map<string, IActivePlayer>;
   private TICK_RATE = 30;
+  private elapsedTime: number;
+  private server: Server;
 
-  constructor() {
+  constructor(server: Server) {
     this.sockets = new Map();
+    this.elapsedTime = new Date().getTime();
+    this.server = server;
   }
 
   // Adds socket to constructor
   addSocket(socket: Socket, username: string) {
     console.log(username + ' has connected to the server');
     const defaultPosition: IPosition = { x: 0, y: 5, z: 0 };
+    const velocity: CANNON.Vec3 = null;
     this.sockets.set(socket.id, {
       username,
       id: socket.id,
       socket,
       position: defaultPosition,
+      velocity,
     });
   }
 
@@ -48,9 +58,33 @@ class GameServer {
     }
   }
 
-  removeSocket(io: Server, id: string) {
+  removeSocket(id: string) {
     this.sockets.delete(id);
-    io.sockets.emit(SocketEvent.USER_DISCONNECTED, id);
+    this.server.sockets.emit(SocketEvent.USER_DISCONNECTED, id);
+  }
+
+  updateState(id: string, { position, velocity }: IStateUpdate) {
+    const player = this.sockets.get(id);
+    player.position = position;
+    player.velocity = velocity;
+    this.broadcastStateUpdates();
+  }
+
+  // // Broadcasts state updates every 30ms, and only if >1 player on server
+  private broadcastStateUpdates() {
+    const currentTime = new Date().getTime();
+    if (
+      currentTime > this.elapsedTime + this.TICK_RATE &&
+      this.sockets.size > 1
+    ) {
+      const updateArray: Partial<IActivePlayer>[] = [];
+      this.sockets.forEach((player) => {
+        const { socket, ...rest } = player;
+        updateArray.push(rest);
+      });
+      this.server.sockets.emit(SocketEvent.UPDATE_STATE, updateArray);
+      this.elapsedTime = currentTime;
+    }
   }
 }
 
