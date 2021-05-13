@@ -10,9 +10,11 @@ import * as THREE from 'three';
 import type { IActivePlayer } from '../../shared/frontendInterfaces';
 import Gamestore from '../../shared/GameStore';
 import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
+import PlaneFactory from '../components/Plane';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
+import { getDimensions, getPosition } from '../utils/utils';
 
 class MultiplayerWorld extends Game {
   private userName: string;
@@ -41,6 +43,7 @@ class MultiplayerWorld extends Game {
     );
     this.userName = get(Gamestore).username;
     this.socket = io('ws://localhost:8000').connect();
+    // this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
 
     this.listenForEvents();
     this.createStartingZone();
@@ -61,7 +64,7 @@ class MultiplayerWorld extends Game {
     const textureLoader = this.loader.getTextureLoader();
     const groundTexture = textureLoader.load('textures/test/iceTexture.jpg');
 
-    const planeGeometry = new THREE.PlaneBufferGeometry(200, 200, 128, 128);
+    const planeGeometry = new THREE.PlaneBufferGeometry(400, 400, 128, 128);
     const planeMaterial = new THREE.MeshStandardMaterial({
       map: groundTexture,
     });
@@ -75,6 +78,47 @@ class MultiplayerWorld extends Game {
     // Move just slightly to prevent Z-Fighting
     plane.position.y = -0.2;
     this.scene.add(plane);
+
+    const wallProperties = [
+      // left
+      {
+        w: 1,
+        h: 400,
+        d: 100,
+        x: -200,
+        y: 50,
+        z: 0,
+      },
+      // right
+      {
+        w: 1,
+        h: 400,
+        d: 100,
+        x: 200,
+        y: 50,
+        z: 0,
+      },
+      // back
+      {
+        w: 400,
+        h: 1,
+        d: 100,
+        x: 0,
+        y: 50,
+        z: 200,
+      },
+    ];
+
+    wallProperties.forEach(({ w, h, d, x, y, z }) => {
+      this.addToWorld(
+        PlaneFactory.createPlane(
+          getDimensions(w, h, d),
+          this.material.getAdamantineMaterial(),
+          getPosition(x, y, z),
+          { color: 0x932ce5, transparent: true, opacity: 0.6 }
+        )
+      );
+    });
   }
 
   // Run all game related Logic inside here
@@ -89,7 +133,6 @@ class MultiplayerWorld extends Game {
         gamePiece.body.quaternion as unknown as THREE.Quaternion
       );
     }
-    console.log(this.currentGamePiece.body.angularVelocity);
 
     this.sendCurrentGameState();
     this.world.step(1 / 100, timeDelta);
@@ -97,12 +140,14 @@ class MultiplayerWorld extends Game {
 
   // Physical plane of starting zone
   addPhysicalStartingZone() {
-    const floorShape = new CANNON.Box(new Vec3(100, 100, 0.1));
+    const floorShape = new CANNON.Box(new Vec3(200, 200, 0.1));
     this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
   }
 
   listenForEvents() {
     this.socket.on('connect', () => {
+      console.log('Connected');
+
       this.socket.emit('userConnected', { username: this.userName });
     });
 

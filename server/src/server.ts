@@ -1,13 +1,3 @@
-// import express from 'express';
-// const app = express();
-// import http from 'http';
-// const server = http.createServer();
-// import { Server } from 'socket.io';
-// const io = new Server(server, {
-//   cors: {
-//     origin: '*',
-//   },
-// });
 import http from 'http';
 import { Server } from 'socket.io';
 import {
@@ -20,6 +10,8 @@ const httpServer = http.createServer();
 const io = new Server(httpServer, {
   cors: { origin: '*' },
 });
+
+const port = process.env.PORT || 8000;
 
 const gameServer = new GameServer(io);
 
@@ -38,6 +30,6 @@ io.on('connection', (socket) => {
   });
 });
 
-httpServer.listen(8000, () => {
-  console.log('Listening on http://localhost:8000');
+httpServer.listen(port, () => {
+  console.log(`Listening on http://localhost:${port}`);
 });
