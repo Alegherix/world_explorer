@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
     });
     socket.on('disconnect', () => __awaiter(void 0, void 0, void 0, function* () {
         io.sockets.emit('userDisconnect', { username: socket.id });
+        gameServer.removeSocket(socket.id);
     }));
 });
 httpServer.listen(8000, () => {

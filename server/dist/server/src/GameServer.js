@@ -11,6 +11,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const interfaces_1 = require("../../src/shared/interfaces");
 class GameServer {
     constructor() {
         this.TICK_RATE = 30;
@@ -26,15 +27,19 @@ class GameServer {
             position: defaultPosition,
         });
     }
-    broadcastIncomingUser(socket, username) {
-        socket.broadcast.emit('userConnected', username);
+    broadcastIncomingUser(incomingSocket, username) {
+        incomingSocket.broadcast.emit(interfaces_1.SocketEvent.USER_CONNECTED, username);
         const currentUsersArray = [];
         this.sockets.forEach((activePlayer) => {
             const { socket } = activePlayer, rest = __rest(activePlayer, ["socket"]);
-            currentUsersArray.push(rest);
+            if (incomingSocket.id !== socket.id)
+                currentUsersArray.push(rest);
         });
-        // Send only to the given client
-        socket.broadcast.to(socket.id).emit('currentUsers', currentUsersArray);
+        if (currentUsersArray.length > 0) {
+            // Send only to the given client
+            console.log('Sending currentUsers to newly connected client');
+            incomingSocket.emit(interfaces_1.SocketEvent.CURRENT_USERS, currentUsersArray);
+        }
     }
     removeSocket(id) {
         this.sockets.delete(id);

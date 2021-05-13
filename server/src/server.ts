@@ -27,6 +27,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', async () => {
     io.sockets.emit('userDisconnect', { username: socket.id });
+    gameServer.removeSocket(socket.id);
   });
 });
 

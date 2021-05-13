@@ -1,4 +1,4 @@
-import { IPosition } from '../../src/shared/interfaces';
+import { IPosition, SocketEvent } from '../../src/shared/interfaces';
 import { v4 } from 'uuid';
 import { Socket } from 'socket.io';
 
@@ -27,17 +27,19 @@ class GameServer {
     });
   }
 
-  broadcastIncomingUser(socket: Socket, username: string) {
-    socket.broadcast.emit('userConnected', username);
+  broadcastIncomingUser(incomingSocket: Socket, username: string) {
+    incomingSocket.broadcast.emit(SocketEvent.USER_CONNECTED, username);
 
     const currentUsersArray: Partial<IActivePlayer>[] = [];
     this.sockets.forEach((activePlayer) => {
       const { socket, ...rest } = activePlayer;
-      currentUsersArray.push(rest);
+      if (incomingSocket.id !== socket.id) currentUsersArray.push(rest);
     });
-
-    // Send only to the given client
-    socket.broadcast.to(socket.id).emit('currentUsers', currentUsersArray);
+    if (currentUsersArray.length > 0) {
+      // Send only to the given client
+      console.log('Sending currentUsers to newly connected client');
+      incomingSocket.emit(SocketEvent.CURRENT_USERS, currentUsersArray);
+    }
   }
 
   removeSocket(id: string) {
