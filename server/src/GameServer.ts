@@ -15,7 +15,7 @@ interface IActivePlayer {
 
 class GameServer {
   private sockets: Map<string, IActivePlayer>;
-  private TICK_RATE = 30;
+  private TICK_RATE = 15;
   private elapsedTime: number;
   private server: Server;
 

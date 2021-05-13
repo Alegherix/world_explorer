@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const interfaces_1 = require("../../src/shared/interfaces");
 class GameServer {
     constructor(server) {
-        this.TICK_RATE = 30;
+        this.TICK_RATE = 15;
         this.sockets = new Map();
         this.elapsedTime = new Date().getTime();
         this.server = server;
