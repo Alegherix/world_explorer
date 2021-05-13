@@ -10,7 +10,7 @@
 // });
 import http from 'http';
 import { Server } from 'socket.io';
-import { IConnected } from '../../src/shared/interfaces';
+import { IConnected, SocketEvent } from '../../src/shared/interfaces';
 import GameServer from './GameServer';
 const httpServer = http.createServer();
 const io = new Server(httpServer, {
@@ -26,8 +26,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', async () => {
-    io.sockets.emit('userDisconnect', { username: socket.id });
-    gameServer.removeSocket(socket.id);
+    gameServer.removeSocket(io, socket.id);
   });
 });
 

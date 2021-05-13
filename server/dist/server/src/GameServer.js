@@ -23,12 +23,16 @@ class GameServer {
         const defaultPosition = { x: 0, y: 5, z: 0 };
         this.sockets.set(socket.id, {
             username,
+            id: socket.id,
             socket,
             position: defaultPosition,
         });
     }
     broadcastIncomingUser(incomingSocket, username) {
-        incomingSocket.broadcast.emit(interfaces_1.SocketEvent.USER_CONNECTED, username);
+        incomingSocket.broadcast.emit(interfaces_1.SocketEvent.USER_CONNECTED, {
+            username,
+            id: incomingSocket.id,
+        });
         const currentUsersArray = [];
         this.sockets.forEach((activePlayer) => {
             const { socket } = activePlayer, rest = __rest(activePlayer, ["socket"]);
@@ -41,8 +45,9 @@ class GameServer {
             incomingSocket.emit(interfaces_1.SocketEvent.CURRENT_USERS, currentUsersArray);
         }
     }
-    removeSocket(id) {
+    removeSocket(io, id) {
         this.sockets.delete(id);
+        io.sockets.emit(interfaces_1.SocketEvent.USER_DISCONNECTED, id);
     }
 }
 exports.default = GameServer;

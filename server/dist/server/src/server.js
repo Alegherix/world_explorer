@@ -36,8 +36,7 @@ io.on('connection', (socket) => {
         gameServer.broadcastIncomingUser(socket, message.username);
     });
     socket.on('disconnect', () => __awaiter(void 0, void 0, void 0, function* () {
-        io.sockets.emit('userDisconnect', { username: socket.id });
-        gameServer.removeSocket(socket.id);
+        gameServer.removeSocket(io, socket.id);
     }));
 });
 httpServer.listen(8000, () => {
