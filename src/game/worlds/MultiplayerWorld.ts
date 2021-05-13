@@ -46,13 +46,13 @@ class MultiplayerWorld extends Game {
       camera,
       'mineral.jpg',
       'space',
-      '.jpg',
-      true
+      '.jpg'
+      // true
     );
     this.gui = new dat.GUI();
     this.userName = get(Gamestore).username;
-    this.socket = io('ws://localhost:8000').connect();
-    // this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
+    // this.socket = io('ws://localhost:8000').connect();
+    this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
 
     this.initializeTextures();
     this.listenForEvents();
@@ -60,6 +60,7 @@ class MultiplayerWorld extends Game {
     this.addPhysicalStartingZone();
     this.createGameMap();
     this.createPlayer(this.userName);
+    // this.world.gravity.set(0, , 0);
   }
 
   createGameMap() {
@@ -130,7 +131,6 @@ class MultiplayerWorld extends Game {
       this.defaultConfig
     );
     this.addToWorld(plane);
-    this.addToGui(plane);
 
     for (let index = 1; index < 3; index++) {
       const offset = index * 400;
@@ -146,11 +146,27 @@ class MultiplayerWorld extends Game {
         direction: 'z',
         distance: 20,
         positionOffset: -1200,
-        speed: -0.02,
+        speed: -0.08,
       };
       this.addToWorld(trap);
       this.obstacleArray.push(trap);
     }
+
+    const bouncePlate = PlaneFactory.createPlane(
+      getDimensions(150, 150, 1),
+      this.material.getAdamantineMaterial(),
+      getPosition(-1650, 200, -1200),
+      this.defaultConfig
+    );
+    bouncePlate.movementType = {
+      start: 'sin',
+      distance: 200,
+      positionOffset: -1200,
+      speed: 0.5,
+      direction: 'z',
+    };
+    this.addToWorld(bouncePlate);
+    this.addToGui(bouncePlate);
   }
 
   // Mesh of starting zone
