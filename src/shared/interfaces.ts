@@ -15,6 +15,7 @@ export enum SocketEvent {
   CURRENT_USERS = 'currentUsers',
   USER_DISCONNECTED = 'userDisconnect',
   UPDATE_STATE = 'updateState',
+  PLAYER_DIED = 'playerDied',
 }
 
 export interface ICurrentUsers {

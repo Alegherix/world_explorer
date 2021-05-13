@@ -5,7 +5,7 @@ import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
 import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
-import type { Vector3 } from 'three';
+import type { MeshStandardMaterialParameters, Vector3 } from 'three';
 import * as THREE from 'three';
 import type { IActivePlayer } from '../../shared/frontendInterfaces';
 import Gamestore from '../../shared/GameStore';
@@ -14,15 +14,16 @@ import PlaneFactory from '../components/Plane';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
+import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import { getDimensions, getPosition } from '../utils/utils';
 
 class MultiplayerWorld extends Game {
   private userName: string;
   private socket: Socket;
 
-  // Used for testing, and making sure to only send current state to server n amount of times each second.
+  // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
-  private haveConnectedToServer: boolean = false;
+  private defaultConfig: MeshStandardMaterialParameters;
 
   constructor(
     scene: THREE.Scene,
@@ -40,23 +41,56 @@ class MultiplayerWorld extends Game {
       'mineral.jpg',
       'space',
       '.jpg'
+      // true
     );
     this.userName = get(Gamestore).username;
     this.socket = io('ws://localhost:8000').connect();
     // this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
 
+    this.defaultConfig = { color: 0x932ce5, transparent: true, opacity: 0.6 };
     this.listenForEvents();
     this.createStartingZone();
     this.addPhysicalStartingZone();
+    this.createGameMap();
     this.createPlayer(this.userName);
   }
 
   createGameMap() {
-    throw new Error('Method not implemented.');
+    this.createStartJump();
+    this.createPillar();
   }
 
   createFinishZone() {
     throw new Error('Method not implemented.');
+  }
+
+  createStartJump() {
+    const ramp = PlaneFactory.createPlane(
+      getDimensions(400, 300, 1),
+      this.material.getGlassMaterial(),
+      getPosition(0, 75, -330),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUp(ramp);
+    this.addToWorld(ramp);
+  }
+
+  createPillar() {
+    const pillar = PlaneFactory.createPlane(
+      getDimensions(60, 60, 1400),
+      this.material.getAdamantineMaterial(),
+      getPosition(0, -600, -1200),
+      this.defaultConfig
+    );
+    this.addToWorld(pillar);
+
+    const plane = PlaneFactory.createPlane(
+      getDimensions(200, 200, 1),
+      this.material.getGlassMaterial(),
+      getPosition(0, 100, -1200),
+      this.defaultConfig
+    );
+    this.addToWorld(plane);
   }
 
   // Mesh of starting zone
@@ -115,7 +149,7 @@ class MultiplayerWorld extends Game {
           getDimensions(w, h, d),
           this.material.getAdamantineMaterial(),
           getPosition(x, y, z),
-          { color: 0x932ce5, transparent: true, opacity: 0.6 }
+          this.defaultConfig
         )
       );
     });
@@ -135,7 +169,20 @@ class MultiplayerWorld extends Game {
     }
 
     this.sendCurrentGameState();
+    this.rewspawnIfDead();
     this.world.step(1 / 100, timeDelta);
+  }
+
+  rewspawnIfDead() {
+    if (this.currentGamePiece.mesh.position.y <= -50) {
+      this.currentGamePiece.body.position.set(
+        (0.5 - Math.random()) * 400,
+        150,
+        (0.5 - Math.random()) * 400
+      );
+      this.currentGamePiece.body.angularVelocity.set(0, 0, 0);
+      this.currentGamePiece.body.velocity.set(0, 0, 0);
+    }
   }
 
   // Physical plane of starting zone

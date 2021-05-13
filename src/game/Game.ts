@@ -212,6 +212,13 @@ abstract class Game implements ISkybox {
           this.currentGamePiece.body.position
         );
         break;
+
+      case 'x':
+        this.currentGamePiece.body.applyImpulse(
+          new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
+          this.currentGamePiece.body.position
+        );
+        break;
     }
   }
 

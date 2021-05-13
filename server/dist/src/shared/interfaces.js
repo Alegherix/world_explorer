@@ -7,5 +7,6 @@ var SocketEvent;
     SocketEvent["CURRENT_USERS"] = "currentUsers";
     SocketEvent["USER_DISCONNECTED"] = "userDisconnect";
     SocketEvent["UPDATE_STATE"] = "updateState";
+    SocketEvent["PLAYER_DIED"] = "playerDied";
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
 //# sourceMappingURL=interfaces.js.map
