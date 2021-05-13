@@ -7,7 +7,10 @@ import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import type { MeshStandardMaterialParameters, Vector3 } from 'three';
 import * as THREE from 'three';
-import type { IActivePlayer } from '../../shared/frontendInterfaces';
+import type {
+  IActivePlayer,
+  IGamePiece,
+} from '../../shared/frontendInterfaces';
 import Gamestore from '../../shared/GameStore';
 import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
 import PlaneFactory from '../components/Plane';
@@ -16,10 +19,13 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import { getDimensions, getPosition } from '../utils/utils';
+import * as dat from 'dat.gui';
 
 class MultiplayerWorld extends Game {
   private userName: string;
   private socket: Socket;
+  private gui;
+  private obstacleArray: IGamePiece[] = [];
 
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
@@ -40,14 +46,15 @@ class MultiplayerWorld extends Game {
       camera,
       'mineral.jpg',
       'space',
-      '.jpg'
-      // true
+      '.jpg',
+      true
     );
+    this.gui = new dat.GUI();
     this.userName = get(Gamestore).username;
     this.socket = io('ws://localhost:8000').connect();
     // this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
 
-    this.defaultConfig = { color: 0x932ce5, transparent: true, opacity: 0.6 };
+    this.initializeTextures();
     this.listenForEvents();
     this.createStartingZone();
     this.addPhysicalStartingZone();
@@ -58,10 +65,23 @@ class MultiplayerWorld extends Game {
   createGameMap() {
     this.createStartJump();
     this.createPillar();
+    this.createFirstObstacle();
   }
 
   createFinishZone() {
     throw new Error('Method not implemented.');
+  }
+
+  addToGui(gamepiece: IGamePiece) {
+    this.gui.add(gamepiece.mesh.position, 'x').step(1);
+    this.gui.add(gamepiece.mesh.position, 'y').step(1);
+    this.gui.add(gamepiece.mesh.position, 'z').step(1);
+    this.camera.position.set(
+      gamepiece.mesh.position.x,
+      gamepiece.mesh.position.y,
+      gamepiece.mesh.position.z
+    );
+    this.camera.lookAt(gamepiece.mesh.position);
   }
 
   createStartJump() {
@@ -85,23 +105,58 @@ class MultiplayerWorld extends Game {
     this.addToWorld(pillar);
 
     const plane = PlaneFactory.createPlane(
-      getDimensions(200, 200, 1),
+      getDimensions(250, 250, 1),
       this.material.getGlassMaterial(),
       getPosition(0, 100, -1200),
       this.defaultConfig
     );
     this.addToWorld(plane);
+
+    const ramp = PlaneFactory.createPlane(
+      getDimensions(250, 350, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-277, 187, -1200),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpLeft(ramp);
+    this.addToWorld(ramp);
+  }
+
+  createFirstObstacle() {
+    const plane = PlaneFactory.createPlane(
+      getDimensions(1000, 250, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-928, 275, -1200),
+      this.defaultConfig
+    );
+    this.addToWorld(plane);
+    this.addToGui(plane);
+
+    for (let index = 1; index < 3; index++) {
+      const offset = index * 400;
+
+      const trap = PlaneFactory.createPlane(
+        getDimensions(250, 20, 20),
+        this.material.getGlassMaterial(),
+        getPosition(-300 - offset, 287, -1200),
+        this.defaultConfig
+      );
+      trap.movementType = {
+        start: 'sin',
+        direction: 'z',
+        distance: 20,
+        positionOffset: -1200,
+        speed: -0.02,
+      };
+      this.addToWorld(trap);
+      this.obstacleArray.push(trap);
+    }
   }
 
   // Mesh of starting zone
   createStartingZone() {
-    const textureLoader = this.loader.getTextureLoader();
-    const groundTexture = textureLoader.load('textures/test/iceTexture.jpg');
-
     const planeGeometry = new THREE.PlaneBufferGeometry(400, 400, 128, 128);
-    const planeMaterial = new THREE.MeshStandardMaterial({
-      map: groundTexture,
-    });
+    const planeMaterial = new THREE.MeshStandardMaterial(this.defaultConfig);
 
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.castShadow = false;
@@ -118,27 +173,27 @@ class MultiplayerWorld extends Game {
       {
         w: 1,
         h: 400,
-        d: 100,
+        d: 50,
         x: -200,
-        y: 50,
+        y: 25,
         z: 0,
       },
       // right
       {
         w: 1,
         h: 400,
-        d: 100,
+        d: 50,
         x: 200,
-        y: 50,
+        y: 25,
         z: 0,
       },
       // back
       {
         w: 400,
         h: 1,
-        d: 100,
+        d: 50,
         x: 0,
-        y: 50,
+        y: 25,
         z: 200,
       },
     ];
@@ -160,12 +215,11 @@ class MultiplayerWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
 
     for (const gamePiece of this.activeGamePieces) {
-      gamePiece.mesh.position.copy(
-        gamePiece.body.position as unknown as Vector3
-      );
-      gamePiece.mesh.quaternion.copy(
-        gamePiece.body.quaternion as unknown as THREE.Quaternion
-      );
+      this.move(gamePiece, elapsedTime);
+    }
+
+    for (const obstacle of this.obstacleArray) {
+      this.rotate(obstacle, elapsedTime);
     }
 
     this.sendCurrentGameState();
@@ -301,6 +355,33 @@ class MultiplayerWorld extends Game {
         );
       }
     });
+  }
+
+  initializeTextures() {
+    const loader = this.loader.getTextureLoader();
+    const map = loader.load('/textures/metalPlate/MetalPlates006_1K_Color.jpg');
+    const normal = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Normal.jpg'
+    );
+    const displacement = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Displacement.jpg'
+    );
+    const metallic = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Metalness.jpg'
+    );
+    const roughness = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Roughness.jpg'
+    );
+
+    this.defaultConfig = {
+      opacity: 0.6,
+      transparent: true,
+      map,
+      normalMap: normal,
+      displacementMap: displacement,
+      roughnessMap: roughness,
+      metalnessMap: metallic,
+    };
   }
 }
 

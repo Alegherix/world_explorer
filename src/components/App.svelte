@@ -5,6 +5,9 @@
   import GameStore from '../shared/GameStore';
 </script>
 
+<svelte:head>
+  <title>World Explorer</title>
+</svelte:head>
 <main>
   <!-- <Game /> -->
   {#if $GameStore.world}
