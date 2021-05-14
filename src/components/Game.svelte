@@ -3,6 +3,8 @@
   import GameScene from '../game/scenes/GameScene';
   import GameStore from '../shared/GameStore';
   import App from './App.svelte';
+  import BoostComponent from './BoostComponent.svelte';
+  import ControllerComponent from './ControllerComponent.svelte';
 
   let canvas;
   $: elapsedTime = $GameStore.elapsedTime;
@@ -21,33 +23,20 @@
 <main>
   <canvas class="webgl" bind:this={canvas} />
   <section>
-    <div class="scoreCounter">
-      <h2>Points</h2>
-      <h3>{$GameStore.score}</h3>
-    </div>
-    <div class="playtimeContainer">
-      <h2>Time played</h2>
-      <h3>{elapsedTime.toFixed(2)}</h3>
-    </div>
+    {#if $GameStore.world !== 'Zetxaru'}
+      <div class="scoreCounter">
+        <h2>Points</h2>
+        <h3>{$GameStore.score}</h3>
+      </div>
+      <div class="playtimeContainer">
+        <h2>Time played</h2>
+        <h3>{elapsedTime.toFixed(2)}</h3>
+      </div>
+    {/if}
+    <BoostComponent />
   </section>
-  <section class="controller">
-    <div class="move">
-      <p>WASD</p>
-      <p>Move</p>
-    </div>
-    <div class="move">
-      <p>Space</p>
-      <p>Jump</p>
-    </div>
-    <div class="move">
-      <p>X</p>
-      <p>Boost</p>
-    </div>
-    <div class="move">
-      <p>R</p>
-      <p>Rotate</p>
-    </div>
-  </section>
+  <ControllerComponent />
+
   <!-- <button on:click={handleMenu}>Back to MainMenu</button> -->
 </main>
 
@@ -89,26 +78,5 @@
     background-color: black;
     color: #1987ee;
     font-size: 2rem;
-  }
-
-  .controller {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    flex-direction: column;
-    z-index: 2;
-    position: absolute;
-    left: 0.5rem;
-    top: 4rem;
-    width: 250px;
-  }
-
-  .move {
-    color: white;
-    font-size: 26px;
-    display: flex;
-    justify-content: space-between;
-  }
-  p {
-    margin: 0.3rem;
   }
 </style>

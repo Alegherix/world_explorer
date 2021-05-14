@@ -9,6 +9,8 @@ import ThirdPersonCamera from './utils/ThirdPersonCamera';
 import GameStore from '../shared/GameStore';
 import type { Vec3 } from 'cannon-es';
 import * as dat from 'dat.gui';
+import Gamestore from '../shared/GameStore';
+import { get } from 'svelte/store';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -17,6 +19,7 @@ abstract class Game implements ISkybox {
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
   private gui: dat.GUI;
+  private lastBoostUsed: number;
 
   constructor(
     protected scene: THREE.Scene,
@@ -107,7 +110,6 @@ abstract class Game implements ISkybox {
     if (gamePiece.movementType) this.activeGamePieces.push(gamePiece);
   }
 
-  //
   addToGui(gamepiece: IGamePiece) {
     this.gui.add(gamepiece.mesh.position, 'x').step(1);
     this.gui.add(gamepiece.mesh.position, 'y').step(1);
@@ -129,6 +131,18 @@ abstract class Game implements ISkybox {
       );
       this.currentGamePiece.body.angularVelocity.set(0, 0, 0);
       this.currentGamePiece.body.velocity.set(0, 0, 0);
+    }
+  }
+
+  // replenish Boost every 5 sec
+  protected replenishBoost() {
+    const { boosts } = get(GameStore);
+    if (boosts < 3) {
+      const currentTime = new Date().getTime();
+      if (currentTime > this.lastBoostUsed + 5000) {
+        GameStore.update((val) => ({ ...val, boosts: val.boosts + 1 }));
+        this.lastBoostUsed = currentTime;
+      }
     }
   }
 
@@ -242,10 +256,18 @@ abstract class Game implements ISkybox {
         break;
 
       case 'x':
-        this.currentGamePiece.body.applyImpulse(
-          new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
-          this.currentGamePiece.body.position
-        );
+        // apply force, update store, and make sure to note when last boost was used;
+        let { boosts } = get(GameStore);
+        if (boosts > 0) {
+          this.currentGamePiece.body.applyImpulse(
+            new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
+            this.currentGamePiece.body.position
+          );
+          GameStore.update((value) => {
+            return { ...value, boosts: boosts - 1 };
+          });
+          this.lastBoostUsed = new Date().getTime();
+        }
         break;
     }
   }

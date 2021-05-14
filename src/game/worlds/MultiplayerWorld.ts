@@ -104,6 +104,7 @@ class MultiplayerWorld extends Game {
 
     this.sendCurrentGameState();
     this.rewspawnIfDead();
+    this.replenishBoost();
     this.world.step(1 / 100, timeDelta);
   }
 

@@ -19,3 +19,10 @@ body {
   padding: 0px;
   box-sizing: border-box;
 }
+
+h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
