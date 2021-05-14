@@ -3,9 +3,11 @@ import type { IDimension } from './../../shared/interfaces';
  * @desc Used for creating the Game world of Morghol, an abandoned mineral planet
  */
 import type * as CANNON from 'cannon-es';
+import type * as THREE from 'three';
 
 import PlaneFactory from '../components/Plane';
 import PlatformFactory from '../components/Platform';
+import ScoreKeeper from '../components/ScoreKeeper';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
@@ -13,6 +15,8 @@ import cannonDebugger from 'cannon-es-debugger';
 import { getDimensions, getPosition } from '../utils/utils';
 
 class MineralWorld extends Game {
+  private scoreKeeper: ScoreKeeper;
+  private defaultConfig: THREE.MeshStandardMaterialParameters;
   constructor(
     scene: THREE.Scene,
     world: CANNON.World,
@@ -33,6 +37,9 @@ class MineralWorld extends Game {
     );
 
     cannonDebugger(this.scene, this.world.bodies);
+
+    this.scoreKeeper = new ScoreKeeper(this.scene);
+
     this.createStartingZone();
     this.createGameMap();
     console.log(this.scene.children);
@@ -41,6 +48,7 @@ class MineralWorld extends Game {
 
   runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
+    this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
 
     for (const gamePiece of this.activeGamePieces) {
@@ -131,7 +139,10 @@ class MineralWorld extends Game {
     const secondStraight = PlatformFactory.createPlanePlatform(
       getDimensions(400, 1, 40),
       this.material.getRockMaterial(),
-      getPosition(-220, -1, -580)
+      getPosition(-220, -1, -580),
+      this.defaultConfig,
+      0,
+      this.scoreKeeper
     );
     this.addToWorld(secondStraight);
 
@@ -186,7 +197,10 @@ class MineralWorld extends Game {
     const firstStraight = PlatformFactory.createPlanePlatform(
       getDimensions(140, 1, 40),
       this.material.getGlassMaterial(),
-      getPosition(-180, 46, -220)
+      getPosition(-180, 46, -220),
+      this.defaultConfig,
+      0,
+      this.scoreKeeper
     );
     this.addToWorld(firstStraight);
 
@@ -211,7 +225,10 @@ class MineralWorld extends Game {
     const secondStraight = PlatformFactory.createPlanePlatform(
       getDimensions(140, 1, 40),
       this.material.getGlassMaterial(),
-      getPosition(159, 34, -220)
+      getPosition(159, 34, -220),
+      this.defaultConfig,
+      0,
+      this.scoreKeeper
     );
     this.addToWorld(secondStraight);
 
@@ -293,7 +310,10 @@ class MineralWorld extends Game {
     const exitPlane = PlatformFactory.createPlanePlatform(
       getDimensions(300, 1, 40),
       this.material.getGlassMaterial(),
-      getPosition(80, 185, -700)
+      getPosition(80, 185, -700),
+      this.defaultConfig,
+      0,
+      this.scoreKeeper
     );
     this.addToWorld(exitPlane);
 
