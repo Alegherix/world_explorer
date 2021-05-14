@@ -19,17 +19,17 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import { getDimensions, getPosition } from '../utils/utils';
-import * as dat from 'dat.gui';
 
 class MultiplayerWorld extends Game {
   private userName: string;
   private socket: Socket;
-  private gui;
+
   private obstacleArray: IGamePiece[] = [];
 
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
   private defaultConfig: MeshStandardMaterialParameters;
+  private elapsedTime: number;
 
   constructor(
     scene: THREE.Scene,
@@ -49,18 +49,131 @@ class MultiplayerWorld extends Game {
       '.jpg'
       // true
     );
-    this.gui = new dat.GUI();
+
     this.userName = get(Gamestore).username;
-    // this.socket = io('ws://localhost:8000').connect();
-    this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
+    this.socket = io('ws://localhost:8000').connect();
+    // this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
 
     this.initializeTextures();
     this.listenForEvents();
     this.createStartingZone();
-    this.addPhysicalStartingZone();
     this.createGameMap();
     this.createPlayer(this.userName);
-    // this.world.gravity.set(0, , 0);
+  }
+
+  initializeTextures() {
+    const loader = this.loader.getTextureLoader();
+    const map = loader.load('/textures/metalPlate/MetalPlates006_1K_Color.jpg');
+    const normal = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Normal.jpg'
+    );
+    const displacement = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Displacement.jpg'
+    );
+    const metallic = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Metalness.jpg'
+    );
+    const roughness = loader.load(
+      '/textures/metalPlate/MetalPlates006_1K_Roughness.jpg'
+    );
+
+    this.defaultConfig = {
+      opacity: 0.6,
+      transparent: true,
+      map,
+      normalMap: normal,
+      displacementMap: displacement,
+      roughnessMap: roughness,
+      metalnessMap: metallic,
+    };
+  }
+
+  // Run all game related Logic inside here
+  runGameLoop(timeDelta: number, elapsedTime: number) {
+    if (!this.useOrbitCamera) this.gameCamera.update();
+
+    for (const gamePiece of this.activeGamePieces) {
+      this.move(gamePiece, this.elapsedTime);
+    }
+
+    for (const obstacle of this.obstacleArray) {
+      this.rotate(obstacle, this.elapsedTime);
+    }
+
+    this.elapsedTime = new Date().getTime() / 1000;
+
+    this.sendCurrentGameState();
+    this.rewspawnIfDead();
+    this.world.step(1 / 100, timeDelta);
+  }
+
+  // Mesh of starting zone
+  createStartingZone() {
+    const planeWidth = 400;
+    const planeHeight = 400;
+    const planeGeometry = new THREE.PlaneBufferGeometry(
+      planeWidth,
+      planeHeight,
+      128,
+      128
+    );
+    const planeMaterial = new THREE.MeshStandardMaterial(this.defaultConfig);
+
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.castShadow = false;
+    plane.receiveShadow = true;
+    plane.rotation.x = -Math.PI / 2;
+    plane.material.side = THREE.DoubleSide;
+
+    // Move just slightly to prevent Z-Fighting
+    plane.position.y = -0.2;
+    this.scene.add(plane);
+
+    const floorShape = new CANNON.Box(
+      new Vec3(planeWidth / 2, planeHeight / 2, 0.1)
+    );
+    this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape);
+
+    const wallProperties = [
+      // left
+      {
+        w: 1,
+        h: 400,
+        d: 50,
+        x: -200,
+        y: 25,
+        z: 0,
+      },
+      // right
+      {
+        w: 1,
+        h: 400,
+        d: 50,
+        x: 200,
+        y: 25,
+        z: 0,
+      },
+      // back
+      {
+        w: 400,
+        h: 1,
+        d: 50,
+        x: 0,
+        y: 25,
+        z: 200,
+      },
+    ];
+
+    wallProperties.forEach(({ w, h, d, x, y, z }) => {
+      this.addToWorld(
+        PlaneFactory.createPlane(
+          getDimensions(w, h, d),
+          this.material.getAdamantineMaterial(),
+          getPosition(x, y, z),
+          this.defaultConfig
+        )
+      );
+    });
   }
 
   createGameMap() {
@@ -71,18 +184,6 @@ class MultiplayerWorld extends Game {
 
   createFinishZone() {
     throw new Error('Method not implemented.');
-  }
-
-  addToGui(gamepiece: IGamePiece) {
-    this.gui.add(gamepiece.mesh.position, 'x').step(1);
-    this.gui.add(gamepiece.mesh.position, 'y').step(1);
-    this.gui.add(gamepiece.mesh.position, 'z').step(1);
-    this.camera.position.set(
-      gamepiece.mesh.position.x,
-      gamepiece.mesh.position.y,
-      gamepiece.mesh.position.z
-    );
-    this.camera.lookAt(gamepiece.mesh.position);
   }
 
   createStartJump() {
@@ -153,7 +254,7 @@ class MultiplayerWorld extends Game {
     }
 
     const bouncePlate = PlaneFactory.createPlane(
-      getDimensions(150, 150, 1),
+      getDimensions(200, 200, 1),
       this.material.getAdamantineMaterial(),
       getPosition(-1650, 200, -1200),
       this.defaultConfig
@@ -166,100 +267,20 @@ class MultiplayerWorld extends Game {
       direction: 'z',
     };
     this.addToWorld(bouncePlate);
-    this.addToGui(bouncePlate);
+
+    const landingPlate = PlaneFactory.createPlane(
+      getDimensions(500, 250, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-2300, 300, -1200),
+      this.defaultConfig
+    );
+    this.addToWorld(landingPlate);
+    this.addToGui(landingPlate);
   }
 
-  // Mesh of starting zone
-  createStartingZone() {
-    const planeGeometry = new THREE.PlaneBufferGeometry(400, 400, 128, 128);
-    const planeMaterial = new THREE.MeshStandardMaterial(this.defaultConfig);
-
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.castShadow = false;
-    plane.receiveShadow = true;
-    plane.rotation.x = -Math.PI / 2;
-    plane.material.side = THREE.DoubleSide;
-
-    // Move just slightly to prevent Z-Fighting
-    plane.position.y = -0.2;
-    this.scene.add(plane);
-
-    const wallProperties = [
-      // left
-      {
-        w: 1,
-        h: 400,
-        d: 50,
-        x: -200,
-        y: 25,
-        z: 0,
-      },
-      // right
-      {
-        w: 1,
-        h: 400,
-        d: 50,
-        x: 200,
-        y: 25,
-        z: 0,
-      },
-      // back
-      {
-        w: 400,
-        h: 1,
-        d: 50,
-        x: 0,
-        y: 25,
-        z: 200,
-      },
-    ];
-
-    wallProperties.forEach(({ w, h, d, x, y, z }) => {
-      this.addToWorld(
-        PlaneFactory.createPlane(
-          getDimensions(w, h, d),
-          this.material.getAdamantineMaterial(),
-          getPosition(x, y, z),
-          this.defaultConfig
-        )
-      );
-    });
-  }
-
-  // Run all game related Logic inside here
-  runGameLoop(timeDelta: number, elapsedTime: number) {
-    if (!this.useOrbitCamera) this.gameCamera.update();
-
-    for (const gamePiece of this.activeGamePieces) {
-      this.move(gamePiece, elapsedTime);
-    }
-
-    for (const obstacle of this.obstacleArray) {
-      this.rotate(obstacle, elapsedTime);
-    }
-
-    this.sendCurrentGameState();
-    this.rewspawnIfDead();
-    this.world.step(1 / 100, timeDelta);
-  }
-
-  rewspawnIfDead() {
-    if (this.currentGamePiece.mesh.position.y <= -50) {
-      this.currentGamePiece.body.position.set(
-        (0.5 - Math.random()) * 400,
-        150,
-        (0.5 - Math.random()) * 400
-      );
-      this.currentGamePiece.body.angularVelocity.set(0, 0, 0);
-      this.currentGamePiece.body.velocity.set(0, 0, 0);
-    }
-  }
-
-  // Physical plane of starting zone
-  addPhysicalStartingZone() {
-    const floorShape = new CANNON.Box(new Vec3(200, 200, 0.1));
-    this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape); // Bottom
-  }
+  /*** 
+  NETWORKING
+  ***/
 
   listenForEvents() {
     this.socket.on('connect', () => {
@@ -288,7 +309,6 @@ class MultiplayerWorld extends Game {
     });
   }
 
-  // need to pass position etc
   spawnExistingPlayers(activePlayers: IActivePlayer[]) {
     activePlayers.forEach(({ username, id }) => {
       this.spawnOtherPlayers(username, id);
@@ -371,33 +391,6 @@ class MultiplayerWorld extends Game {
         );
       }
     });
-  }
-
-  initializeTextures() {
-    const loader = this.loader.getTextureLoader();
-    const map = loader.load('/textures/metalPlate/MetalPlates006_1K_Color.jpg');
-    const normal = loader.load(
-      '/textures/metalPlate/MetalPlates006_1K_Normal.jpg'
-    );
-    const displacement = loader.load(
-      '/textures/metalPlate/MetalPlates006_1K_Displacement.jpg'
-    );
-    const metallic = loader.load(
-      '/textures/metalPlate/MetalPlates006_1K_Metalness.jpg'
-    );
-    const roughness = loader.load(
-      '/textures/metalPlate/MetalPlates006_1K_Roughness.jpg'
-    );
-
-    this.defaultConfig = {
-      opacity: 0.6,
-      transparent: true,
-      map,
-      normalMap: normal,
-      displacementMap: displacement,
-      roughnessMap: roughness,
-      metalnessMap: metallic,
-    };
   }
 }
 

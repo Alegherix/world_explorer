@@ -8,6 +8,7 @@ import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
 import GameStore from '../shared/GameStore';
 import type { Vec3 } from 'cannon-es';
+import * as dat from 'dat.gui';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -15,6 +16,7 @@ abstract class Game implements ISkybox {
   protected gamePieceTexture: THREE.Texture;
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
+  private gui: dat.GUI;
 
   constructor(
     protected scene: THREE.Scene,
@@ -31,6 +33,7 @@ abstract class Game implements ISkybox {
     this.world = world;
     this.loader = loader;
     this.material = material;
+    this.gui = new dat.GUI();
     if (this.useOrbitCamera) {
       this.orbitCamera = new OrbitControls(
         this.camera,
@@ -68,7 +71,7 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer(name?: string) {
-    const startPosition = { x: 0, y: 15, z: 0 };
+    const startPosition = { x: -1300, y: 380, z: -1200 };
     // const startPosition = { x: 490, y: 340, z: -470 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
@@ -102,6 +105,31 @@ abstract class Game implements ISkybox {
     this.scene.add(gamePiece.mesh);
     this.world.addBody(gamePiece.body);
     if (gamePiece.movementType) this.activeGamePieces.push(gamePiece);
+  }
+
+  //
+  addToGui(gamepiece: IGamePiece) {
+    this.gui.add(gamepiece.mesh.position, 'x').step(1);
+    this.gui.add(gamepiece.mesh.position, 'y').step(1);
+    this.gui.add(gamepiece.mesh.position, 'z').step(1);
+    this.camera.position.set(
+      gamepiece.mesh.position.x,
+      gamepiece.mesh.position.y,
+      gamepiece.mesh.position.z
+    );
+    this.camera.lookAt(gamepiece.mesh.position);
+  }
+
+  rewspawnIfDead(limit: number = -50) {
+    if (this.currentGamePiece.mesh.position.y <= limit) {
+      this.currentGamePiece.body.position.set(
+        (0.5 - Math.random()) * 400,
+        150,
+        (0.5 - Math.random()) * 400
+      );
+      this.currentGamePiece.body.angularVelocity.set(0, 0, 0);
+      this.currentGamePiece.body.velocity.set(0, 0, 0);
+    }
   }
 
   // Used to move a gamepiece

@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
   import GameStore from '../shared/GameStore';
+  import App from './App.svelte';
 
   let canvas;
   $: elapsedTime = $GameStore.elapsedTime;
@@ -27,6 +28,24 @@
     <div class="playtimeContainer">
       <h2>Time played</h2>
       <h3>{elapsedTime.toFixed(2)}</h3>
+    </div>
+  </section>
+  <section class="controller">
+    <div class="move">
+      <p>WASD</p>
+      <p>Move</p>
+    </div>
+    <div class="move">
+      <p>Space</p>
+      <p>Jump</p>
+    </div>
+    <div class="move">
+      <p>X</p>
+      <p>Boost</p>
+    </div>
+    <div class="move">
+      <p>R</p>
+      <p>Rotate</p>
     </div>
   </section>
   <!-- <button on:click={handleMenu}>Back to MainMenu</button> -->
@@ -70,5 +89,26 @@
     background-color: black;
     color: #1987ee;
     font-size: 2rem;
+  }
+
+  .controller {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    position: absolute;
+    left: 0.5rem;
+    top: 4rem;
+    width: 250px;
+  }
+
+  .move {
+    color: white;
+    font-size: 26px;
+    display: flex;
+    justify-content: space-between;
+  }
+  p {
+    margin: 0.3rem;
   }
 </style>

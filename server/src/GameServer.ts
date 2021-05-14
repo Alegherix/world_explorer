@@ -18,6 +18,7 @@ class GameServer {
   private TICK_RATE = 15;
   private elapsedTime: number;
   private server: Server;
+  private syncronizedTime: number;
 
   constructor(server: Server) {
     this.sockets = new Map();
