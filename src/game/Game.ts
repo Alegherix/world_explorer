@@ -11,6 +11,7 @@ import type { Vec3 } from 'cannon-es';
 import * as dat from 'dat.gui';
 import Gamestore from '../shared/GameStore';
 import { get } from 'svelte/store';
+import { BODY_TYPES } from 'objects/Body';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -74,8 +75,9 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer(name?: string) {
-    const startPosition = { x: -1300, y: 380, z: -1200 };
+    // const startPosition = { x: -2200, y: 380, z: -1200 };
     // const startPosition = { x: 490, y: 340, z: -470 };
+    const startPosition = { x: 0, y: 150, z: 0 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -229,7 +231,7 @@ abstract class Game implements ISkybox {
 
       case 'a':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * z, 0, force * -x),
+          new CANNON.Vec3(force * z * 3, 0, force * -x * 3),
           this.currentGamePiece.body.position
         );
         break;
@@ -243,14 +245,14 @@ abstract class Game implements ISkybox {
 
       case 'd':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * -z, 0, force * x),
+          new CANNON.Vec3(force * -z * 3, 0, force * x * 3),
           this.currentGamePiece.body.position
         );
         break;
 
       case ' ':
-        this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(0, 2500, 0),
+        this.currentGamePiece.body.applyImpulse(
+          new CANNON.Vec3(0, 50, 0),
           this.currentGamePiece.body.position
         );
         break;

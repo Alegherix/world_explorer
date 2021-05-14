@@ -51,8 +51,8 @@ class MultiplayerWorld extends Game {
     );
 
     this.userName = get(Gamestore).username;
-    this.socket = io('ws://localhost:8000').connect();
-    // this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
+    // this.socket = io('ws://localhost:8000').connect();
+    this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
 
     this.initializeTextures();
     this.listenForEvents();
@@ -181,6 +181,7 @@ class MultiplayerWorld extends Game {
     this.createStartJump();
     this.createPillar();
     this.createFirstObstacle();
+    this.createLeapOfFaith();
   }
 
   createFinishZone() {
@@ -276,7 +277,43 @@ class MultiplayerWorld extends Game {
       this.defaultConfig
     );
     this.addToWorld(landingPlate);
-    this.addToGui(landingPlate);
+  }
+
+  createLeapOfFaith() {
+    const superStairs = PlaneFactory.createPlane(
+      getDimensions(250, 1200, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-3070, 600, -1200),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpLeft(superStairs);
+    this.addToWorld(superStairs);
+
+    const downStairs = PlaneFactory.createPlane(
+      getDimensions(250, 1200, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-4570, 600, -1200),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpRight(downStairs);
+
+    this.addToWorld(downStairs);
+
+    const downObstacle = PlaneFactory.createPlane(
+      getDimensions(20, 150, 40),
+      this.material.getGlassMaterial(),
+      getPosition(-4570, 650, -1200),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpRight(downObstacle);
+    downObstacle.mesh.rotation.z = Math.PI / 4;
+    downObstacle.body.quaternion.setFromAxisAngle(
+      new CANNON.Vec3(0, 0, 1),
+      Math.PI / 4
+    );
+
+    this.addToWorld(downObstacle);
+    this.addToGui(downObstacle);
   }
 
   /*** 

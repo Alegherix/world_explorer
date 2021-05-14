@@ -6,7 +6,8 @@
   <h2>Boost</h2>
   <div class="boostBar">
     {#each Array($GameStore.boosts) as _, i}
-      <div class="boost" />
+      <!-- <div class="boost" /> -->
+      <img src="./bar.svg" alt="An svg of a boostbar" />
     {/each}
   </div>
 </div>
