@@ -59,7 +59,8 @@ class MineralWorld extends Game {
     this.createFirstPart();
     this.createSecondPart();
     this.createMaze();
-    this.createthirdPart();
+    this.createMovingStairs();
+    this.createThirdPart();
   }
 
   createFinishZone() {
@@ -104,26 +105,26 @@ class MineralWorld extends Game {
     );
     this.addToWorld(firstStraight);
 
-    const firstGlassWall = PlaneFactory.createPlane(
-      getDimensions(40, 1, 20),
+    const firstShortGlassWall = PlaneFactory.createPlane(
+      getDimensions(1, 80, 20),
       this.material.getGlassMaterial(),
-      getPosition(0, 10, -600)
+      getPosition(20, 10, -560)
     );
-    this.addToWorld(firstGlassWall);
+    this.addToWorld(firstShortGlassWall);
 
-    const secondGlassWall = PlaneFactory.createPlane(
-      getDimensions(1, 40, 20),
+    const firstLongGlassWall = PlaneFactory.createPlane(
+      getDimensions(480, 1, 20),
       this.material.getGlassMaterial(),
-      getPosition(20, 10, -580)
+      getPosition(-220, 10, -600)
     );
-    this.addToWorld(secondGlassWall);
+    this.addToWorld(firstLongGlassWall);
 
     const firstBounceCorner = PlatformFactory.createPlanePlatform(
       getDimensions(1, 20, 40),
       this.material.getSpungeMaterial(),
-      getPosition(3, 10, -585)
+      getPosition(4, 0, -580)
     );
-    firstBounceCorner.mesh.rotateY(Math.PI * 0.245);
+    firstBounceCorner.mesh.rotateY(Math.PI * 0.175);
     firstBounceCorner.body.quaternion.copy(firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(firstBounceCorner);
 
@@ -141,49 +142,35 @@ class MineralWorld extends Game {
     );
     this.addToWorld(ThirdStraight);
 
-    const thirdGlassWall = PlaneFactory.createPlane(
-      getDimensions(40, 1, 20),
+    const secondLongGlassWall = PlaneFactory.createPlane(
+      getDimensions(1, 430, 20),
       this.material.getGlassMaterial(),
-      getPosition(-440, 10, -600)
+      getPosition(-460, 10, -385)
     );
-    this.addToWorld(thirdGlassWall);
-
-    const fourthGlassWall = PlaneFactory.createPlane(
-      getDimensions(1, 40, 20),
-      this.material.getGlassMaterial(),
-      getPosition(-460, 10, -580)
-    );
-    this.addToWorld(fourthGlassWall);
+    this.addToWorld(secondLongGlassWall);
 
     const secondBounceCorner = PlatformFactory.createPlanePlatform(
       getDimensions(1, 20, 40),
       this.material.getSpungeMaterial(),
-      getPosition(-443, 10, -585)
+      getPosition(-440, 0, -584)
     );
-    secondBounceCorner.mesh.rotateY(-Math.PI * 0.245);
+    secondBounceCorner.mesh.rotateY(-Math.PI * 0.332);
     secondBounceCorner.body.quaternion.copy(secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(secondBounceCorner);
 
-    const fifthGlassWall = PlaneFactory.createPlane(
+    const secondShortGlassWall = PlaneFactory.createPlane(
       getDimensions(40, 1, 20),
       this.material.getGlassMaterial(),
       getPosition(-440, 10, -170)
     );
-    this.addToWorld(fifthGlassWall);
+    this.addToWorld(secondShortGlassWall);
 
-    const sixthGlassWall = PlaneFactory.createPlane(
-      getDimensions(1, 68, 20),
-      this.material.getGlassMaterial(),
-      getPosition(-460, 10, -205)
-    );
-    this.addToWorld(sixthGlassWall);
-
-    const seventhGlassWall = PlaneFactory.createPlane(
+    const thirdShortGlassWall = PlaneFactory.createPlane(
       getDimensions(1, 30, 20),
       this.material.getGlassMaterial(),
       getPosition(-420, 10, -185)
     );
-    this.addToWorld(seventhGlassWall);
+    this.addToWorld(thirdShortGlassWall);
   }
 
   createSecondPart() {
@@ -304,9 +291,9 @@ class MineralWorld extends Game {
     this.addToWorld(roof);
 
     const exitPlane = PlatformFactory.createPlanePlatform(
-      getDimensions(40, 1, 40),
+      getDimensions(300, 1, 40),
       this.material.getGlassMaterial(),
-      getPosition(210, 185, -700)
+      getPosition(80, 185, -700)
     );
     this.addToWorld(exitPlane);
 
@@ -332,48 +319,58 @@ class MineralWorld extends Game {
     this.addToWorld(exitRoof);
   }
 
-  createthirdPart() {}
+  createMovingStairs() {
+    const firstStep = PlatformFactory.createPlanePlatform(
+      getDimensions(40, 20, 60),
+      this.material.getGlassMaterial(),
+      getPosition(-90, 205, -700)
+    );
+    firstStep.movementType = {
+      start: 'sin',
+      distance: 10,
+      positionOffset: 185,
+      speed: 1,
+      direction: 'y',
+    };
+    this.addToWorld(firstStep);
 
-  // createPlatforms() {
-  //   const startingPlatform = PlatformFactory.createPlanePlatform(
-  //     getDimensions(100, 2, 50),
-  //     this.material.getAdamantineMaterial(),
-  //     getPosition(0, 0.1, 0)
-  //   );
-  //   this.addToWorld(startingPlatform);
+    const secondStep = PlatformFactory.createPlanePlatform(
+      getDimensions(40, 20, 60),
+      this.material.getGlassMaterial(),
+      getPosition(-130, 220, -700)
+    );
+    secondStep.movementType = {
+      start: 'cos',
+      distance: 10,
+      positionOffset: 205,
+      speed: 1,
+      direction: 'y',
+    };
+    this.addToWorld(secondStep);
 
-  //   for (let index = 1; index < 3; index++) {
-  //     let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
-  //     const zOffset = 150;
-  //     const movingPlatforms = PlatformFactory.createCylinderPlatform(
-  //       getCylinderDimensions(30, 30, 4, 32),
-  //       this.material.getSpungeMaterial(),
-  //       getPosition(0, 50, -500 + index * zOffset)
-  //     );
-  //     movingPlatforms.movementType = {
-  //       start: direction,
-  //       distance: 200,
-  //       positionOffset: 0,
-  //       speed: 0.5,
-  //       direction: 'x',
-  //     };
-  //     this.addToWorld(movingPlatforms);
-  //   }
+    const thirdStep = PlatformFactory.createPlanePlatform(
+      getDimensions(40, 20, 60),
+      this.material.getGlassMaterial(),
+      getPosition(-170, 240, -700)
+    );
+    thirdStep.movementType = {
+      start: 'sin',
+      distance: 10,
+      positionOffset: 225,
+      speed: 1,
+      direction: 'y',
+    };
+    this.addToWorld(thirdStep);
+  }
 
-  //   const largePlatform = PlatformFactory.createPlanePlatform(
-  //     getDimensions(400, 4, 100),
-  //     this.material.getSpungeMaterial(),
-  //     getPosition(0, 50, -600)
-  //   );
-  //   largePlatform.movementType = {
-  //     start: 'sin',
-  //     distance: 50,
-  //     positionOffset: 100,
-  //     speed: 0.5,
-  //     direction: 'y',
-  //   };
-  //   this.addToWorld(largePlatform);
-  // }
+  createThirdPart() {
+    const safePlatform = PlatformFactory.createPlanePlatform(
+      getDimensions(150, 1, 40),
+      this.material.getGlassMaterial(),
+      getPosition(-265, 244, -700)
+    );
+    this.addToWorld(safePlatform);
+  }
 }
 
 export default MineralWorld;

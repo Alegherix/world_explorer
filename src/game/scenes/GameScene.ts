@@ -30,7 +30,7 @@ class GameScene extends BaseScene {
     //   this.worldCamera
     // );
 
-    // this.game = new MineralWorld(this.scene, this.world, this.loader, this.material, this.worldCamera);
+    this.game = new MineralWorld(this.scene, this.world, this.loader, this.material, this.worldCamera);
 
     this.tick();
   }
