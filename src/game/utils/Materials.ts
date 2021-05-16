@@ -49,8 +49,8 @@ class Material {
   getIceRockContactMaterial = (): CANNON.ContactMaterial => {
     if (!this.iceRockContactMaterial) {
       this.iceRockContactMaterial = new CANNON.ContactMaterial(this.getRockMaterial(), this.getIceMaterial(), {
-        friction: 5,
-        restitution: 0,
+        friction: 1,
+        restitution: 0.1,
         contactEquationRelaxation: 4,
         frictionEquationRelaxation: 10,
       });
