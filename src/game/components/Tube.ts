@@ -54,7 +54,7 @@ class TubeFactory {
     const { x, y, z } = position;
     const geometry = new TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc);
     const material = new MeshStandardMaterial(
-      configObj ? configObj : { color: '#FFF7AB', transparent: true, opacity: 0.4 }
+      configObj ? configObj : { color: '#FF7070', transparent: true, opacity: 0.3 }
     );
     const mesh = new Mesh(geometry, material);
     mesh.position.set(x, y, z);
