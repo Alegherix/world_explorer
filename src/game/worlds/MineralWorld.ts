@@ -39,7 +39,7 @@ class MineralWorld extends Game {
       // true
     );
 
-    cannonDebugger(this.scene, this.world.bodies);
+    // cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
 
     // this.createExtraLight();
@@ -52,24 +52,6 @@ class MineralWorld extends Game {
 
   initializeTextures() {
     const loader = this.loader.getTextureLoader();
-
-    // Rock Textures
-    const rockAmbientOcclusionTexture = loader.load(
-      '/textures/rockPlanet/rockTextures/Rock012_1K_AmbientOcclusion.jpg'
-    );
-    const rockColorTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Color.jpg');
-    const rockDisplacementTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Displacement.jpg');
-    const rockNormalTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Normal.jpg');
-    const rockRoughnessTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Roughness.jpg');
-
-    this.rockTextureConfig = {
-      map: rockColorTexture,
-      aoMap: rockAmbientOcclusionTexture,
-      displacementMap: rockDisplacementTexture,
-      displacementScale: 1.1,
-      normalMap: rockNormalTexture,
-      roughnessMap: rockRoughnessTexture,
-    };
 
     // Ice Textures
     const iceColorTexture = loader.load('/textures/rockPlanet/iceTextures/Blue_Ice_001_COLOR.jpg');
@@ -122,9 +104,9 @@ class MineralWorld extends Game {
   }
 
   createStartingZone() {
+    this.createStartingPlane();
     this.initializeTextures();
     this.createPlayer();
-    this.createStartingPlane();
   }
 
   createGameMap() {
@@ -168,16 +150,48 @@ class MineralWorld extends Game {
   }
 
   createStartingPlane() {
+    // Rock Textures
+    const rockAmbientOcclusionTexture = this.loader
+      .getTextureLoader()
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_AmbientOcclusion.jpg');
+    const rockColorTexture = this.loader
+      .getTextureLoader()
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Color.jpg');
+    const rockDisplacementTexture = this.loader
+      .getTextureLoader()
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Displacement.jpg');
+    const rockNormalTexture = this.loader
+      .getTextureLoader()
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Normal.jpg');
+    const rockRoughnessTexture = this.loader
+      .getTextureLoader()
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Roughness.jpg');
+
     const plane: IDimension = { width: 200, height: 200, depth: 0.1 };
     const { mesh, body } = PlaneFactory.createPlane(
       plane,
       this.material.getRockMaterial(),
       { x: 0, y: 0, z: 0 },
-      this.rockTextureConfig
+      {
+        map: rockColorTexture,
+        aoMap: rockAmbientOcclusionTexture,
+        displacementMap: rockDisplacementTexture,
+        displacementScale: 1.1,
+        normalMap: rockNormalTexture,
+        roughnessMap: rockRoughnessTexture,
+      }
     );
 
     this.scene.add(mesh);
     this.world.addBody(body);
+    this.rockTextureConfig = {
+      map: rockColorTexture,
+      aoMap: rockAmbientOcclusionTexture,
+      displacementMap: rockDisplacementTexture,
+      displacementScale: 1.1,
+      normalMap: rockNormalTexture,
+      roughnessMap: rockRoughnessTexture,
+    };
   }
 
   createFirstPart() {
