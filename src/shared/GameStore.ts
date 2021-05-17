@@ -21,9 +21,11 @@ interface IScore {
 const GameStore = writable<IScore>({
   score: 0,
   elapsedTime: 0,
-  world: 'Zetxaru',
-  username: users[Math.floor(Math.random() * users.length)],
+  world: null,
+  username: null,
   boosts: 3,
 });
 
+// 'Zetxaru'
+// users[Math.floor(Math.random() * users.length)]
 export default GameStore;
