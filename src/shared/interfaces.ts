@@ -38,8 +38,10 @@ export interface ICylinderDimension {
   radialSegments: number;
 }
 
-// This is the same as in the socket server, can't rly share
-// Since they won't share same hosting and codebase in prod
-export interface ISocketMessage {
-  msg: 'currentUsers' | 'connected' | 'update' | 'disconnect';
+export interface ITorusDimension {
+  radius: number;
+  tube: number;
+  radialSegments: number;
+  tubularSegments: number;
+  arc: number;
 }

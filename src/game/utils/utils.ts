@@ -1,4 +1,4 @@
-import type { IDimension, IPosition } from './../../shared/interfaces';
+import type { IDimension, ICylinderDimension, ITorusDimension, IPosition } from './../../shared/interfaces';
 import { Material, Vec3 } from 'cannon-es';
 import * as CANNON from 'cannon-es';
 
@@ -35,12 +35,27 @@ export function createBoundry(
   return body;
 }
 
-export function getDimensions(
-  width: number,
-  height: number,
-  depth: number
-): IDimension {
+export function getDimensions(width: number, height: number, depth: number): IDimension {
   return { width, height, depth };
+}
+
+export function getCylinderDimensions(
+  radiusTop: number,
+  radiusBottom: number,
+  height: number,
+  radialSegments: number
+): ICylinderDimension {
+  return { radiusTop, radiusBottom, height, radialSegments };
+}
+
+export function getTorusrDimensions(
+  radius: number,
+  tube: number,
+  radialSegments: number,
+  tubularSegments: number,
+  arc: number
+): ITorusDimension {
+  return { radius, tube, radialSegments, tubularSegments, arc };
 }
 
 export function getPosition(x: number, y: number, z: number): IPosition {
