@@ -46,8 +46,6 @@ class MineralWorld extends Game {
     this.createStartingZone();
     this.createGameMap();
     this.createFinishZone();
-    console.log(this.scene.children);
-    this.scene.remove(this.scene.children[3]);
   }
 
   initializeTextures() {
