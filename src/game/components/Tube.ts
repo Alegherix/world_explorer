@@ -1,17 +1,11 @@
-import { Vec3, Quaternion, Body, Trimesh } from 'cannon-es';
-import {
-  DoubleSide,
-  Mesh,
-  MeshStandardMaterial,
-  MeshStandardMaterialParameters,
-  TorusBufferGeometry,
-} from 'three';
+import { Vec3, Quaternion, Body, Trimesh, Material } from 'cannon-es';
+import { DoubleSide, Mesh, MeshStandardMaterial, MeshStandardMaterialParameters, TorusBufferGeometry } from 'three';
 import type { IDimension, IPosition } from '../../shared/interfaces';
 import type { IGamePiece } from '../../shared/frontendInterfaces';
 
 class TubeFactory {
   static createTube(
-    phyicsMaterial: CANNON.Material,
+    phyicsMaterial: Material,
     position?: IPosition,
     configObj?: MeshStandardMaterialParameters
   ): IGamePiece {
