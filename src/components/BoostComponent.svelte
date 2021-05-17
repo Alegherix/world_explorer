@@ -6,7 +6,6 @@
   <h2>Boost</h2>
   <div class="boostBar">
     {#each Array($GameStore.boosts) as _, i}
-      <!-- <div class="boost" /> -->
       <img src="./bar.svg" alt="An svg of a boostbar" />
     {/each}
   </div>
@@ -24,11 +23,5 @@
     grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
     justify-content: space-evenly;
-  }
-  .boost {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    background-color: #1987ee;
   }
 </style>

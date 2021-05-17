@@ -11,7 +11,6 @@ import type { Vec3 } from 'cannon-es';
 import * as dat from 'dat.gui';
 import Gamestore from '../shared/GameStore';
 import { get } from 'svelte/store';
-import { BODY_TYPES } from 'objects/Body';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
