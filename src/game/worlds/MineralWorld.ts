@@ -39,10 +39,10 @@ class MineralWorld extends Game {
       // true
     );
 
-    // cannonDebugger(this.scene, this.world.bodies);
+    cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
 
-    this.createExtraLight();
+    // this.createExtraLight();
     this.createStartingZone();
     this.createGameMap();
     this.createFinishZone();
@@ -541,7 +541,8 @@ class MineralWorld extends Game {
     const elevatorPlane = PlatformFactory.createPlanePlatform(
       getDimensions(100, 1, 100),
       this.material.getGlassMaterial(),
-      getPosition(-320, 390, -590)
+      getPosition(-320, 390, -590),
+      this.iceTextureConfig
     );
     this.addToWorld(elevatorPlane);
 
