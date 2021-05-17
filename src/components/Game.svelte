@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
   import GameStore from '../shared/GameStore';
-  import App from './App.svelte';
   import BoostComponent from './BoostComponent.svelte';
   import ControllerComponent from './ControllerComponent.svelte';
 
