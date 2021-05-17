@@ -8,6 +8,10 @@ import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
 import GameStore from '../shared/GameStore';
 import type { Vec3 } from 'cannon-es';
+import * as dat from 'dat.gui';
+import Gamestore from '../shared/GameStore';
+import { get } from 'svelte/store';
+import { BODY_TYPES } from 'objects/Body';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -15,6 +19,8 @@ abstract class Game implements ISkybox {
   protected gamePieceTexture: THREE.Texture;
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
+  private gui: dat.GUI;
+  private lastBoostUsed: number;
 
   constructor(
     protected scene: THREE.Scene,
@@ -31,6 +37,7 @@ abstract class Game implements ISkybox {
     this.world = world;
     this.loader = loader;
     this.material = material;
+    this.gui = new dat.GUI();
     if (this.useOrbitCamera) {
       this.orbitCamera = new OrbitControls(
         this.camera,
@@ -68,8 +75,9 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer(name?: string) {
-    const startPosition = { x: 0, y: 15, z: 0 };
+    // const startPosition = { x: -2200, y: 380, z: -1200 };
     // const startPosition = { x: 490, y: 340, z: -470 };
+    const startPosition = { x: 0, y: 150, z: 0 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -102,6 +110,42 @@ abstract class Game implements ISkybox {
     this.scene.add(gamePiece.mesh);
     this.world.addBody(gamePiece.body);
     if (gamePiece.movementType) this.activeGamePieces.push(gamePiece);
+  }
+
+  addToGui(gamepiece: IGamePiece) {
+    this.gui.add(gamepiece.mesh.position, 'x').step(1);
+    this.gui.add(gamepiece.mesh.position, 'y').step(1);
+    this.gui.add(gamepiece.mesh.position, 'z').step(1);
+    this.camera.position.set(
+      gamepiece.mesh.position.x,
+      gamepiece.mesh.position.y,
+      gamepiece.mesh.position.z
+    );
+    this.camera.lookAt(gamepiece.mesh.position);
+  }
+
+  rewspawnIfDead(limit: number = -50) {
+    if (this.currentGamePiece.mesh.position.y <= limit) {
+      this.currentGamePiece.body.position.set(
+        (0.5 - Math.random()) * 400,
+        150,
+        (0.5 - Math.random()) * 400
+      );
+      this.currentGamePiece.body.angularVelocity.set(0, 0, 0);
+      this.currentGamePiece.body.velocity.set(0, 0, 0);
+    }
+  }
+
+  // replenish Boost every 5 sec
+  protected replenishBoost() {
+    const { boosts } = get(GameStore);
+    if (boosts < 3) {
+      const currentTime = new Date().getTime();
+      if (currentTime > this.lastBoostUsed + 5000) {
+        GameStore.update((val) => ({ ...val, boosts: val.boosts + 1 }));
+        this.lastBoostUsed = currentTime;
+      }
+    }
   }
 
   // Used to move a gamepiece
@@ -187,7 +231,7 @@ abstract class Game implements ISkybox {
 
       case 'a':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * z, 0, force * -x),
+          new CANNON.Vec3(force * z * 3, 0, force * -x * 3),
           this.currentGamePiece.body.position
         );
         break;
@@ -201,16 +245,31 @@ abstract class Game implements ISkybox {
 
       case 'd':
         this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * -z, 0, force * x),
+          new CANNON.Vec3(force * -z * 3, 0, force * x * 3),
           this.currentGamePiece.body.position
         );
         break;
 
       case ' ':
-        this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(0, 2500, 0),
+        this.currentGamePiece.body.applyImpulse(
+          new CANNON.Vec3(0, 50, 0),
           this.currentGamePiece.body.position
         );
+        break;
+
+      case 'x':
+        // apply force, update store, and make sure to note when last boost was used;
+        let { boosts } = get(GameStore);
+        if (boosts > 0) {
+          this.currentGamePiece.body.applyImpulse(
+            new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
+            this.currentGamePiece.body.position
+          );
+          GameStore.update((value) => {
+            return { ...value, boosts: boosts - 1 };
+          });
+          this.lastBoostUsed = new Date().getTime();
+        }
         break;
     }
   }

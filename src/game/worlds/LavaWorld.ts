@@ -1,16 +1,14 @@
-import { MeshPhongMaterial } from 'three';
 /**
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
-
 import type * as CANNON from 'cannon-es';
-import cannonDebugger from 'cannon-es-debugger';
 import {
   Mesh,
-  MeshBasicMaterial,
+  MeshPhongMaterial,
   MeshStandardMaterialParameters,
   OctahedronBufferGeometry,
 } from 'three';
+import type { IGamePiece } from '../../shared/frontendInterfaces';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -20,7 +18,6 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
-import type { IGamePiece } from '../../shared/frontendInterfaces';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;

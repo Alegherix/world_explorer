@@ -5,15 +5,11 @@ class ScoreKeeper {
   private geometry: CylinderBufferGeometry;
   private material: MeshPhongMaterial;
   private coins: Mesh[] = [];
-  private coinBox: Box3;
-  private playerBox: Box3;
   constructor(private scene: THREE.Scene) {
     this.geometry = new CylinderBufferGeometry(2.5, 2.5, 1, 20);
     this.material = new MeshPhongMaterial({
       color: 0xf4cd04,
     });
-    this.coinBox = new Box3();
-    this.playerBox = new Box3();
   }
 
   createCoin(x: number, y: number, z: number) {
