@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import SelectionScene from '../game/scenes/SelectionScene';
-  import type { GameWorld } from '../shared/interfaces';
+  import type { GameWorld } from '../shared/frontendInterfaces';
   import GameStore from '../shared/GameStore';
 
   let canvas: HTMLCanvasElement;

@@ -2,6 +2,9 @@
   import { onMount } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
   import GameStore from '../shared/GameStore';
+  import App from './App.svelte';
+  import BoostComponent from './BoostComponent.svelte';
+  import ControllerComponent from './ControllerComponent.svelte';
 
   let canvas;
   $: elapsedTime = $GameStore.elapsedTime;
@@ -20,15 +23,20 @@
 <main>
   <canvas class="webgl" bind:this={canvas} />
   <section>
-    <div class="scoreCounter">
-      <h2>Points</h2>
-      <h3>{$GameStore.score}</h3>
-    </div>
-    <div class="playtimeContainer">
-      <h2>Time played</h2>
-      <h3>{elapsedTime.toFixed(2)}</h3>
-    </div>
+    {#if $GameStore.world !== 'Zetxaru'}
+      <div class="scoreCounter">
+        <h2>Points</h2>
+        <h3>{$GameStore.score}</h3>
+      </div>
+      <div class="playtimeContainer">
+        <h2>Time played</h2>
+        <h3>{elapsedTime.toFixed(2)}</h3>
+      </div>
+    {/if}
+    <BoostComponent />
   </section>
+  <ControllerComponent />
+
   <!-- <button on:click={handleMenu}>Back to MainMenu</button> -->
 </main>
 
