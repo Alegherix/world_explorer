@@ -34,7 +34,7 @@ class Controller {
 
   steer() {
     const { x, z } = this.gameCamera.getWorldDirection();
-    const force = 120;
+    const force = 60;
 
     for (const pressedKey of this.pressedKeys) {
       switch (pressedKey) {
@@ -47,7 +47,7 @@ class Controller {
 
         case 'a':
           this.currentGamePiece.body.applyForce(
-            new CANNON.Vec3(force * z * 3, 0, force * -x * 3),
+            new CANNON.Vec3(force * z, 0, force * -x),
             this.currentGamePiece.body.position
           );
           break;
@@ -61,14 +61,14 @@ class Controller {
 
         case 'd':
           this.currentGamePiece.body.applyForce(
-            new CANNON.Vec3(force * -z * 3, 0, force * x * 3),
+            new CANNON.Vec3(force * -z, 0, force * x),
             this.currentGamePiece.body.position
           );
           break;
 
         case ' ':
           this.currentGamePiece.body.applyImpulse(
-            new CANNON.Vec3(0, 50, 0),
+            new CANNON.Vec3(0, 4, 0),
             this.currentGamePiece.body.position
           );
           break;
