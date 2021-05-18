@@ -92,7 +92,7 @@ class MultiplayerWorld extends Game {
   runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
 
-    this.controller.steer();
+    this.controller.run();
 
     for (const gamePiece of this.activeGamePieces) {
       this.move(gamePiece, this.elapsedTime);
@@ -106,7 +106,6 @@ class MultiplayerWorld extends Game {
 
     this.sendCurrentGameState();
     this.rewspawnIfDead();
-    this.replenishBoost();
     this.world.step(1 / 100, timeDelta);
   }
 

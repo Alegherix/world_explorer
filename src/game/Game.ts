@@ -21,7 +21,6 @@ abstract class Game implements ISkybox {
   protected orbitCamera: OrbitControls;
   protected controller: Controller;
   private gui: dat.GUI;
-  private lastBoostUsed: number;
 
   constructor(
     protected scene: THREE.Scene,
@@ -53,8 +52,6 @@ abstract class Game implements ISkybox {
       .load(`textures/playerTextures/${playerTextureName}`);
     this.createSkybox(skyboxFolderName, skyboxExtension);
     this.controller = new Controller(this.gameCamera);
-
-    // window.addEventListener('keydown', this.steer.bind(this));
   }
 
   abstract createGameMap();
@@ -139,18 +136,6 @@ abstract class Game implements ISkybox {
     }
   }
 
-  // replenish Boost every 5 sec
-  protected replenishBoost() {
-    const { boosts } = get(GameStore);
-    if (boosts < 3) {
-      const currentTime = new Date().getTime();
-      if (currentTime > this.lastBoostUsed + 5000) {
-        GameStore.update((val) => ({ ...val, boosts: val.boosts + 1 }));
-        this.lastBoostUsed = currentTime;
-      }
-    }
-  }
-
   // Used to move a gamepiece
   move = (gamePiece: IGamePiece, estimatedTime: number): void => {
     if (!gamePiece.movementType) {
@@ -218,64 +203,6 @@ abstract class Game implements ISkybox {
       );
     }
   };
-
-  // // Steer the currently controlled GamePiece
-  // steer(event: KeyboardEvent) {
-  //   const { x, z } = this.gameCamera.getWorldDirection();
-  //   const force = 120;
-
-  //   switch (event.key) {
-  //     case 'w':
-  //       this.currentGamePiece.body.applyForce(
-  //         new CANNON.Vec3(force * x, 0, z * force),
-  //         this.currentGamePiece.body.position
-  //       );
-  //       break;
-
-  //     case 'a':
-  //       this.currentGamePiece.body.applyForce(
-  //         new CANNON.Vec3(force * z * 3, 0, force * -x * 3),
-  //         this.currentGamePiece.body.position
-  //       );
-  //       break;
-
-  //     case 's':
-  //       this.currentGamePiece.body.applyForce(
-  //         new CANNON.Vec3(force * -x, 0, force * -z),
-  //         this.currentGamePiece.body.position
-  //       );
-  //       break;
-
-  //     case 'd':
-  //       this.currentGamePiece.body.applyForce(
-  //         new CANNON.Vec3(force * -z * 3, 0, force * x * 3),
-  //         this.currentGamePiece.body.position
-  //       );
-  //       break;
-
-  //     case ' ':
-  //       this.currentGamePiece.body.applyImpulse(
-  //         new CANNON.Vec3(0, 50, 0),
-  //         this.currentGamePiece.body.position
-  //       );
-  //       break;
-
-  //     case 'x':
-  //       // apply force, update store, and make sure to note when last boost was used;
-  //       let { boosts } = get(GameStore);
-  //       if (boosts > 0) {
-  //         this.currentGamePiece.body.applyImpulse(
-  //           new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
-  //           this.currentGamePiece.body.position
-  //         );
-  //         GameStore.update((value) => {
-  //           return { ...value, boosts: boosts - 1 };
-  //         });
-  //         this.lastBoostUsed = new Date().getTime();
-  //       }
-  //       break;
-  //   }
-  // }
 
   // Creates the physical plane boundry of a Plane
   createBoundry(x1, y1, z1, x2, y2, z2, rotation, floorShape) {

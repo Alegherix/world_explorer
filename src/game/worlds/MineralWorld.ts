@@ -145,7 +145,7 @@ class MineralWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-    this.controller.steer();
+    this.controller.run();
 
     for (const gamePiece of this.activeGamePieces) {
       this.move(gamePiece, elapsedTime);

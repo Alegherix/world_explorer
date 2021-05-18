@@ -16,14 +16,16 @@ interface IScore {
   elapsedTime: number;
   world: GameWorld;
   boosts: number;
+  jumps: number;
 }
 
 const GameStore = writable<IScore>({
   score: 0,
   elapsedTime: 0,
-  world: 'Zetxaru',
+  world: 'Velknaz',
   username: 'Kimball',
   boosts: 3,
+  jumps: 4,
 });
 
 // 'Zetxaru'
