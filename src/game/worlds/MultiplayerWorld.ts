@@ -170,7 +170,7 @@ class MultiplayerWorld extends Game {
     this.createPillar();
     this.createFirstObstacle();
     this.createLeapOfFaith();
-    this.createStraightToLoop();
+    this.createLoopSection();
   }
 
   createFinishZone() {
@@ -325,7 +325,7 @@ class MultiplayerWorld extends Game {
     this.addToWorld(downObstacleTwo);
   }
 
-  createStraightToLoop() {
+  createLoopSection() {
     const loopEntry = PlaneFactory.createPlane(
       getDimensions(1080, 250, 1),
       this.material.getGlassMaterial(),
@@ -365,7 +365,7 @@ class MultiplayerWorld extends Game {
     this.addToWorld(loopExit);
 
     const tube = TubeFactory.createCustomTube(
-      getTorusrDimensions(450, 130, 18, 10, 1.6),
+      getTorusrDimensions(450, 130, 18, 10, 1.65),
       this.material.getGlassMaterial(),
       getPosition(-6760, 380, -1745),
       this.defaultConfig
