@@ -14,8 +14,8 @@ interface IScore {
 const GameStore = writable<IScore>({
   score: 0,
   elapsedTime: 0,
-  world: null,
-  username: null,
+  world: 'Zetxaru',
+  username: 'Kimball',
   boosts: 3,
 });
 

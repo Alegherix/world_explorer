@@ -376,13 +376,20 @@ class MultiplayerWorld extends Game {
     this.addToWorld(secondLoop);
 
     const secondLoopExit = PlaneFactory.createPlane(
-      getDimensions(350, 1000, 1),
+      getDimensions(350, 1500, 1),
       this.material.getGlassMaterial(),
       getPosition(-6650, 300, -1275),
       this.defaultConfig
     );
     this.addToWorld(secondLoopExit);
     this.addToGui(secondLoopExit);
+
+    const antiCheatWall = PlaneFactory.createPlane(
+      getDimensions(1, 550, 300),
+      this.material.getGlassMaterial(),
+      getPosition(-6200, 300, -800)
+    );
+    this.addToWorld(antiCheatWall);
   }
 
   /*** 
