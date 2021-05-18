@@ -92,6 +92,8 @@ class MultiplayerWorld extends Game {
   runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
 
+    this.controller.steer();
+
     for (const gamePiece of this.activeGamePieces) {
       this.move(gamePiece, this.elapsedTime);
     }

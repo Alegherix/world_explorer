@@ -11,6 +11,7 @@ import type { Vec3 } from 'cannon-es';
 import * as dat from 'dat.gui';
 import Gamestore from '../shared/GameStore';
 import { get } from 'svelte/store';
+import Controller from './utils/Controller';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -18,6 +19,7 @@ abstract class Game implements ISkybox {
   protected gamePieceTexture: THREE.Texture;
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
+  protected controller: Controller;
   private gui: dat.GUI;
   private lastBoostUsed: number;
 
@@ -50,8 +52,9 @@ abstract class Game implements ISkybox {
       .getTextureLoader()
       .load(`textures/playerTextures/${playerTextureName}`);
     this.createSkybox(skyboxFolderName, skyboxExtension);
+    this.controller = new Controller(this.gameCamera);
 
-    window.addEventListener('keydown', this.steer.bind(this));
+    // window.addEventListener('keydown', this.steer.bind(this));
   }
 
   abstract createGameMap();
@@ -100,6 +103,7 @@ abstract class Game implements ISkybox {
     this.scene.add(mesh);
     this.world.addBody(body);
     this.currentGamePiece = { mesh, body };
+    this.controller.addPieceToSteer(this.currentGamePiece);
     this.activeGamePieces.push(this.currentGamePiece);
     if (!this.useOrbitCamera)
       this.gameCamera.setTracking(this.currentGamePiece);
@@ -215,63 +219,63 @@ abstract class Game implements ISkybox {
     }
   };
 
-  // Steer the currently controlled GamePiece
-  steer(event: KeyboardEvent) {
-    const { x, z } = this.gameCamera.getWorldDirection();
-    const force = 120;
+  // // Steer the currently controlled GamePiece
+  // steer(event: KeyboardEvent) {
+  //   const { x, z } = this.gameCamera.getWorldDirection();
+  //   const force = 120;
 
-    switch (event.key) {
-      case 'w':
-        this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * x, 0, z * force),
-          this.currentGamePiece.body.position
-        );
-        break;
+  //   switch (event.key) {
+  //     case 'w':
+  //       this.currentGamePiece.body.applyForce(
+  //         new CANNON.Vec3(force * x, 0, z * force),
+  //         this.currentGamePiece.body.position
+  //       );
+  //       break;
 
-      case 'a':
-        this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * z * 3, 0, force * -x * 3),
-          this.currentGamePiece.body.position
-        );
-        break;
+  //     case 'a':
+  //       this.currentGamePiece.body.applyForce(
+  //         new CANNON.Vec3(force * z * 3, 0, force * -x * 3),
+  //         this.currentGamePiece.body.position
+  //       );
+  //       break;
 
-      case 's':
-        this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * -x, 0, force * -z),
-          this.currentGamePiece.body.position
-        );
-        break;
+  //     case 's':
+  //       this.currentGamePiece.body.applyForce(
+  //         new CANNON.Vec3(force * -x, 0, force * -z),
+  //         this.currentGamePiece.body.position
+  //       );
+  //       break;
 
-      case 'd':
-        this.currentGamePiece.body.applyForce(
-          new CANNON.Vec3(force * -z * 3, 0, force * x * 3),
-          this.currentGamePiece.body.position
-        );
-        break;
+  //     case 'd':
+  //       this.currentGamePiece.body.applyForce(
+  //         new CANNON.Vec3(force * -z * 3, 0, force * x * 3),
+  //         this.currentGamePiece.body.position
+  //       );
+  //       break;
 
-      case ' ':
-        this.currentGamePiece.body.applyImpulse(
-          new CANNON.Vec3(0, 50, 0),
-          this.currentGamePiece.body.position
-        );
-        break;
+  //     case ' ':
+  //       this.currentGamePiece.body.applyImpulse(
+  //         new CANNON.Vec3(0, 50, 0),
+  //         this.currentGamePiece.body.position
+  //       );
+  //       break;
 
-      case 'x':
-        // apply force, update store, and make sure to note when last boost was used;
-        let { boosts } = get(GameStore);
-        if (boosts > 0) {
-          this.currentGamePiece.body.applyImpulse(
-            new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
-            this.currentGamePiece.body.position
-          );
-          GameStore.update((value) => {
-            return { ...value, boosts: boosts - 1 };
-          });
-          this.lastBoostUsed = new Date().getTime();
-        }
-        break;
-    }
-  }
+  //     case 'x':
+  //       // apply force, update store, and make sure to note when last boost was used;
+  //       let { boosts } = get(GameStore);
+  //       if (boosts > 0) {
+  //         this.currentGamePiece.body.applyImpulse(
+  //           new CANNON.Vec3(force * x * 0.8, 0, z * force * 0.8),
+  //           this.currentGamePiece.body.position
+  //         );
+  //         GameStore.update((value) => {
+  //           return { ...value, boosts: boosts - 1 };
+  //         });
+  //         this.lastBoostUsed = new Date().getTime();
+  //       }
+  //       break;
+  //   }
+  // }
 
   // Creates the physical plane boundry of a Plane
   createBoundry(x1, y1, z1, x2, y2, z2, rotation, floorShape) {
