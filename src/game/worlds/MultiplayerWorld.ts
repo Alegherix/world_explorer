@@ -334,62 +334,64 @@ class MultiplayerWorld extends Game {
     );
     this.addToWorld(loopEntry);
 
-    const firstLoopPartOne = TubeFactory.createCustomTube(
-      getTorusrDimensions(250, 150, 18, 10, 3.1),
+    const loopPartOne = TubeFactory.createCustomTube(
+      getTorusrDimensions(350, 130, 18, 10, 3.1),
       this.material.getGlassMaterial(),
-      getPosition(-6000, 590, -1375),
+      getPosition(-5850, 600, -1450),
       this.defaultConfig
     );
-    firstLoopPartOne.mesh.rotateZ(-Math.PI * 0.5);
-    firstLoopPartOne.mesh.rotateY(Math.PI * 0.25);
-    firstLoopPartOne.body.quaternion.copy(firstLoopPartOne.mesh.quaternion as unknown as CANNON.Quaternion);
-    this.addToWorld(firstLoopPartOne);
+    loopPartOne.mesh.rotateZ(-Math.PI * 0.5);
+    loopPartOne.mesh.rotateY(Math.PI * 0.25);
+    loopPartOne.body.quaternion.copy(loopPartOne.mesh.quaternion as unknown as CANNON.Quaternion);
+    this.addToWorld(loopPartOne);
 
-    const firstLoopPartTwo = TubeFactory.createCustomTube(
-      getTorusrDimensions(250, 150, 18, 10, 3.1),
+    const loopPartTwo = TubeFactory.createCustomTube(
+      getTorusrDimensions(350, 130, 18, 10, 3.1),
       this.material.getGlassMaterial(),
-      getPosition(-6017, 589, -1725),
+      getPosition(-5876, 600, -1943),
       this.defaultConfig
     );
-    firstLoopPartTwo.mesh.rotateZ(Math.PI * 0.5);
-    firstLoopPartTwo.mesh.rotateY(Math.PI * 0.25);
-    firstLoopPartTwo.body.quaternion.copy(firstLoopPartTwo.mesh.quaternion as unknown as CANNON.Quaternion);
-    this.addToWorld(firstLoopPartTwo);
+    loopPartTwo.mesh.rotateZ(Math.PI * 0.5);
+    loopPartTwo.mesh.rotateY(Math.PI * 0.25);
+    loopPartTwo.body.quaternion.copy(loopPartTwo.mesh.quaternion as unknown as CANNON.Quaternion);
+    this.addToWorld(loopPartTwo);
 
-    const firstLoopExit = PlaneFactory.createPlane(
-      getDimensions(1000, 250, 1),
+    const loopExit = PlaneFactory.createPlane(
+      getDimensions(1300, 250, 1),
       this.material.getGlassMaterial(),
-      getPosition(-6330, 300, -1900),
+      getPosition(-6240, 300, -2190),
       this.defaultConfig
     );
-    this.addToWorld(firstLoopExit);
+    this.addToWorld(loopExit);
 
-    const secondLoop = TubeFactory.createCustomTube(
-      getTorusrDimensions(250, 150, 18, 10, 1.8),
+    const tube = TubeFactory.createCustomTube(
+      getTorusrDimensions(450, 130, 18, 10, 1.6),
       this.material.getGlassMaterial(),
-      getPosition(-6450, 380, -1650),
+      getPosition(-6760, 380, -1745),
       this.defaultConfig
     );
-    secondLoop.mesh.rotateX(Math.PI * 0.5);
-    secondLoop.mesh.rotateZ(-Math.PI * 0.5);
-    secondLoop.body.quaternion.copy(secondLoop.mesh.quaternion as unknown as CANNON.Quaternion);
-    this.addToWorld(secondLoop);
+    tube.mesh.rotateX(Math.PI * 0.5);
+    tube.mesh.rotateZ(-Math.PI * 0.5);
+    tube.body.quaternion.copy(tube.mesh.quaternion as unknown as CANNON.Quaternion);
+    this.addToWorld(tube);
 
-    const secondLoopExit = PlaneFactory.createPlane(
-      getDimensions(350, 1500, 1),
+    const ramp = PlaneFactory.createPlane(
+      getDimensions(220, 50, 1),
       this.material.getGlassMaterial(),
-      getPosition(-6650, 300, -1275),
+      getPosition(-6910, 287, -2175),
       this.defaultConfig
     );
-    this.addToWorld(secondLoopExit);
-    this.addToGui(secondLoopExit);
+    PlaneFactory.slopePlaneUpRight(ramp);
+    this.addToWorld(ramp);
 
-    const antiCheatWall = PlaneFactory.createPlane(
-      getDimensions(1, 550, 300),
+    const tubeExit = PlaneFactory.createPlane(
+      getDimensions(250, 2000, 1),
       this.material.getGlassMaterial(),
-      getPosition(-6200, 300, -800)
+      getPosition(-7200, 251, -820),
+      this.defaultConfig
     );
-    this.addToWorld(antiCheatWall);
+    this.addToWorld(tubeExit);
+    this.addToGui(tubeExit);
   }
 
   /*** 
