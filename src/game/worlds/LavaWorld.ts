@@ -85,7 +85,7 @@ class LavaWorld extends Game {
       this.rotate(testObj, elapsedTime);
     }
 
-    this.runGameUpdates(timeDelta);
+    this.runGameUpdates(timeDelta, -450);
   }
 
   createGameMap() {

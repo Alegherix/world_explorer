@@ -2,6 +2,7 @@ import * as CANNON from 'cannon-es';
 import * as dat from 'dat.gui';
 import type { Vector3 } from 'three';
 import * as THREE from 'three';
+import SpriteText from 'three-spritetext';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { IGamePiece, ISkybox } from '../shared/frontendInterfaces';
 import GameStore from '../shared/GameStore';
@@ -21,6 +22,7 @@ abstract class Game implements ISkybox {
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
   private gui: dat.GUI;
+  private spriteText: SpriteText;
 
   constructor(
     protected scene: THREE.Scene,
@@ -101,6 +103,12 @@ abstract class Game implements ISkybox {
     this.scene.add(mesh);
     this.world.addBody(body);
     this.currentGamePiece = { mesh, body };
+
+    this.spriteText = new SpriteText(this.currentGamePiece.mesh.name);
+    console.log(this.spriteText.scale);
+
+    this.spriteText.scale.set(22.5, 5, 0);
+    this.scene.add(this.spriteText);
 
     // Creates the controller for the object
     setControllerProperties(this.currentGamePiece, this.gameCamera);
@@ -207,9 +215,11 @@ abstract class Game implements ISkybox {
     }
   };
 
-  protected runGameUpdates(timeDelta: number) {
-    this.rewspawnIfDead();
+  protected runGameUpdates(timeDelta: number, respawnOffset?: number) {
+    const { x, y, z } = this.currentGamePiece.mesh.position;
+    this.rewspawnIfDead(respawnOffset);
     runController();
+    this.spriteText.position.set(x, y + 14, z);
     this.world.step(1 / 100, timeDelta);
   }
 
