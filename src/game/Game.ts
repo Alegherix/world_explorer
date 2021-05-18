@@ -1,17 +1,18 @@
 import * as CANNON from 'cannon-es';
-import * as THREE from 'three';
+import * as dat from 'dat.gui';
 import type { Vector3 } from 'three';
+import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import type { ISkybox, IGamePiece } from '../shared/frontendInterfaces';
+import type { IGamePiece, ISkybox } from '../shared/frontendInterfaces';
+import GameStore from '../shared/GameStore';
+import {
+  addKeyEvents,
+  runController,
+  setControllerProperties,
+} from './utils/Controller';
 import type Loader from './utils/Loader';
 import type Material from './utils/Materials';
 import ThirdPersonCamera from './utils/ThirdPersonCamera';
-import GameStore from '../shared/GameStore';
-import type { Vec3 } from 'cannon-es';
-import * as dat from 'dat.gui';
-import Gamestore from '../shared/GameStore';
-import { get } from 'svelte/store';
-import Controller from './utils/Controller';
 
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
@@ -19,7 +20,6 @@ abstract class Game implements ISkybox {
   protected gamePieceTexture: THREE.Texture;
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
-  protected controller: Controller;
   private gui: dat.GUI;
 
   constructor(
@@ -51,7 +51,8 @@ abstract class Game implements ISkybox {
       .getTextureLoader()
       .load(`textures/playerTextures/${playerTextureName}`);
     this.createSkybox(skyboxFolderName, skyboxExtension);
-    this.controller = new Controller(this.gameCamera);
+
+    addKeyEvents();
   }
 
   abstract createGameMap();
@@ -100,7 +101,9 @@ abstract class Game implements ISkybox {
     this.scene.add(mesh);
     this.world.addBody(body);
     this.currentGamePiece = { mesh, body };
-    this.controller.addPieceToSteer(this.currentGamePiece);
+
+    // Creates the controller for the object
+    setControllerProperties(this.currentGamePiece, this.gameCamera);
     this.activeGamePieces.push(this.currentGamePiece);
     if (!this.useOrbitCamera)
       this.gameCamera.setTracking(this.currentGamePiece);
@@ -203,6 +206,12 @@ abstract class Game implements ISkybox {
       );
     }
   };
+
+  protected runGameUpdates(timeDelta: number) {
+    this.rewspawnIfDead();
+    runController();
+    this.world.step(1 / 100, timeDelta);
+  }
 
   // Creates the physical plane boundry of a Plane
   createBoundry(x1, y1, z1, x2, y2, z2, rotation, floorShape) {

@@ -1,21 +1,38 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
+  import { removeEventListeners } from '../game/utils/Controller';
   import GameStore from '../shared/GameStore';
   import BoostComponent from './BoostComponent.svelte';
   import ControllerComponent from './ControllerComponent.svelte';
   import JumpComponent from './JumpComponent.svelte';
 
   let canvas;
+  let gameScene: GameScene;
+
   $: elapsedTime = $GameStore.elapsedTime;
 
   onMount(() => {
-    new GameScene(canvas, $GameStore.world);
+    if (!gameScene) {
+      gameScene = new GameScene(canvas, $GameStore.world);
+    }
+  });
+
+  onDestroy(() => {
+    gameScene = null;
   });
 
   const handleMenu = () => {
+    removeEventListeners();
     GameStore.update((store) => {
-      return { ...store, world: null };
+      return {
+        ...store,
+        boosts: 3,
+        jumps: 4,
+        score: 0,
+        elapsedTime: 0,
+        world: null,
+      };
     });
   };
 </script>
