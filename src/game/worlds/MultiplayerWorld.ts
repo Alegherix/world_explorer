@@ -171,6 +171,7 @@ class MultiplayerWorld extends Game {
     this.createFirstObstacle();
     this.createLeapOfFaith();
     this.createLoopSection();
+    this.createBounceSection();
   }
 
   createFinishZone() {
@@ -391,7 +392,54 @@ class MultiplayerWorld extends Game {
       this.defaultConfig
     );
     this.addToWorld(tubeExit);
-    this.addToGui(tubeExit);
+  }
+
+  createBounceSection() {
+    const rampUp = PlaneFactory.createPlane(
+      getDimensions(250, 1000, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-7200, 502, 600),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpBack(rampUp);
+    this.addToWorld(rampUp);
+
+    for (let index = 1; index < 4; index++) {
+      let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
+      const spaceBetweenBouncePlates = 400;
+      const bouncePlate = PlaneFactory.createPlane(
+        getDimensions(200, 100, 1),
+        this.material.getAdamantineMaterial(),
+        getPosition(-7200, 850, 1400 + index * spaceBetweenBouncePlates),
+        this.defaultConfig
+      );
+      bouncePlate.movementType = {
+        start: direction,
+        distance: 200,
+        positionOffset: -7200,
+        speed: 0.5,
+        direction: 'x',
+      };
+      this.addToWorld(bouncePlate);
+    }
+
+    const rampDown = PlaneFactory.createPlane(
+      getDimensions(250, 1000, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-7200, 502, 3900),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUp(rampDown);
+    this.addToWorld(rampDown);
+
+    const landing = PlaneFactory.createPlane(
+      getDimensions(250, 1000, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-7200, 252, 4833),
+      this.defaultConfig
+    );
+    this.addToWorld(landing);
+    this.addToGui(landing);
   }
 
   /*** 
