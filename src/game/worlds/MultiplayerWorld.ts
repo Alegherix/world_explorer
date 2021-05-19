@@ -28,6 +28,7 @@ class MultiplayerWorld extends Game {
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
   private defaultConfig: MeshStandardMaterialParameters;
+  private chipConfig: MeshStandardMaterialParameters;
   private elapsedTime: number;
 
   constructor(
@@ -44,8 +45,8 @@ class MultiplayerWorld extends Game {
       material,
       camera,
       'mineral.jpg',
-      'space',
-      '.jpg'
+      'alien',
+      '.png'
       // true
     );
 
@@ -63,21 +64,39 @@ class MultiplayerWorld extends Game {
   }
 
   initializeTextures() {
+    // Metal Textures
     const loader = this.loader.getTextureLoader();
-    const map = loader.load('/textures/metalPlate/MetalPlates006_1K_Color.jpg');
-    const normal = loader.load('/textures/metalPlate/MetalPlates006_1K_Normal.jpg');
-    const displacement = loader.load('/textures/metalPlate/MetalPlates006_1K_Displacement.jpg');
-    const metallic = loader.load('/textures/metalPlate/MetalPlates006_1K_Metalness.jpg');
-    const roughness = loader.load('/textures/metalPlate/MetalPlates006_1K_Roughness.jpg');
+    const metalColor = loader.load('/textures/metalPlate/MetalPlates006_1K_Color.jpg');
+    const metalNormal = loader.load('/textures/metalPlate/MetalPlates006_1K_Normal.jpg');
+    const metalDisplacement = loader.load('/textures/metalPlate/MetalPlates006_1K_Displacement.jpg');
+    const metalMetalness = loader.load('/textures/metalPlate/MetalPlates006_1K_Metalness.jpg');
+    const metalRoughness = loader.load('/textures/metalPlate/MetalPlates006_1K_Roughness.jpg');
 
     this.defaultConfig = {
-      opacity: 0.6,
+      opacity: 0.7,
       transparent: true,
-      map,
-      normalMap: normal,
-      displacementMap: displacement,
-      roughnessMap: roughness,
-      metalnessMap: metallic,
+      map: metalColor,
+      normalMap: metalNormal,
+      displacementMap: metalDisplacement,
+      roughnessMap: metalRoughness,
+      metalnessMap: metalMetalness,
+    };
+
+    // Chip Textures
+    const chipColor = loader.load('/textures/alienPlanet/Chip006_1K_Color.jpg');
+    const chipNormal = loader.load('/textures/alienPlanet/Chip006_1K_Normal.jpg');
+    const chipDisplacement = loader.load('/textures/alienPlanet/Chip006_1K_Displacement.jpg');
+    const chipMetalness = loader.load('/textures/alienPlanet/Chip006_1K_Metalness.jpg');
+    const chipRoughness = loader.load('/textures/alienPlanet/Chip006_1K_Roughness.jpg');
+
+    this.chipConfig = {
+      opacity: 0.8,
+      transparent: true,
+      map: chipColor,
+      normalMap: chipNormal,
+      displacementMap: chipDisplacement,
+      roughnessMap: chipRoughness,
+      metalnessMap: chipMetalness,
     };
   }
 
@@ -172,6 +191,7 @@ class MultiplayerWorld extends Game {
     this.createLeapOfFaith();
     this.createLoopSection();
     this.createBounceSection();
+    this.createHeavenlyAscend();
   }
 
   createFinishZone() {
@@ -232,7 +252,7 @@ class MultiplayerWorld extends Game {
         getDimensions(250, 20, 20),
         this.material.getGlassMaterial(),
         getPosition(-300 - offset, 287, -1200),
-        this.defaultConfig
+        this.chipConfig
       );
       trap.movementType = {
         start: 'sin',
@@ -249,7 +269,7 @@ class MultiplayerWorld extends Game {
       getDimensions(200, 200, 1),
       this.material.getAdamantineMaterial(),
       getPosition(-1650, 200, -1200),
-      this.defaultConfig
+      this.chipConfig
     );
     bouncePlate.movementType = {
       start: 'sin',
@@ -292,7 +312,7 @@ class MultiplayerWorld extends Game {
       getDimensions(20, 250, 40),
       this.material.getGlassMaterial(),
       getPosition(-4570, 650, -1200),
-      this.defaultConfig
+      this.chipConfig
     );
     PlaneFactory.slopePlaneUpRight(downObstacleOne);
     downObstacleOne.mesh.rotation.z = Math.PI / 0.5;
@@ -311,7 +331,7 @@ class MultiplayerWorld extends Game {
       getDimensions(20, 250, 40),
       this.material.getGlassMaterial(),
       getPosition(-5000, 650, -1200),
-      this.defaultConfig
+      this.chipConfig
     );
     PlaneFactory.slopePlaneUpRight(downObstacleTwo);
     downObstacleTwo.mesh.rotation.z = Math.PI / 0.5;
@@ -388,7 +408,7 @@ class MultiplayerWorld extends Game {
     const tubeExit = PlaneFactory.createPlane(
       getDimensions(250, 2000, 1),
       this.material.getGlassMaterial(),
-      getPosition(-7200, 251, -820),
+      getPosition(-7200, 251, -833),
       this.defaultConfig
     );
     this.addToWorld(tubeExit);
@@ -406,12 +426,12 @@ class MultiplayerWorld extends Game {
 
     for (let index = 1; index < 4; index++) {
       let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
-      const spaceBetweenBouncePlates = 400;
+      const spaceBetweenBouncePlates = 500;
       const bouncePlate = PlaneFactory.createPlane(
         getDimensions(200, 100, 1),
         this.material.getAdamantineMaterial(),
-        getPosition(-7200, 850, 1400 + index * spaceBetweenBouncePlates),
-        this.defaultConfig
+        getPosition(-7200, 825, 1400 + index * spaceBetweenBouncePlates),
+        this.chipConfig
       );
       bouncePlate.movementType = {
         start: direction,
@@ -441,6 +461,8 @@ class MultiplayerWorld extends Game {
     this.addToWorld(landing);
     this.addToGui(landing);
   }
+
+  createHeavenlyAscend() {}
 
   /*** 
    NETWORKING
