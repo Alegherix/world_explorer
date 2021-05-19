@@ -62,6 +62,7 @@ class MultiplayerWorld extends Game {
     this.createStartingZone();
     this.createGameMap();
     this.createPlayer(this.userName);
+    this.createFinishZone();
   }
 
   initializeTextures() {
@@ -198,7 +199,87 @@ class MultiplayerWorld extends Game {
   }
 
   createFinishZone() {
-    throw new Error('Method not implemented.');
+    const walls = [
+      {
+        x: 1950,
+        y: 1350,
+        z: 4560,
+        h: 300,
+        w: 1,
+        d: 200,
+      },
+      {
+        x: 1950,
+        y: 1350,
+        z: 4260,
+        h: 300,
+        w: 1,
+        d: 200,
+      },
+      {
+        x: 1950,
+        y: 1450,
+        z: 4410,
+        h: 300,
+        w: 300,
+        d: 1,
+      },
+      {
+        x: 2100,
+        y: 1350,
+        z: 4410,
+        h: 1,
+        w: 300,
+        d: 200,
+      },
+      {
+        x: 1800,
+        y: 1350,
+        z: 4271,
+        h: 1,
+        w: 25,
+        d: 200,
+      },
+      {
+        x: 1800,
+        y: 1350,
+        z: 4545,
+        h: 1,
+        w: 30,
+        d: 200,
+      },
+    ];
+
+    const platform = PlaneFactory.createPlane(
+      getDimensions(300, 300, 1),
+      this.material.getGlassMaterial(),
+      getPosition(1950, 1250, 4410),
+      this.defaultConfig
+    );
+    this.addToWorld(platform);
+
+    for (const { x, y, z, h, w, d } of walls) {
+      const wall = PlaneFactory.createPlane(
+        getDimensions(h, w, d),
+        this.material.getGlassMaterial(),
+        getPosition(x, y, z),
+        { color: 0x1987ee, transparent: true, opacity: 0.4 }
+      );
+      this.addToWorld(wall);
+    }
+
+    const lootGeometry = new THREE.OctahedronBufferGeometry(12, 0);
+    const lootMaterial = new THREE.MeshPhongMaterial({
+      color: '#FFD700',
+      emissive: 0x0,
+      emissiveIntensity: 0.2,
+      shininess: 52,
+    });
+    const lootMesh = new THREE.Mesh(lootGeometry, lootMaterial);
+    lootMesh.receiveShadow = true;
+    lootMesh.castShadow = true;
+    lootMesh.position.set(1950, 1270, 4410);
+    this.scene.add(lootMesh);
   }
 
   createStartJump() {
