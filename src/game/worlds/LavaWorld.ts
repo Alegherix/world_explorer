@@ -25,7 +25,6 @@ class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
   private defaultConfig: MeshStandardMaterialParameters;
   private bouncePadConfig: MeshStandardMaterialParameters;
-  private testArray: IGamePiece[] = [];
 
   constructor(
     scene: THREE.Scene,
@@ -76,16 +75,7 @@ class LavaWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-
-    for (const gamePiece of this.activeGamePieces) {
-      this.move(gamePiece, elapsedTime);
-    }
-
-    for (const testObj of this.testArray) {
-      this.rotate(testObj, elapsedTime);
-    }
-
-    this.runGameUpdates(timeDelta, -450);
+    this.runGameUpdates(timeDelta, elapsedTime, -450, 200);
   }
 
   createGameMap() {
@@ -518,7 +508,7 @@ class LavaWorld extends Game {
         speed: 0.02,
       };
       platform.mesh.name = 'test';
-      this.testArray.push(platform);
+      this.movingPieces.push(platform);
       this.addToWorld(platform);
     }
 

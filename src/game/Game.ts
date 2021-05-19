@@ -18,6 +18,7 @@ import ThirdPersonCamera from './utils/ThirdPersonCamera';
 abstract class Game implements ISkybox {
   protected currentGamePiece: IGamePiece;
   protected activeGamePieces: IGamePiece[] = [];
+  protected movingPieces: IGamePiece[] = [];
   protected gamePieceTexture: THREE.Texture;
   protected gameCamera: ThirdPersonCamera;
   protected orbitCamera: OrbitControls;
@@ -135,12 +136,12 @@ abstract class Game implements ISkybox {
     this.camera.lookAt(gamepiece.mesh.position);
   }
 
-  rewspawnIfDead(limit: number = -50) {
+  respawnIfDead(limit: number = -50, width: number = 400) {
     if (this.currentGamePiece.mesh.position.y <= limit) {
       this.currentGamePiece.body.position.set(
-        (0.5 - Math.random()) * 400,
+        (0.5 - Math.random()) * width,
         150,
-        (0.5 - Math.random()) * 400
+        (0.5 - Math.random()) * width
       );
       this.currentGamePiece.body.angularVelocity.set(0, 0, 0);
       this.currentGamePiece.body.velocity.set(0, 0, 0);
@@ -215,10 +216,24 @@ abstract class Game implements ISkybox {
     }
   };
 
-  protected runGameUpdates(timeDelta: number, respawnOffset?: number) {
+  protected runGameUpdates(
+    timeDelta: number,
+    elapsedTime: number,
+    respawnOffset?: number,
+    planeWidth?: number
+  ) {
     const { x, y, z } = this.currentGamePiece.mesh.position;
-    this.rewspawnIfDead(respawnOffset);
+    this.respawnIfDead(respawnOffset, planeWidth);
     runController();
+
+    for (const gamePiece of this.activeGamePieces) {
+      this.move(gamePiece, elapsedTime);
+    }
+
+    for (const testObj of this.movingPieces) {
+      this.rotate(testObj, elapsedTime);
+    }
+
     this.spriteText.position.set(x, y + 14, z);
     this.world.step(1 / 100, timeDelta);
   }
