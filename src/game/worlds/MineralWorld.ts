@@ -57,8 +57,6 @@ class MineralWorld extends Game {
     this.createStartingZone();
     this.createGameMap();
     this.createFinishZone();
-    console.log(this.scene.children);
-    this.scene.remove(this.scene.children[3]);
   }
 
   initializeTextures() {
@@ -187,18 +185,7 @@ class MineralWorld extends Game {
     );
     this.addToWorld(walls);
 
-    const lootGeometry = new OctahedronBufferGeometry(12, 0);
-    const lootMaterial = new MeshPhongMaterial({
-      color: 0x98b1c4,
-      emissive: 0x0,
-      emissiveIntensity: 0.2,
-      shininess: 52,
-    });
-    const lootMesh = new Mesh(lootGeometry, lootMaterial);
-    lootMesh.receiveShadow = true;
-    lootMesh.castShadow = true;
-    lootMesh.position.set(-320, -85, 1400);
-    this.scene.add(lootMesh);
+    this.scoreKeeper.createPrize(-320, -85, 1400);
   }
 
   createStartingPlane() {

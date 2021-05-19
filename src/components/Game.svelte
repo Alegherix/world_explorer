@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
-  import { removeEventListeners } from '../game/utils/Controller';
   import GameStore from '../shared/GameStore';
   import BoostComponent from './BoostComponent.svelte';
   import ControllerComponent from './ControllerComponent.svelte';
   import JumpComponent from './JumpComponent.svelte';
+  import MenuButton from './MenuButton.svelte';
+  import SinglePlayerCounter from './SinglePlayerCounter.svelte';
+  import WinMenu from './WinMenu.svelte';
 
   let canvas;
   let gameScene: GameScene;
-
-  $: elapsedTime = $GameStore.elapsedTime;
 
   onMount(() => {
     if (!gameScene) {
@@ -22,39 +22,25 @@
     gameScene = null;
   });
 
-  const handleMenu = () => {
-    removeEventListeners();
-    GameStore.update((store) => {
-      return {
-        ...store,
-        boosts: 3,
-        jumps: 4,
-        score: 0,
-        elapsedTime: 0,
-        world: null,
-      };
-    });
+  const restartGame = () => {
+    gameScene = new GameScene(canvas, $GameStore.world);
   };
 </script>
 
 <main>
+  {#if $GameStore.winnerName && $GameStore.world !== 'Zetxaru'}
+    <WinMenu on:restart={restartGame} />
+  {/if}
   <canvas class="webgl" bind:this={canvas} />
   <section>
-    {#if $GameStore.world !== 'Zetxaru'}
-      <div class="scoreCounter">
-        <h2>Points</h2>
-        <h3>{$GameStore.score}</h3>
-      </div>
-      <div class="playtimeContainer">
-        <h2>Time played</h2>
-        <h3>{elapsedTime.toFixed(2)}</h3>
-      </div>
-    {/if}
+    <SinglePlayerCounter />
     <JumpComponent />
     <BoostComponent />
   </section>
   <div class="menu">
-    <button on:click={handleMenu}>Back to MainMenu</button>
+    {#if !$GameStore.winnerName}
+      <MenuButton />
+    {/if}
     <ControllerComponent />
   </div>
 </main>
@@ -68,25 +54,6 @@
     top: 0;
   }
 
-  .scoreCounter,
-  .playtimeContainer {
-    width: 200px;
-    height: 100px;
-  }
-  h2 {
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    color: white;
-  }
-
-  h3 {
-    text-align: center;
-    color: #f4cd04;
-    font-size: 52px;
-    margin: 0;
-  }
-
   .menu {
     position: relative;
     z-index: 2;
@@ -96,16 +63,5 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-
-  button {
-    border: solid #1987ee 2px;
-    border-radius: 5px;
-    padding: 0.5rem 1rem;
-    background-color: black;
-    color: #1987ee;
-    font-size: 2rem;
-    width: 100%;
-    cursor: pointer;
   }
 </style>

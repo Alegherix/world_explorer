@@ -143,18 +143,7 @@ class LavaWorld extends Game {
       this.addToWorld(firstWall);
     }
 
-    const lootGeometry = new OctahedronBufferGeometry(12, 0);
-    const lootMaterial = new MeshPhongMaterial({
-      color: 0x98b1c4,
-      emissive: 0x0,
-      emissiveIntensity: 0.2,
-      shininess: 52,
-    });
-    const lootMesh = new Mesh(lootGeometry, lootMaterial);
-    lootMesh.receiveShadow = true;
-    lootMesh.castShadow = true;
-    lootMesh.position.set(1016, 2015, -690);
-    this.scene.add(lootMesh);
+    this.scoreKeeper.createPrize(1016, 2015, -690);
   }
 
   createStartingZone() {

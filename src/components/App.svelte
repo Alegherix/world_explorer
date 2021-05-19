@@ -8,6 +8,7 @@
 <svelte:head>
   <title>World Explorer</title>
 </svelte:head>
+
 <main>
   {#if $GameStore.world}
     <Game />
