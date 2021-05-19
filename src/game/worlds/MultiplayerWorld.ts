@@ -11,12 +11,13 @@ import type { IActivePlayer, IGamePiece } from '../../shared/frontendInterfaces'
 import Gamestore from '../../shared/GameStore';
 import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
 import PlaneFactory from '../components/Plane';
+import PlatformFactory from '../components/Platform';
 import TubeFactory from '../components/Tube';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import ThirdPersonCamera from '../utils/ThirdPersonCamera';
-import { getDimensions, getPosition, getTorusrDimensions } from '../utils/utils';
+import { getDimensions, getPosition, getCylinderDimensions, getTorusrDimensions } from '../utils/utils';
 import cannonDebugger from 'cannon-es-debugger';
 
 class MultiplayerWorld extends Game {
@@ -192,6 +193,8 @@ class MultiplayerWorld extends Game {
     this.createLoopSection();
     this.createBounceSection();
     this.createHeavenlyAscend();
+    this.createCorners();
+    this.createHomeStrech();
   }
 
   createFinishZone() {
@@ -316,7 +319,6 @@ class MultiplayerWorld extends Game {
     );
     PlaneFactory.slopePlaneUpRight(downObstacleOne);
     downObstacleOne.mesh.rotation.z = Math.PI / 0.5;
-    // downObstacleOne.body.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2.75);
     downObstacleOne.body.quaternion.copy(downObstacleOne.mesh.quaternion as unknown as CANNON.Quaternion);
     downObstacleOne.movementType = {
       start: 'sin',
@@ -459,10 +461,227 @@ class MultiplayerWorld extends Game {
       this.defaultConfig
     );
     this.addToWorld(landing);
-    this.addToGui(landing);
+
+    for (let index = 1; index < 6; index++) {
+      const offset = index * 5;
+      const corner = TubeFactory.createCustomTube(
+        getTorusrDimensions(250, 3, 18, 18, 1.65),
+        this.material.getGlassMaterial(),
+        getPosition(-7070, 252 + offset, 5080),
+        this.chipConfig
+      );
+
+      corner.mesh.rotateX(-Math.PI * 0.5);
+      corner.mesh.rotateZ(-Math.PI * 0.525);
+      corner.body.quaternion.copy(corner.mesh.quaternion as unknown as CANNON.Quaternion);
+      this.addToWorld(corner);
+    }
   }
 
-  createHeavenlyAscend() {}
+  createHeavenlyAscend() {
+    const straight = PlaneFactory.createPlane(
+      getDimensions(700, 250, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-6726, 252, 5208),
+      this.defaultConfig
+    );
+    this.addToWorld(straight);
+
+    const ramp = PlaneFactory.createPlane(
+      getDimensions(250, 200, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-6289, 302, 5208),
+      this.defaultConfig
+    );
+    PlaneFactory.slopePlaneUpRight(ramp);
+    this.addToWorld(ramp);
+
+    // First set of bounce plates
+    for (let index = 1; index < 4; index++) {
+      const spaceBetweenBouncePlates = 300;
+      const xOffset = 50;
+      const bouncePlate = PlaneFactory.createPlane(
+        getDimensions(250, 125, 1),
+        this.material.getAdamantineMaterial(),
+        getPosition(-5700 + index * xOffset, 150 + index * spaceBetweenBouncePlates, 5208),
+        this.chipConfig
+      );
+      PlaneFactory.slopePlaneUpRight(bouncePlate);
+      this.addToWorld(bouncePlate);
+    }
+
+    // Second set of bounce plates
+    for (let index = 1; index < 4; index++) {
+      const spaceBetweenBouncePlates = 300;
+      const xOffset = 50;
+      const bouncePlate = PlaneFactory.createPlane(
+        getDimensions(250, 125, 1),
+        this.material.getAdamantineMaterial(),
+        getPosition(-6250 - index * xOffset, 300 + index * spaceBetweenBouncePlates, 5208),
+        this.chipConfig
+      );
+      PlaneFactory.slopePlaneUpLeft(bouncePlate);
+      this.addToWorld(bouncePlate);
+    }
+  }
+
+  createCorners() {
+    const straight = PlaneFactory.createPlane(
+      getDimensions(1200, 250, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-4800, 1250, 5208),
+      this.defaultConfig
+    );
+    this.addToWorld(straight);
+
+    for (let index = 1; index < 6; index++) {
+      const offset = index * 5;
+      const firstCorner = TubeFactory.createCustomTube(
+        getTorusrDimensions(250, 3, 18, 18, 1.65),
+        this.material.getGlassMaterial(),
+        getPosition(-4453, 1250 + offset, 5080),
+        this.chipConfig
+      );
+
+      firstCorner.mesh.rotateX(Math.PI * 0.5);
+      firstCorner.mesh.rotateZ(Math.PI * 0.525);
+      firstCorner.body.quaternion.copy(firstCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+      this.addToWorld(firstCorner);
+    }
+
+    const plane = PlaneFactory.createPlane(
+      getDimensions(250, 800, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-4325, 1250, 4683),
+      this.defaultConfig
+    );
+    this.addToWorld(plane);
+
+    for (let index = 1; index < 6; index++) {
+      const offset = index * 5;
+      const secondCorner = TubeFactory.createCustomTube(
+        getTorusrDimensions(250, 3, 18, 18, 1.65),
+        this.material.getGlassMaterial(),
+        getPosition(-4196, 1250 + offset, 4537),
+        this.chipConfig
+      );
+
+      secondCorner.mesh.rotateX(Math.PI * 0.5);
+      secondCorner.mesh.rotateZ(-Math.PI * 0.525);
+      secondCorner.body.quaternion.copy(secondCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+      this.addToWorld(secondCorner);
+    }
+  }
+
+  createHomeStrech() {
+    const plane = PlaneFactory.createPlane(
+      getDimensions(6000, 250, 1),
+      this.material.getGlassMaterial(),
+      getPosition(-1200, 1250, 4408),
+      this.defaultConfig
+    );
+    this.addToWorld(plane);
+
+    // First set of obstacles
+    for (let index = 1; index < 4; index++) {
+      let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
+      const spaceBetweenObstacles = 400;
+      const obstacleBox = PlaneFactory.createPlane(
+        getDimensions(60, 200, 50),
+        this.material.getGlassMaterial(),
+        getPosition(-3600 + index * spaceBetweenObstacles, 1275, 4408),
+        this.chipConfig
+      );
+      obstacleBox.movementType = {
+        start: direction,
+        distance: 250,
+        positionOffset: 4408,
+        speed: 1 + index * 0.1,
+        direction: 'z',
+      };
+      this.addToWorld(obstacleBox);
+    }
+
+    // Second set of obstacles
+    for (let index = 1; index < 3; index++) {
+      let direction: 'cos' | 'sin' = index % 2 === 0 ? 'cos' : 'sin';
+      const spaceBetweenObstacles = 400;
+      const obstaclePlane = PlaneFactory.createPlane(
+        getDimensions(10, 250, 60),
+        this.material.getGlassMaterial(),
+        getPosition(-2100 + index * spaceBetweenObstacles, 1275, 4408),
+        this.chipConfig
+      );
+      obstaclePlane.movementType = {
+        start: direction,
+        distance: 100,
+        positionOffset: 1385,
+        speed: 0.7 + index / 1.8,
+        direction: 'y',
+      };
+      this.addToWorld(obstaclePlane);
+    }
+
+    // First set of cylinder obstacles
+    for (let index = 1; index < 4; index++) {
+      let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
+      const spaceBetweenObstacles = 600;
+      const obstacleCylinder = PlatformFactory.createCylinderPlatform(
+        getCylinderDimensions(20, 20, 80, 20),
+        this.material.getGlassMaterial(),
+        getPosition(-1200 + index * spaceBetweenObstacles, 1275, 4290 + index * 15),
+        this.chipConfig
+      );
+      obstacleCylinder.movementType = {
+        start: direction,
+        distance: 50,
+        positionOffset: 1200,
+        speed: 0.7 + index * 0.1,
+        direction: 'y',
+      };
+      this.addToWorld(obstacleCylinder);
+    }
+
+    // Second set of cylinder obstacles
+    for (let index = 1; index < 4; index++) {
+      let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
+      const spaceBetweenObstacles = 600;
+      const obstacleCylinder = PlatformFactory.createCylinderPlatform(
+        getCylinderDimensions(20, 20, 80, 20),
+        this.material.getGlassMaterial(),
+        getPosition(-1400 + index * spaceBetweenObstacles, 1275, 4530 - index * 20),
+        this.chipConfig
+      );
+      obstacleCylinder.movementType = {
+        start: direction,
+        distance: 50,
+        positionOffset: 1200,
+        speed: 0.7 + index * 0.12,
+        direction: 'y',
+      };
+      this.addToWorld(obstacleCylinder);
+    }
+
+    // Third set of cylinder obstacles
+    for (let index = 1; index < 4; index++) {
+      let direction: 'sin' | 'cos' = index % 2 === 0 ? 'sin' : 'cos';
+      const spaceBetweenObstacles = 800;
+      const obstacleCylinder = PlatformFactory.createCylinderPlatform(
+        getCylinderDimensions(20, 20, 80, 20),
+        this.material.getGlassMaterial(),
+        getPosition(-1200 + index * spaceBetweenObstacles, 1275, 4420),
+        this.chipConfig
+      );
+      obstacleCylinder.movementType = {
+        start: direction,
+        distance: 50,
+        positionOffset: 1200,
+        speed: 0.7 + index * 0.09,
+        direction: 'y',
+      };
+      this.addToWorld(obstacleCylinder);
+    }
+  }
 
   /*** 
    NETWORKING

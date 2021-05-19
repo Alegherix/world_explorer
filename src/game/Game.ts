@@ -72,7 +72,7 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer(name?: string) {
-    const startPosition = { x: -7200, y: 260, z: 4835 };
+    const startPosition = { x: -4300, y: 1300, z: 4408 };
     // const startPosition = { x: 490, y: 340, z: -470 };
     // const startPosition = { x: 0, y: 150, z: 0 };
     const mesh = new THREE.Mesh(
