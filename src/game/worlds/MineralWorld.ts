@@ -3,7 +3,13 @@ import type { IDimension } from './../../shared/interfaces';
  * @desc Used for creating the Game world of Morghol, an abandoned mineral planet
  */
 import type * as CANNON from 'cannon-es';
-import { Mesh, MeshStandardMaterialParameters, OctahedronBufferGeometry, MeshPhongMaterial, AmbientLight } from 'three';
+import {
+  Mesh,
+  MeshStandardMaterialParameters,
+  OctahedronBufferGeometry,
+  MeshPhongMaterial,
+  AmbientLight,
+} from 'three';
 
 import PlaneFactory from '../components/Plane';
 import PlatformFactory from '../components/Platform';
@@ -13,7 +19,12 @@ import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import cannonDebugger from 'cannon-es-debugger';
-import { getDimensions, getCylinderDimensions, getPosition, getTorusrDimensions } from '../utils/utils';
+import {
+  getDimensions,
+  getCylinderDimensions,
+  getPosition,
+  getTorusrDimensions,
+} from '../utils/utils';
 
 class MineralWorld extends Game {
   private scoreKeeper: ScoreKeeper;
@@ -39,7 +50,7 @@ class MineralWorld extends Game {
       // true
     );
 
-    cannonDebugger(this.scene, this.world.bodies);
+    // cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
 
     // this.createExtraLight();
@@ -57,10 +68,18 @@ class MineralWorld extends Game {
     const rockAmbientOcclusionTexture = loader.load(
       '/textures/rockPlanet/rockTextures/Rock012_1K_AmbientOcclusion.jpg'
     );
-    const rockColorTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Color.jpg');
-    const rockDisplacementTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Displacement.jpg');
-    const rockNormalTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Normal.jpg');
-    const rockRoughnessTexture = loader.load('/textures/rockPlanet/rockTextures/Rock012_1K_Roughness.jpg');
+    const rockColorTexture = loader.load(
+      '/textures/rockPlanet/rockTextures/Rock012_1K_Color.jpg'
+    );
+    const rockDisplacementTexture = loader.load(
+      '/textures/rockPlanet/rockTextures/Rock012_1K_Displacement.jpg'
+    );
+    const rockNormalTexture = loader.load(
+      '/textures/rockPlanet/rockTextures/Rock012_1K_Normal.jpg'
+    );
+    const rockRoughnessTexture = loader.load(
+      '/textures/rockPlanet/rockTextures/Rock012_1K_Roughness.jpg'
+    );
 
     this.rockTextureConfig = {
       map: rockColorTexture,
@@ -72,11 +91,21 @@ class MineralWorld extends Game {
     };
 
     // Ice Textures
-    const iceColorTexture = loader.load('/textures/rockPlanet/iceTextures/Blue_Ice_001_COLOR.jpg');
-    const iceAmbientOcclusionTexture = loader.load('/textures/rockPlanet/iceTextures/Blue_Ice_001_OCC.jpg');
-    const iceDisplacementTexture = loader.load('/textures/rockPlanet/iceTextures/Blue_Ice_001_DISP.png');
-    const iceNormalTexture = loader.load('/textures/rockPlanet/iceTextures/Blue_Ice_001_NORM.jpg');
-    const iceRoughnessTexture = loader.load('/textures/rockPlanet/iceTextures/Blue_Ice_001_ROUGH.jpg');
+    const iceColorTexture = loader.load(
+      '/textures/rockPlanet/iceTextures/Blue_Ice_001_COLOR.jpg'
+    );
+    const iceAmbientOcclusionTexture = loader.load(
+      '/textures/rockPlanet/iceTextures/Blue_Ice_001_OCC.jpg'
+    );
+    const iceDisplacementTexture = loader.load(
+      '/textures/rockPlanet/iceTextures/Blue_Ice_001_DISP.png'
+    );
+    const iceNormalTexture = loader.load(
+      '/textures/rockPlanet/iceTextures/Blue_Ice_001_NORM.jpg'
+    );
+    const iceRoughnessTexture = loader.load(
+      '/textures/rockPlanet/iceTextures/Blue_Ice_001_ROUGH.jpg'
+    );
 
     this.iceTextureConfig = {
       map: iceColorTexture,
@@ -90,10 +119,18 @@ class MineralWorld extends Game {
     const boxAmbientOcclusionTexture = loader.load(
       '/textures/rockPlanet/woodTextures/Wood_Crate_001_ambientOcclusion.jpg'
     );
-    const boxColorTexture = loader.load('/textures/rockPlanet/woodTextures/Wood_Crate_001_basecolor.jpg');
-    const boxDisplacementTexture = loader.load('/textures/rockPlanet/woodTextures/Wood_Crate_001_height.png');
-    const boxNormalTexture = loader.load('/textures/rockPlanet/woodTextures/Wood_Crate_001_normal.jpg');
-    const boxRoughnessTexture = loader.load('/textures/rockPlanet/woodTextures/Wood_Crate_001_roughness.jpg');
+    const boxColorTexture = loader.load(
+      '/textures/rockPlanet/woodTextures/Wood_Crate_001_basecolor.jpg'
+    );
+    const boxDisplacementTexture = loader.load(
+      '/textures/rockPlanet/woodTextures/Wood_Crate_001_height.png'
+    );
+    const boxNormalTexture = loader.load(
+      '/textures/rockPlanet/woodTextures/Wood_Crate_001_normal.jpg'
+    );
+    const boxRoughnessTexture = loader.load(
+      '/textures/rockPlanet/woodTextures/Wood_Crate_001_roughness.jpg'
+    );
 
     this.boxTextureConfig = {
       map: boxColorTexture,
@@ -108,12 +145,7 @@ class MineralWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-
-    for (const gamePiece of this.activeGamePieces) {
-      this.move(gamePiece, elapsedTime);
-    }
-
-    this.world.step(1 / 100, timeDelta);
+    this.runGameUpdates(timeDelta, elapsedTime, -200, 200);
   }
 
   createExtraLight() {
@@ -150,7 +182,9 @@ class MineralWorld extends Game {
       getPosition(-380, -65, 1020)
     );
     walls.mesh.rotateY(-Math.PI * 0.55);
-    walls.body.quaternion.copy(walls.mesh.quaternion as unknown as CANNON.Quaternion);
+    walls.body.quaternion.copy(
+      walls.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(walls);
 
     const lootGeometry = new OctahedronBufferGeometry(12, 0);
@@ -210,7 +244,9 @@ class MineralWorld extends Game {
       this.iceTextureConfig
     );
     firstBounceCorner.mesh.rotateY(Math.PI * 0.2);
-    firstBounceCorner.body.quaternion.copy(firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+    firstBounceCorner.body.quaternion.copy(
+      firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(firstBounceCorner);
 
     const secondStraight = PlatformFactory.createPlanePlatform(
@@ -245,7 +281,9 @@ class MineralWorld extends Game {
       this.iceTextureConfig
     );
     secondBounceCorner.mesh.rotateY(-Math.PI * 0.31);
-    secondBounceCorner.body.quaternion.copy(secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+    secondBounceCorner.body.quaternion.copy(
+      secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(secondBounceCorner);
 
     const secondShortGlassWall = PlaneFactory.createPlane(
@@ -271,7 +309,9 @@ class MineralWorld extends Game {
       this.rockTextureConfig
     );
     firstClimb.mesh.rotateZ(0.15);
-    firstClimb.body.quaternion.copy(firstClimb.mesh.quaternion as unknown as CANNON.Quaternion);
+    firstClimb.body.quaternion.copy(
+      firstClimb.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(firstClimb);
 
     const firstStraight = PlatformFactory.createPlanePlatform(
@@ -291,7 +331,9 @@ class MineralWorld extends Game {
       this.rockTextureConfig
     );
     firstRamp.mesh.rotateZ(0.45);
-    firstRamp.body.quaternion.copy(firstRamp.mesh.quaternion as unknown as CANNON.Quaternion);
+    firstRamp.body.quaternion.copy(
+      firstRamp.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(firstRamp);
 
     const bouncePad = PlatformFactory.createPlanePlatform(
@@ -309,7 +351,9 @@ class MineralWorld extends Game {
       this.rockTextureConfig
     );
     secondRamp.mesh.rotateZ(-0.5);
-    secondRamp.body.quaternion.copy(secondRamp.mesh.quaternion as unknown as CANNON.Quaternion);
+    secondRamp.body.quaternion.copy(
+      secondRamp.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(secondRamp);
 
     const secondStraight = PlatformFactory.createPlanePlatform(
@@ -371,7 +415,9 @@ class MineralWorld extends Game {
       this.iceTextureConfig
     );
     entranceRamp.mesh.rotateX(-Math.PI * 0.3);
-    entranceRamp.body.quaternion.copy(entranceRamp.mesh.quaternion as unknown as CANNON.Quaternion);
+    entranceRamp.body.quaternion.copy(
+      entranceRamp.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(entranceRamp);
 
     const mazePlane = PlatformFactory.createPlanePlatform(
@@ -552,7 +598,9 @@ class MineralWorld extends Game {
       getPosition(-320, 390, -280)
     );
     firstTube.mesh.rotateY(Math.PI * 0.5);
-    firstTube.body.quaternion.copy(firstTube.mesh.quaternion as unknown as CANNON.Quaternion);
+    firstTube.body.quaternion.copy(
+      firstTube.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(firstTube);
 
     const secondTube = TubeFactory.createCustomTube(
@@ -561,7 +609,9 @@ class MineralWorld extends Game {
       getPosition(-320, 150, 600)
     );
     secondTube.mesh.rotateY(Math.PI * 0.5);
-    secondTube.body.quaternion.copy(secondTube.mesh.quaternion as unknown as CANNON.Quaternion);
+    secondTube.body.quaternion.copy(
+      secondTube.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(secondTube);
   }
 }

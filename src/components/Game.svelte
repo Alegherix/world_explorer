@@ -1,21 +1,38 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import GameScene from '../game/scenes/GameScene';
+  import { removeEventListeners } from '../game/utils/Controller';
   import GameStore from '../shared/GameStore';
-  import App from './App.svelte';
   import BoostComponent from './BoostComponent.svelte';
   import ControllerComponent from './ControllerComponent.svelte';
+  import JumpComponent from './JumpComponent.svelte';
 
   let canvas;
+  let gameScene: GameScene;
+
   $: elapsedTime = $GameStore.elapsedTime;
 
   onMount(() => {
-    new GameScene(canvas, $GameStore.world);
+    if (!gameScene) {
+      gameScene = new GameScene(canvas, $GameStore.world);
+    }
+  });
+
+  onDestroy(() => {
+    gameScene = null;
   });
 
   const handleMenu = () => {
+    removeEventListeners();
     GameStore.update((store) => {
-      return { ...store, world: null };
+      return {
+        ...store,
+        boosts: 3,
+        jumps: 4,
+        score: 0,
+        elapsedTime: 0,
+        world: null,
+      };
     });
   };
 </script>
@@ -33,11 +50,13 @@
         <h3>{elapsedTime.toFixed(2)}</h3>
       </div>
     {/if}
+    <JumpComponent />
     <BoostComponent />
   </section>
-  <ControllerComponent />
-
-  <!-- <button on:click={handleMenu}>Back to MainMenu</button> -->
+  <div class="menu">
+    <button on:click={handleMenu}>Back to MainMenu</button>
+    <ControllerComponent />
+  </div>
 </main>
 
 <style>
@@ -68,15 +87,25 @@
     margin: 0;
   }
 
-  button {
+  .menu {
+    position: relative;
+    z-index: 2;
     position: absolute;
-    top: 4rem;
-    left: 2rem;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  button {
     border: solid #1987ee 2px;
     border-radius: 5px;
     padding: 0.5rem 1rem;
     background-color: black;
     color: #1987ee;
     font-size: 2rem;
+    width: 100%;
+    cursor: pointer;
   }
 </style>

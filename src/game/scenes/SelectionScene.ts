@@ -56,19 +56,21 @@ class SelectionScene extends BaseScene implements ISkybox {
   createRockPlanet(x: number) {
     const color = this.loader
       .getTextureLoader()
-      .load('/textures/rockPlanet/Rock012_1K_Color.jpg');
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Color.jpg');
     const normal = this.loader
       .getTextureLoader()
-      .load('/textures/rockPlanet/Rock012_1K_Normal.jpg');
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Normal.jpg');
     const ao = this.loader
       .getTextureLoader()
-      .load('/textures/rockPlanet/Rock012_1K_AmbientOcclusion.jpg');
+      .load(
+        '/textures/rockPlanet/rockTextures/Rock012_1K_AmbientOcclusion.jpg'
+      );
     const displacement = this.loader
       .getTextureLoader()
-      .load('/textures/rockPlanet/Rock012_1K_Displacement.jpg');
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Displacement.jpg');
     const roughness = this.loader
       .getTextureLoader()
-      .load('/textures/rockPlanet/Rock012_1K_Roughness.jpg');
+      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Roughness.jpg');
     const emission = this.loader
       .getTextureLoader()
       .load('/textures/lavaPlanet/Lava004_1K_Emission.jpg');

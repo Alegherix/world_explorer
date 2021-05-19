@@ -21,28 +21,22 @@
 
 <style>
   main {
-    position: relative;
     width: 100vw;
     height: 100vh;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: url('/textures/skybox/space/nx.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
   }
 
   .container {
-    margin-top: 5rem;
-    height: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
   }
 
   h1 {
     font-size: 96px;
-    position: absolute;
-    top: 0;
     margin-top: 20rem;
     text-align: center;
     z-index: 2;
@@ -77,5 +71,7 @@
     margin-top: 2rem;
     width: 100%;
     max-width: 100px;
+    cursor: pointer;
+    border-radius: 3px;
   }
 </style>

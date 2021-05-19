@@ -8,6 +8,7 @@ const users = [
   'WhateverFace',
   'Something',
   'else',
+  'anooothar',
 ];
 
 interface IScore {
@@ -16,6 +17,7 @@ interface IScore {
   elapsedTime: number;
   world: GameWorld;
   boosts: number;
+  jumps: number;
 }
 
 const GameStore = writable<IScore>({
@@ -24,8 +26,7 @@ const GameStore = writable<IScore>({
   world: null,
   username: null,
   boosts: 3,
+  jumps: 4,
 });
 
-// 'Zetxaru'
-// users[Math.floor(Math.random() * users.length)]
 export default GameStore;
