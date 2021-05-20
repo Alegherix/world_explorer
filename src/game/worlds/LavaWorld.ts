@@ -3,13 +3,7 @@
  */
 import type * as CANNON from 'cannon-es';
 import { get } from 'svelte/store';
-import {
-  Mesh,
-  MeshPhongMaterial,
-  MeshStandardMaterialParameters,
-  OctahedronBufferGeometry,
-} from 'three';
-import type { IGamePiece } from '../../shared/frontendInterfaces';
+import type { MeshStandardMaterialParameters } from 'three';
 import GameStore from '../../shared/GameStore';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';

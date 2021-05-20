@@ -27,6 +27,7 @@ import {
   getTorusrDimensions,
 } from '../utils/utils';
 import cannonDebugger from 'cannon-es-debugger';
+import ScoreKeeper from '../components/ScoreKeeper';
 
 class MultiplayerWorld extends Game {
   private userName: string;
@@ -297,27 +298,8 @@ class MultiplayerWorld extends Game {
       this.addToWorld(wall);
     }
 
-    const lootGeometry = new THREE.OctahedronBufferGeometry(12, 0);
-    const lootMaterial = new THREE.MeshPhongMaterial({
-      color: '#FFD700',
-      emissive: 0x0,
-      emissiveIntensity: 0.2,
-      shininess: 60,
-    });
-    const lootMesh = new THREE.Mesh(lootGeometry, lootMaterial);
-    lootMesh.receiveShadow = true;
-    lootMesh.castShadow = true;
-    lootMesh.position.set(1950, 1265, 4410);
-    this.scene.add(lootMesh);
-
-    const shape = new CANNON.Box(new Vec3(4, 8, 4));
-    const body = new CANNON.Body({
-      mass: 0,
-      shape,
-    });
-
-    body.position.copy(lootMesh.position as unknown as Vec3);
-    this.world.addBody(body);
+    const scoreKeeper = new ScoreKeeper(this.scene);
+    scoreKeeper.createPrize(1950, 1265, 4410);
   }
 
   createStartJump() {
