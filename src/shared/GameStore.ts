@@ -1,7 +1,6 @@
 import { v4 } from 'uuid';
 import { writable } from 'svelte/store';
 import type { GameWorld } from './frontendInterfaces';
-const users = ['Kimball', 'Alegherix', 'TestUser', 'WhateverFace', 'Something', 'else'];
 
 interface IScore {
   username: string;
@@ -9,16 +8,18 @@ interface IScore {
   elapsedTime: number;
   world: GameWorld;
   boosts: number;
+  jumps: number;
+  winnerName: string;
 }
 
 const GameStore = writable<IScore>({
+  username: null,
   score: 0,
   elapsedTime: 0,
-  world: 'Zetxaru',
-  username: 'Kimball',
+  world: null,
   boosts: 3,
+  jumps: 4,
+  winnerName: null,
 });
 
-// 'Zetxaru'
-// users[Math.floor(Math.random() * users.length)]
 export default GameStore;

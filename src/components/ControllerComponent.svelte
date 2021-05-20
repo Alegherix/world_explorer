@@ -22,10 +22,6 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
-    z-index: 2;
-    position: absolute;
-    left: 0.5rem;
-    top: 4rem;
     width: 250px;
   }
 

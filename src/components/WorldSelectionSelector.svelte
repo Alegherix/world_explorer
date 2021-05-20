@@ -1,18 +1,25 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import SelectionScene from '../game/scenes/SelectionScene';
   import type { GameWorld } from '../shared/frontendInterfaces';
   import GameStore from '../shared/GameStore';
 
   let canvas: HTMLCanvasElement;
   let planetName: GameWorld;
+  let selectionScene: SelectionScene;
 
   const updatePlanetName = (name: GameWorld) => {
     planetName = name;
   };
 
   onMount(() => {
-    new SelectionScene(canvas, updatePlanetName);
+    if (!selectionScene) {
+      selectionScene = new SelectionScene(canvas, updatePlanetName);
+    }
+  });
+
+  onDestroy(() => {
+    selectionScene = null;
   });
 
   const setWorld = () => {

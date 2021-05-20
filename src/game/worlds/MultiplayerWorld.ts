@@ -56,6 +56,7 @@ class MultiplayerWorld extends Game {
     this.userName = get(Gamestore).username;
     // this.socket = io('ws://localhost:8000').connect();
     this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
+    this.activeGamePieces = [];
 
     this.initializeTextures();
     this.listenForEvents();
@@ -63,6 +64,7 @@ class MultiplayerWorld extends Game {
     this.createGameMap();
     this.createPlayer(this.userName);
     this.createFinishZone();
+    this.world.gravity.set(0, -80, 0);
   }
 
   initializeTextures() {
@@ -106,8 +108,6 @@ class MultiplayerWorld extends Game {
   runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
 
-    this.controller.steer();
-
     for (const gamePiece of this.activeGamePieces) {
       this.move(gamePiece, this.elapsedTime);
     }
@@ -119,9 +119,7 @@ class MultiplayerWorld extends Game {
     this.elapsedTime = new Date().getTime() / 1000;
 
     this.sendCurrentGameState();
-    this.rewspawnIfDead();
-    this.replenishBoost();
-    this.world.step(1 / 100, timeDelta);
+    this.runGameUpdates(timeDelta);
   }
 
   // Mesh of starting zone
