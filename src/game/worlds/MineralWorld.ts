@@ -14,10 +14,11 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import cannonDebugger from 'cannon-es-debugger';
 import { getDimensions, getCylinderDimensions, getPosition, getTorusrDimensions } from '../utils/utils';
+import Platform from '../components/Platform';
 
 class MineralWorld extends Game {
   private scoreKeeper: ScoreKeeper;
-  private rockTextureConfig: MeshStandardMaterialParameters;
+  private defaultConfig: MeshStandardMaterialParameters;
   private iceTextureConfig: MeshStandardMaterialParameters;
   private boxTextureConfig: MeshStandardMaterialParameters;
   constructor(
@@ -115,7 +116,7 @@ class MineralWorld extends Game {
       getCylinderDimensions(100, 100, 1, 30),
       this.material.getGlassMaterial(),
       getPosition(-320, -100, 1400),
-      this.rockTextureConfig
+      this.defaultConfig
     );
     this.addToWorld(finishPlatform);
 
@@ -166,22 +167,24 @@ class MineralWorld extends Game {
 
     this.scene.add(mesh);
     this.world.addBody(body);
-    this.rockTextureConfig = {
+    this.defaultConfig = {
       map: rockColorTexture,
       aoMap: rockAmbientOcclusionTexture,
       displacementMap: rockDisplacementTexture,
       displacementScale: 1.1,
       normalMap: rockNormalTexture,
       roughnessMap: rockRoughnessTexture,
+      transparent: true,
+      opacity: 0.8,
     };
   }
 
   createFirstPart() {
-    const firstStraight = PlatformFactory.createPlanePlatform(
-      getDimensions(40, 1, 500),
-      this.material.getRockMaterial(),
+    const firstStraight = PlaneFactory.createPlane(
+      getDimensions(40, 500, 1),
+      this.material.getGlassMaterial(),
       getPosition(0, -1, -350),
-      this.rockTextureConfig
+      this.defaultConfig
     );
     this.addToWorld(firstStraight);
 
@@ -199,31 +202,30 @@ class MineralWorld extends Game {
     );
     this.addToWorld(firstLongGlassWall);
 
-    const firstBounceCorner = PlatformFactory.createPlanePlatform(
-      getDimensions(1, 10, 40),
+    const firstBounceCorner = PlaneFactory.createPlane(
+      getDimensions(40, 10, 1),
       this.material.getSpungeMaterial(),
       getPosition(4, 5, -580),
       this.iceTextureConfig
     );
-    firstBounceCorner.mesh.rotateY(Math.PI * 0.2);
+    firstBounceCorner.mesh.rotateZ(Math.PI * 0.25);
     firstBounceCorner.body.quaternion.copy(firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(firstBounceCorner);
 
-    const secondStraight = PlatformFactory.createPlanePlatform(
-      getDimensions(400, 1, 40),
-      this.material.getRockMaterial(),
+    const secondStraight = PlaneFactory.createPlane(
+      getDimensions(400, 40, 1),
+      this.material.getGlassMaterial(),
       getPosition(-220, -1, -580),
-      this.rockTextureConfig,
-      0,
+      this.defaultConfig,
       this.scoreKeeper
     );
     this.addToWorld(secondStraight);
 
-    const ThirdStraight = PlatformFactory.createPlanePlatform(
-      getDimensions(40, 1, -430),
-      this.material.getRockMaterial(),
+    const ThirdStraight = PlaneFactory.createPlane(
+      getDimensions(40, 430, 1),
+      this.material.getGlassMaterial(),
       getPosition(-440, 0 - 1, -385),
-      this.rockTextureConfig
+      this.defaultConfig
     );
     this.addToWorld(ThirdStraight);
 
@@ -234,7 +236,7 @@ class MineralWorld extends Game {
     );
     this.addToWorld(secondLongGlassWall);
 
-    const secondBounceCorner = PlatformFactory.createPlanePlatform(
+    const secondBounceCorner = PlaneFactory.createPlane(
       getDimensions(1, 10, 40),
       this.material.getSpungeMaterial(),
       getPosition(-440, 5, -584),
@@ -260,60 +262,58 @@ class MineralWorld extends Game {
   }
 
   createSecondPart() {
-    const firstClimb = PlatformFactory.createPlanePlatform(
-      getDimensions(150, 1, 40),
+    const climb = PlaneFactory.createPlane(
+      getDimensions(40, 160, 1),
       this.material.getGlassMaterial(),
-      getPosition(-346, 10, -220),
-      this.rockTextureConfig
+      getPosition(-351, 40, -220),
+      this.defaultConfig
     );
-    firstClimb.mesh.rotateZ(0.15);
-    firstClimb.body.quaternion.copy(firstClimb.mesh.quaternion as unknown as CANNON.Quaternion);
-    this.addToWorld(firstClimb);
+    PlaneFactory.slopePlaneUpRight(climb);
+    this.addToWorld(climb);
 
-    const firstStraight = PlatformFactory.createPlanePlatform(
-      getDimensions(180, 1, 40),
+    const firstStraight = PlaneFactory.createPlane(
+      getDimensions(180, 40, 1),
       this.material.getGlassMaterial(),
-      getPosition(-182, 21, -220),
-      this.rockTextureConfig,
-      0,
+      getPosition(-190, 80, -220),
+      this.defaultConfig,
       this.scoreKeeper
     );
     this.addToWorld(firstStraight);
+    this.addToGui(firstStraight);
 
-    const firstRamp = PlatformFactory.createPlanePlatform(
+    const firstRamp = PlaneFactory.createPlane(
       getDimensions(20, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(-83, 25, -220),
-      this.rockTextureConfig
+      this.defaultConfig
     );
     firstRamp.mesh.rotateZ(0.45);
     firstRamp.body.quaternion.copy(firstRamp.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(firstRamp);
 
-    const bouncePad = PlatformFactory.createPlanePlatform(
-      getDimensions(40, 2, 40),
+    const bouncePad = PlatformFactory.createCylinderPlatform(
+      getCylinderDimensions(40, 40, 1, 10),
       this.material.getAdamantineMaterial(),
       getPosition(10, 30, -220),
       this.iceTextureConfig
     );
     this.addToWorld(bouncePad);
 
-    const secondRamp = PlatformFactory.createPlanePlatform(
+    const secondRamp = PlaneFactory.createPlane(
       getDimensions(20, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(80, 39, -220),
-      this.rockTextureConfig
+      this.defaultConfig
     );
     secondRamp.mesh.rotateZ(-0.5);
     secondRamp.body.quaternion.copy(secondRamp.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(secondRamp);
 
-    const secondStraight = PlatformFactory.createPlanePlatform(
+    const secondStraight = PlaneFactory.createPlane(
       getDimensions(140, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(159, 34, -220),
-      this.rockTextureConfig,
-      0,
+      this.defaultConfig,
       this.scoreKeeper
     );
     this.addToWorld(secondStraight);
@@ -332,7 +332,7 @@ class MineralWorld extends Game {
     );
     this.addToWorld(secondElevatorGlassWall);
 
-    const elevator = PlatformFactory.createPlanePlatform(
+    const elevator = PlaneFactory.createPlane(
       getDimensions(40, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(210, 34, -260),
@@ -350,17 +350,16 @@ class MineralWorld extends Game {
   }
 
   createMaze() {
-    const mazeEntrance = PlatformFactory.createPlanePlatform(
+    const mazeEntrance = PlaneFactory.createPlane(
       getDimensions(100, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(240, 185, -300),
       this.iceTextureConfig,
-      0,
       this.scoreKeeper
     );
     this.addToWorld(mazeEntrance);
 
-    const entranceRamp = PlatformFactory.createPlanePlatform(
+    const entranceRamp = PlaneFactory.createPlane(
       getDimensions(40, 10, 1),
       this.material.getGlassMaterial(),
       getPosition(270, 189, -324),
@@ -370,11 +369,11 @@ class MineralWorld extends Game {
     entranceRamp.body.quaternion.copy(entranceRamp.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(entranceRamp);
 
-    const mazePlane = PlatformFactory.createPlanePlatform(
+    const mazePlane = PlaneFactory.createPlane(
       getDimensions(100, 1, 360),
       this.material.getRockMaterial(),
       getPosition(240, 185, -500),
-      this.rockTextureConfig
+      this.defaultConfig
     );
     this.addToWorld(mazePlane);
 
@@ -415,12 +414,11 @@ class MineralWorld extends Game {
     );
     this.addToWorld(roof);
 
-    const mazeExit = PlatformFactory.createPlanePlatform(
+    const mazeExit = PlaneFactory.createPlane(
       getDimensions(300, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(80, 185, -700),
-      this.rockTextureConfig,
-      0,
+      this.defaultConfig,
       this.scoreKeeper
     );
     this.addToWorld(mazeExit);
@@ -448,7 +446,7 @@ class MineralWorld extends Game {
   }
 
   createMovingStairs() {
-    const firstStep = PlatformFactory.createPlanePlatform(
+    const firstStep = PlaneFactory.createPlane(
       getDimensions(40, 20, 60),
       this.material.getGlassMaterial(),
       getPosition(-90, 205, -700),
@@ -463,7 +461,7 @@ class MineralWorld extends Game {
     };
     this.addToWorld(firstStep);
 
-    const secondStep = PlatformFactory.createPlanePlatform(
+    const secondStep = PlaneFactory.createPlane(
       getDimensions(40, 20, 60),
       this.material.getGlassMaterial(),
       getPosition(-130, 220, -700),
@@ -478,7 +476,7 @@ class MineralWorld extends Game {
     };
     this.addToWorld(secondStep);
 
-    const thirdStep = PlatformFactory.createPlanePlatform(
+    const thirdStep = PlaneFactory.createPlane(
       getDimensions(40, 20, 60),
       this.material.getGlassMaterial(),
       getPosition(-170, 240, -700),
@@ -495,12 +493,11 @@ class MineralWorld extends Game {
   }
 
   createThirdPart() {
-    const safePlatform = PlatformFactory.createPlanePlatform(
+    const safePlatform = PlaneFactory.createPlane(
       getDimensions(150, 1, 40),
       this.material.getGlassMaterial(),
       getPosition(-265, 244, -700),
-      this.rockTextureConfig,
-      0,
+      this.defaultConfig,
       this.scoreKeeper
     );
     this.addToWorld(safePlatform);
@@ -519,7 +516,7 @@ class MineralWorld extends Game {
     );
     this.addToWorld(secondSafeGlassWall);
 
-    const blockElevator = PlatformFactory.createPlanePlatform(
+    const blockElevator = PlaneFactory.createPlane(
       getDimensions(40, 60, 40),
       this.material.getGlassMaterial(),
       getPosition(-320, 280, -660),
@@ -534,7 +531,7 @@ class MineralWorld extends Game {
     };
     this.addToWorld(blockElevator);
 
-    const elevatorPlane = PlatformFactory.createPlanePlatform(
+    const elevatorPlane = PlaneFactory.createPlane(
       getDimensions(100, 1, 100),
       this.material.getGlassMaterial(),
       getPosition(-320, 390, -590),
