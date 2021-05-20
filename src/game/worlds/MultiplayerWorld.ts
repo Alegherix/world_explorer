@@ -913,6 +913,8 @@ class MultiplayerWorld extends Game {
   // Updates the world based on Server Response
   updateGameState(update: IActivePlayer[]) {
     update.forEach(({ id, position, velocity }) => {
+      console.log(position);
+
       const { x, y, z } = position;
       const pieceToUpdate = this.activeGamePieces.find(
         (piece) => piece.mesh.userData.clientId === id
