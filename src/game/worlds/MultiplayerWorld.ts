@@ -854,8 +854,6 @@ class MultiplayerWorld extends Game {
   }
 
   spawnOtherPlayers(username: string, id: string) {
-    console.log(username, 'should be added to the scene');
-
     const startPosition = { x: 0, y: 180, z: 0 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
@@ -913,22 +911,22 @@ class MultiplayerWorld extends Game {
   // Updates the world based on Server Response
   updateGameState(update: IActivePlayer[]) {
     update.forEach(({ id, position, velocity }) => {
-      console.log(position);
-
-      const { x, y, z } = position;
-      const pieceToUpdate = this.activeGamePieces.find(
-        (piece) => piece.mesh.userData.clientId === id
-      );
-      if (pieceToUpdate) {
-        pieceToUpdate.mesh.position.set(x, y, z);
-        pieceToUpdate.body.angularVelocity.set(
-          velocity.x,
-          velocity.y,
-          velocity.z
+      if (position && velocity) {
+        const { x, y, z } = position;
+        const pieceToUpdate = this.activeGamePieces.find(
+          (piece) => piece.mesh.userData.clientId === id
         );
-        pieceToUpdate.body.position.copy(
-          pieceToUpdate.mesh.position as unknown as Vec3
-        );
+        if (pieceToUpdate) {
+          pieceToUpdate.mesh.position.set(x, y, z);
+          pieceToUpdate.body.angularVelocity.set(
+            velocity.x,
+            velocity.y,
+            velocity.z
+          );
+          pieceToUpdate.body.position.copy(
+            pieceToUpdate.mesh.position as unknown as Vec3
+          );
+        }
       }
     });
   }
