@@ -42,12 +42,17 @@ abstract class Game implements ISkybox {
     this.material = material;
     this.gui = new dat.GUI();
     if (this.useOrbitCamera) {
-      this.orbitCamera = new OrbitControls(this.camera, document.querySelector('canvas'));
+      this.orbitCamera = new OrbitControls(
+        this.camera,
+        document.querySelector('canvas')
+      );
     } else {
       this.gameCamera = new ThirdPersonCamera(camera);
     }
 
-    this.gamePieceTexture = this.loader.getTextureLoader().load(`textures/playerTextures/${playerTextureName}`);
+    this.gamePieceTexture = this.loader
+      .getTextureLoader()
+      .load(`textures/playerTextures/${playerTextureName}`);
     this.createSkybox(skyboxFolderName, skyboxExtension);
 
     addKeyEvents();
@@ -73,9 +78,7 @@ abstract class Game implements ISkybox {
   }
 
   createPlayer(name?: string) {
-    const startPosition = { x: 1500, y: 1300, z: 4408 };
-    // const startPosition = { x: 490, y: 340, z: -470 };
-    // const startPosition = { x: 0, y: 150, z: 0 };
+    const startPosition = { x: 0, y: 150, z: 0 };
     const mesh = new THREE.Mesh(
       new THREE.SphereBufferGeometry(5, 64, 64),
       new THREE.MeshStandardMaterial({ map: this.gamePieceTexture })
@@ -107,7 +110,8 @@ abstract class Game implements ISkybox {
     // Creates the controller for the object
     setControllerProperties(this.currentGamePiece, this.gameCamera);
     this.activeGamePieces.push(this.currentGamePiece);
-    if (!this.useOrbitCamera) this.gameCamera.setTracking(this.currentGamePiece);
+    if (!this.useOrbitCamera)
+      this.gameCamera.setTracking(this.currentGamePiece);
   }
 
   addToWorld(gamePiece: IGamePiece) {
@@ -120,7 +124,11 @@ abstract class Game implements ISkybox {
     this.gui.add(gamepiece.mesh.position, 'x').step(1);
     this.gui.add(gamepiece.mesh.position, 'y').step(1);
     this.gui.add(gamepiece.mesh.position, 'z').step(1);
-    this.camera.position.set(gamepiece.mesh.position.x, gamepiece.mesh.position.y, gamepiece.mesh.position.z);
+    this.camera.position.set(
+      gamepiece.mesh.position.x,
+      gamepiece.mesh.position.y,
+      gamepiece.mesh.position.z
+    );
     this.camera.lookAt(gamepiece.mesh.position);
   }
 
@@ -139,14 +147,20 @@ abstract class Game implements ISkybox {
   // Used to move a gamepiece
   move = (gamePiece: IGamePiece, estimatedTime: number): void => {
     if (!gamePiece.movementType) {
-      gamePiece.mesh.position.copy(gamePiece.body.position as unknown as Vector3);
-      gamePiece.mesh.quaternion.copy(gamePiece.body.quaternion as unknown as THREE.Quaternion);
+      gamePiece.mesh.position.copy(
+        gamePiece.body.position as unknown as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
+      );
     } else {
-      const { start, distance, speed, positionOffset, direction } = gamePiece.movementType;
+      const { start, distance, speed, positionOffset, direction } =
+        gamePiece.movementType;
       const movement =
         start === 'sin'
           ? Math.sin(estimatedTime * speed) * distance + positionOffset
-          : Math.cos(Math.PI / 2 + estimatedTime * speed) * distance + positionOffset;
+          : Math.cos(Math.PI / 2 + estimatedTime * speed) * distance +
+            positionOffset;
 
       switch (direction) {
         case 'x':
@@ -168,11 +182,17 @@ abstract class Game implements ISkybox {
 
   rotate = (gamePiece: IGamePiece, estimatedTime: number): void => {
     if (!gamePiece.movementType) {
-      gamePiece.mesh.position.copy(gamePiece.body.position as unknown as Vector3);
-      gamePiece.mesh.quaternion.copy(gamePiece.body.quaternion as unknown as THREE.Quaternion);
+      gamePiece.mesh.position.copy(
+        gamePiece.body.position as unknown as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
+      );
     } else {
-      const { distance, speed, positionOffset, direction } = gamePiece.movementType;
-      const movement = Math.sin(estimatedTime * speed) * distance + positionOffset;
+      const { distance, speed, positionOffset, direction } =
+        gamePiece.movementType;
+      const movement =
+        Math.sin(estimatedTime * speed) * distance + positionOffset;
 
       switch (direction) {
         case 'x':
@@ -186,7 +206,9 @@ abstract class Game implements ISkybox {
           gamePiece.mesh.rotation.z = movement;
           break;
       }
-      gamePiece.body.quaternion.copy(gamePiece.mesh.quaternion as unknown as CANNON.Quaternion);
+      gamePiece.body.quaternion.copy(
+        gamePiece.mesh.quaternion as unknown as CANNON.Quaternion
+      );
     }
   };
 
@@ -236,8 +258,12 @@ abstract class Game implements ISkybox {
     if (!this.useOrbitCamera) this.gameCamera.update();
 
     for (const gamePiece of this.activeGamePieces) {
-      gamePiece.mesh.position.copy(gamePiece.body.position as unknown as Vector3);
-      gamePiece.mesh.quaternion.copy(gamePiece.body.quaternion as unknown as THREE.Quaternion);
+      gamePiece.mesh.position.copy(
+        gamePiece.body.position as unknown as Vector3
+      );
+      gamePiece.mesh.quaternion.copy(
+        gamePiece.body.quaternion as unknown as THREE.Quaternion
+      );
     }
     this.world.step(1 / 100, timeDelta);
   }
