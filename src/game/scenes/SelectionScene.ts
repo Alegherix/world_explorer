@@ -6,6 +6,8 @@ import type { ISkybox, GameWorld } from './../../shared/frontendInterfaces';
 import BaseScene from './BaseScene';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { get } from 'svelte/store';
+import LoaderStore from '../../shared/LoaderStore';
 
 class SelectionScene extends BaseScene implements ISkybox {
   private raycaster: THREE.Raycaster;
@@ -91,34 +93,11 @@ class SelectionScene extends BaseScene implements ISkybox {
   }
 
   createLavaPlanet(x: number) {
-    const color = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Color.jpg');
-    const emission = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Emission.jpg');
-    const displacement = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Displacement.jpg');
-    const normal = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Normal.jpg');
-    const roughness = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Roughness.jpg');
-
-    let configObject = {
-      map: color,
-      normalMap: normal,
-      roughnessMap: roughness,
-      emissive: 0x931a1a,
-      emissiveMap: emission,
-      emissiveIntensity: 5,
-      displacementMap: displacement,
-      displacementScale: 0.1,
-    };
-
-    this.createPlanet(x, configObject, 'Velknaz');
+    this.createPlanet(
+      x,
+      get(LoaderStore).loader.getLavaWorldConfig(),
+      'Velknaz'
+    );
   }
 
   createAlientPlanet(x: number) {
@@ -157,9 +136,14 @@ class SelectionScene extends BaseScene implements ISkybox {
     this.createPlanet(x, configObject, 'Zetxaru');
   }
 
-  createPlanet(x: number, materialConfig: any, name: GameWorld) {
+  createPlanet(
+    x: number,
+    materialConfig: any,
+    name: GameWorld,
+    material?: THREE.MeshStandardMaterial
+  ) {
     const geometry = new THREE.SphereBufferGeometry(50, 128, 128);
-    const material = new THREE.MeshStandardMaterial(materialConfig);
+    if (!material) material = new THREE.MeshStandardMaterial(materialConfig);
     const planet = new THREE.Mesh(geometry, material);
     planet.geometry.setAttribute(
       'uv2',

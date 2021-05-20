@@ -3,32 +3,28 @@
  */
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
+import cannonDebugger from 'cannon-es-debugger';
 import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import type { MeshStandardMaterialParameters, Object3D, Vector3 } from 'three';
 import * as THREE from 'three';
-import type {
-  IActivePlayer,
-  IGamePiece,
-} from '../../shared/frontendInterfaces';
+import SpriteText from 'three-spritetext';
+import type { IActivePlayer } from '../../shared/frontendInterfaces';
 import Gamestore from '../../shared/GameStore';
 import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
 import PlaneFactory from '../components/Plane';
 import PlatformFactory from '../components/Platform';
+import ScoreKeeper from '../components/ScoreKeeper';
 import TubeFactory from '../components/Tube';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
-import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import {
+  getCylinderDimensions,
   getDimensions,
   getPosition,
-  getCylinderDimensions,
   getTorusrDimensions,
 } from '../utils/utils';
-import cannonDebugger from 'cannon-es-debugger';
-import ScoreKeeper from '../components/ScoreKeeper';
-import SpriteText from 'three-spritetext';
 
 class MultiplayerWorld extends Game {
   private userName: string;
