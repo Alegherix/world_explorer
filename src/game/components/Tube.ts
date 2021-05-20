@@ -53,9 +53,7 @@ class TubeFactory {
     const { radius, tube, radialSegments, tubularSegments, arc } = dimensions;
     const { x, y, z } = position;
     const geometry = new TorusBufferGeometry(radius, tube, radialSegments, tubularSegments, arc);
-    const material = new MeshStandardMaterial(
-      configObj ? configObj : { color: '#FF7070', transparent: true, opacity: 0.3 }
-    );
+    const material = new MeshStandardMaterial(configObj);
     const mesh = new Mesh(geometry, material);
     mesh.position.set(x, y, z);
     mesh.material.side = DoubleSide;
