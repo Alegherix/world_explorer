@@ -2,13 +2,9 @@
  * @desc Used for creating the Lava game world, hopefully something pretty cool with fire?
  */
 import type * as CANNON from 'cannon-es';
-import {
-  Mesh,
-  MeshPhongMaterial,
-  MeshStandardMaterialParameters,
-  OctahedronBufferGeometry,
-} from 'three';
-import type { IGamePiece } from '../../shared/frontendInterfaces';
+import { get } from 'svelte/store';
+import type { MeshStandardMaterialParameters } from 'three';
+import GameStore from '../../shared/GameStore';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -23,7 +19,6 @@ class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
   private defaultConfig: MeshStandardMaterialParameters;
   private bouncePadConfig: MeshStandardMaterialParameters;
-  private testArray: IGamePiece[] = [];
 
   constructor(
     scene: THREE.Scene,
@@ -45,7 +40,6 @@ class LavaWorld extends Game {
     );
     // cannonDebugger(this.scene, this.world.bodies);
     this.scoreKeeper = new ScoreKeeper(this.scene);
-
     this.createStartingZone();
     this.createGameMap();
     this.createFinishZone();
@@ -75,16 +69,7 @@ class LavaWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-
-    for (const gamePiece of this.activeGamePieces) {
-      this.move(gamePiece, elapsedTime);
-    }
-
-    for (const testObj of this.testArray) {
-      this.rotate(testObj, elapsedTime);
-    }
-
-    this.world.step(1 / 100, timeDelta);
+    this.runGameUpdates(timeDelta, elapsedTime, -450, 200);
   }
 
   createGameMap() {
@@ -152,23 +137,12 @@ class LavaWorld extends Game {
       this.addToWorld(firstWall);
     }
 
-    const lootGeometry = new OctahedronBufferGeometry(12, 0);
-    const lootMaterial = new MeshPhongMaterial({
-      color: 0x98b1c4,
-      emissive: 0x0,
-      emissiveIntensity: 0.2,
-      shininess: 52,
-    });
-    const lootMesh = new Mesh(lootGeometry, lootMaterial);
-    lootMesh.receiveShadow = true;
-    lootMesh.castShadow = true;
-    lootMesh.position.set(1016, 2015, -690);
-    this.scene.add(lootMesh);
+    this.scoreKeeper.createPrize(1016, 2015, -690);
   }
 
   createStartingZone() {
     this.initializeTextures();
-    this.createPlayer();
+    this.createPlayer(get(GameStore).username);
     this.createStartingPlane();
     new Ramp(this.world, this.scene, this.material);
   }
@@ -517,7 +491,7 @@ class LavaWorld extends Game {
         speed: 0.02,
       };
       platform.mesh.name = 'test';
-      this.testArray.push(platform);
+      this.movingPieces.push(platform);
       this.addToWorld(platform);
     }
 

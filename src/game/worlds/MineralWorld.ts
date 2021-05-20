@@ -88,12 +88,7 @@ class MineralWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-
-    for (const gamePiece of this.activeGamePieces) {
-      this.move(gamePiece, elapsedTime);
-    }
-
-    this.world.step(1 / 100, timeDelta);
+    this.runGameUpdates(timeDelta, elapsedTime, -200, 200);
   }
 
   createExtraLight() {
@@ -133,18 +128,7 @@ class MineralWorld extends Game {
     walls.body.quaternion.copy(walls.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(walls);
 
-    const lootGeometry = new OctahedronBufferGeometry(12, 0);
-    const lootMaterial = new MeshPhongMaterial({
-      color: 0x98b1c4,
-      emissive: 0x0,
-      emissiveIntensity: 0.2,
-      shininess: 52,
-    });
-    const lootMesh = new Mesh(lootGeometry, lootMaterial);
-    lootMesh.receiveShadow = true;
-    lootMesh.castShadow = true;
-    lootMesh.position.set(-320, -85, 1400);
-    this.scene.add(lootMesh);
+    this.scoreKeeper.createPrize(-320, -85, 1400);
   }
 
   createStartingPlane() {

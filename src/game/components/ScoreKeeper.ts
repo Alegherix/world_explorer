@@ -1,10 +1,17 @@
-import { Box3, CylinderBufferGeometry, Mesh, MeshPhongMaterial } from 'three';
+import {
+  Box3,
+  CylinderBufferGeometry,
+  Mesh,
+  MeshPhongMaterial,
+  OctahedronBufferGeometry,
+} from 'three';
 import GameStore from '../../shared/GameStore';
 
 class ScoreKeeper {
   private geometry: CylinderBufferGeometry;
   private material: MeshPhongMaterial;
   private coins: Mesh[] = [];
+  private prize: Mesh;
   constructor(private scene: THREE.Scene) {
     this.geometry = new CylinderBufferGeometry(2.5, 2.5, 1, 20);
     this.material = new MeshPhongMaterial({
@@ -45,6 +52,32 @@ class ScoreKeeper {
   watchScore(player: Mesh) {
     this.haveScored(player);
     this.spinCoins();
+    this.haveWon(player);
+  }
+
+  private haveWon(player: Mesh) {
+    if (this.prize.position.distanceTo(player.position) < 10) {
+      this.scene.remove(this.prize);
+      GameStore.update((store) => {
+        return { ...store, winnerName: player.name };
+      });
+    }
+  }
+
+  createPrize(x: number, y: number, z: number) {
+    const lootGeometry = new OctahedronBufferGeometry(12, 0);
+    const lootMaterial = new MeshPhongMaterial({
+      color: 0x98b1c4,
+      emissive: 0x0,
+      emissiveIntensity: 0.2,
+      shininess: 52,
+    });
+    const lootMesh = new Mesh(lootGeometry, lootMaterial);
+    lootMesh.receiveShadow = true;
+    lootMesh.castShadow = true;
+    lootMesh.position.set(x, y, z);
+    this.prize = lootMesh;
+    this.scene.add(lootMesh);
   }
 }
 

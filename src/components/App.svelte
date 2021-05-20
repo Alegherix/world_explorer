@@ -8,8 +8,8 @@
 <svelte:head>
   <title>World Explorer</title>
 </svelte:head>
+
 <main>
-  <!-- <Game /> -->
   {#if $GameStore.world}
     <Game />
   {:else if $GameStore.username}
