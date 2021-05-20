@@ -18,6 +18,7 @@ interface IScore {
   world: GameWorld;
   boosts: number;
   jumps: number;
+  winnerName: string;
 }
 
 const GameStore = writable<IScore>({
@@ -27,6 +28,7 @@ const GameStore = writable<IScore>({
   username: null,
   boosts: 3,
   jumps: 4,
+  winnerName: null,
 });
 
 export default GameStore;

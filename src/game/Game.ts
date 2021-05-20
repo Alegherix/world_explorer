@@ -1,7 +1,7 @@
 import * as CANNON from 'cannon-es';
 import * as dat from 'dat.gui';
-import type { Vector3 } from 'three';
 import * as THREE from 'three';
+import type { Vector3 } from 'three';
 import SpriteText from 'three-spritetext';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import type { IGamePiece, ISkybox } from '../shared/frontendInterfaces';
@@ -106,8 +106,6 @@ abstract class Game implements ISkybox {
     this.currentGamePiece = { mesh, body };
 
     this.spriteText = new SpriteText(this.currentGamePiece.mesh.name);
-    console.log(this.spriteText.scale);
-
     this.spriteText.scale.set(22.5, 5, 0);
     this.scene.add(this.spriteText);
 
