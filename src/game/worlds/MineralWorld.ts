@@ -65,7 +65,7 @@ class MineralWorld extends Game {
       normalMap: iceNormalTexture,
       roughnessMap: iceRoughnessTexture,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.6,
     };
 
     // Box Textures
@@ -215,7 +215,7 @@ class MineralWorld extends Game {
       normalMap: rockNormalTexture,
       roughnessMap: rockRoughnessTexture,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.6,
     };
   }
 
@@ -285,7 +285,6 @@ class MineralWorld extends Game {
     secondBounceCorner.mesh.rotateZ(Math.PI * 0.2);
     secondBounceCorner.body.quaternion.copy(secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(secondBounceCorner);
-    this.addToGui(secondBounceCorner);
 
     const secondShortGlassWall = PlaneFactory.createPlane(
       getDimensions(40, 1, 20),
@@ -371,16 +370,16 @@ class MineralWorld extends Game {
     this.addToWorld(secondElevatorGlassWall);
 
     const elevator = PlaneFactory.createPlane(
-      getDimensions(40, 40, 1),
+      getDimensions(40, 40, 10),
       this.material.getGlassMaterial(),
       getPosition(570, 150, -260),
-      this.iceTextureConfig
+      this.boxTextureConfig
     );
     elevator.movementType = {
       start: 'sin',
       distance: 75,
-      positionOffset: 144,
-      speed: 0.5,
+      positionOffset: 140,
+      speed: 0.8,
       direction: 'y',
     };
     this.addToWorld(elevator);
@@ -489,35 +488,61 @@ class MineralWorld extends Game {
     );
     this.addToWorld(mazePlane);
 
-    // for (let i = 1; i < 3; i++) {
-    //   const xOffset = 100;
-    //   const outerWalls = PlaneFactory.createPlane(
-    //     getDimensions(1, 400, 50),
-    //     this.material.getGlassMaterial(),
-    //     getPosition(90 + i * xOffset, 210, -480)
-    //   );
-    //   this.addToWorld(outerWalls);
-    // }
+    // First set of maze walls
+    for (let i = 1; i < 3; i++) {
+      const offset = i * 40;
+      const longMazeWall = PlaneFactory.createPlane(
+        getDimensions(1, 320, 180),
+        this.material.getGlassMaterial(),
+        getPosition(530 + offset, 310, -560 + offset),
+        this.defaultConfig
+      );
+      this.addToWorld(longMazeWall);
+    }
 
-    // for (let i = 1; i < 5; i++) {
-    //   const zOffset = 100;
-    //   const leftSideMazeWalls = PlaneFactory.createPlane(
-    //     getDimensions(60, 1, 50),
-    //     this.material.getGlassMaterial(),
-    //     getPosition(220, 210, -720 + i * zOffset)
-    //   );
-    //   this.addToWorld(leftSideMazeWalls);
-    // }
+    // Second set of maze walls
+    for (let i = 1; i < 3; i++) {
+      const offset = i * 40;
+      const shortMazeWall = PlaneFactory.createPlane(
+        getDimensions(80, 1, 180),
+        this.material.getGlassMaterial(),
+        getPosition(450 + offset, 310, -440 + offset),
+        this.defaultConfig
+      );
+      this.addToWorld(shortMazeWall);
+    }
 
-    // for (let i = 1; i < 6; i++) {
-    //   const zOffset = 100;
-    //   const rightSideMazeWalls = PlaneFactory.createPlane(
-    //     getDimensions(60, 1, 50),
-    //     this.material.getGlassMaterial(),
-    //     getPosition(260, 210, -780 + i * zOffset)
-    //   );
-    //   this.addToWorld(rightSideMazeWalls);
-    // }
+    // Third set of maze walls
+    for (let i = 1; i < 3; i++) {
+      const offset = i * 40;
+      const shortMazeWall = PlaneFactory.createPlane(
+        getDimensions(80, 1, 180),
+        this.material.getGlassMaterial(),
+        getPosition(450 + offset, 310, -520 + offset),
+        this.defaultConfig
+      );
+      this.addToWorld(shortMazeWall);
+    }
+
+    // Fourth set of maze walls
+    for (let i = 1; i < 3; i++) {
+      const offset = i * 40;
+      const longMazeWall = PlaneFactory.createPlane(
+        getDimensions(1, 160, 180),
+        this.material.getGlassMaterial(),
+        getPosition(450 + offset, 310, -640 + offset),
+        this.defaultConfig
+      );
+      this.addToWorld(longMazeWall);
+    }
+
+    const secretShortCut = PlaneFactory.createPlane(
+      getDimensions(40, 1, 80),
+      this.material.getGlassMaterial(),
+      getPosition(510, 260, -680),
+      this.defaultConfig
+    );
+    this.addToWorld(secretShortCut);
 
     const mazeExit = PlaneFactory.createPlane(
       getDimensions(80, 40, 1),
