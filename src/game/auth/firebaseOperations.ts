@@ -1,14 +1,8 @@
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import type { IHighscore } from '../../shared/interfaces.js';
 import initFireBase from './initFirebase.js';
 initFireBase();
-
-interface IHighscore {
-  collectionName: string;
-  username: string;
-  time: number;
-  score?: number;
-}
 
 const firestore = firebase.firestore();
 
@@ -25,29 +19,24 @@ export const saveToFirebase = async (
   return res;
 };
 
-interface IHighScore {
-  username: string;
-  score: number;
-  time: number;
-}
-
-export function getScore(collection: string): Promise<IHighScore[]> {
+export function getScore(collection: string): Promise<IHighscore[]> {
   return firestore
     .collection(collection)
     .orderBy('score', 'desc')
     .orderBy('time', 'asc')
-    .limit(5)
+    .limit(3)
     .get()
     .then((querySnapshot) => {
-      const temp: IHighScore[] = [];
+      const temp: IHighscore[] = [];
       querySnapshot.forEach((doc) => {
         const { username, time, score } = doc.data();
-        const forageEntity: IHighScore = {
+        const highscore: IHighscore = {
+          collectionName: collection,
           username,
           score,
           time,
         };
-        temp.push(forageEntity);
+        temp.push(highscore);
       });
       return temp;
     });

@@ -30,7 +30,6 @@
 
 <main>
   {#if $GameStore.winnerName && $GameStore.world !== 'Zetxaru'}
-    <Highscore />
     <WinMenu on:restart={restartGame} />
   {/if}
   <canvas class="webgl" bind:this={canvas} />
@@ -39,11 +38,14 @@
     <JumpComponent />
     <BoostComponent />
   </section>
+  <ControllerComponent />
   <div class="menu">
     {#if !$GameStore.winnerName}
       <MenuButton />
     {/if}
-    <ControllerComponent />
+    {#if $GameStore.world !== 'Zetxaru'}
+      <Highscore />
+    {/if}
   </div>
 </main>
 

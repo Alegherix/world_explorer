@@ -45,3 +45,10 @@ export interface ITorusDimension {
   tubularSegments: number;
   arc: number;
 }
+
+export interface IHighscore {
+  collectionName: string;
+  username: string;
+  time: number;
+  score?: number;
+}
