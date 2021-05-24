@@ -4,6 +4,7 @@
   const handleMenu = () => {
     removeEventListeners();
     GameStore.update((store) => {
+      store.game.resetScene();
       return {
         ...store,
         boosts: 3,
@@ -11,6 +12,7 @@
         score: 0,
         elapsedTime: 0,
         world: null,
+        winnerName: null,
       };
     });
   };

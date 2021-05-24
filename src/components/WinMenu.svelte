@@ -1,7 +1,6 @@
 <script lang="ts">
   import MenuButton from './MenuButton.svelte';
   import GameStore from '../shared/GameStore';
-  import Game from './Game.svelte';
 
   import { createEventDispatcher } from 'svelte';
 
