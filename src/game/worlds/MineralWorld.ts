@@ -14,7 +14,6 @@ import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getCylinderDimensions, getTorusrDimensions, getPosition } from '../utils/utils';
-import SpriteText from 'three-spritetext';
 
 class MineralWorld extends Game {
   private scoreKeeper: ScoreKeeper;
@@ -253,10 +252,6 @@ class MineralWorld extends Game {
     firstBounceCorner.body.quaternion.copy(firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(firstBounceCorner);
 
-    const bounceText1 = new SpriteText('Bounce!', 5);
-    bounceText1.position.set(0, 15, -580);
-    this.scene.add(bounceText1);
-
     const secondStraight = PlaneFactory.createPlane(
       getDimensions(400, 40, 1),
       this.material.getGlassMaterial(),
@@ -270,8 +265,7 @@ class MineralWorld extends Game {
       getDimensions(40, 430, 1),
       this.material.getGlassMaterial(),
       getPosition(-440, 0 - 1, -385),
-      this.defaultConfig,
-      this.scoreKeeper
+      this.defaultConfig
     );
     this.addToWorld(ThirdStraight);
 
@@ -291,10 +285,6 @@ class MineralWorld extends Game {
     secondBounceCorner.mesh.rotateZ(Math.PI * 0.2);
     secondBounceCorner.body.quaternion.copy(secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
     this.addToWorld(secondBounceCorner);
-
-    const bounceText2 = new SpriteText('Bounce!', 5);
-    bounceText2.position.set(-440, 15, -585);
-    this.scene.add(bounceText2);
 
     const secondShortGlassWall = PlaneFactory.createPlane(
       getDimensions(40, 1, 20),
@@ -325,7 +315,8 @@ class MineralWorld extends Game {
       getDimensions(180, 40, 1),
       this.material.getGlassMaterial(),
       getPosition(-192, 80, -220),
-      this.defaultConfig
+      this.defaultConfig,
+      this.scoreKeeper
     );
     this.addToWorld(firstStraight);
 
@@ -475,52 +466,27 @@ class MineralWorld extends Game {
       getDimensions(100, 40, 1),
       this.material.getGlassMaterial(),
       getPosition(600, 219, -300),
-      this.iceTextureConfig
+      this.iceTextureConfig,
+      this.scoreKeeper
     );
     this.addToWorld(mazeEntrance);
 
-    const text = new SpriteText('Coin is king!', 6);
-    text.position.set(575, 250, -300);
-    this.scene.add(text);
-
-    const firstCorridor = PlaneFactory.createPlane(
-      getDimensions(40, 360, 1),
+    const entranceRamp = PlaneFactory.createPlane(
+      getDimensions(40, 20, 1),
       this.material.getGlassMaterial(),
-      getPosition(630, 219, -500),
-      this.defaultConfig,
-      this.scoreKeeper
+      getPosition(630, 225, -329),
+      this.iceTextureConfig
     );
-    this.addToWorld(firstCorridor);
+    PlaneFactory.slopePlaneUp(entranceRamp);
+    this.addToWorld(entranceRamp);
 
-    const secondCorridor = PlaneFactory.createPlane(
-      getDimensions(40, 360, 1),
+    const mazePlane = PlaneFactory.createPlane(
+      getDimensions(200, 360, 1),
       this.material.getGlassMaterial(),
-      getPosition(590, 219, -500),
-      this.defaultConfig,
-      this.scoreKeeper
-    );
-    this.addToWorld(secondCorridor);
-
-    for (let i = 1; i < 5; i++) {
-      const offset = i * 40;
-      const longMazeWall = PlaneFactory.createPlane(
-        getDimensions(120, 40, 1),
-        this.material.getGlassMaterial(),
-        getPosition(510, 219, -500 + offset),
-        this.defaultConfig,
-        this.scoreKeeper
-      );
-      this.addToWorld(longMazeWall);
-    }
-
-    const exitPlane = PlaneFactory.createPlane(
-      getDimensions(120, 200, 1),
-      this.material.getGlassMaterial(),
-      getPosition(510, 219, -580),
+      getPosition(550, 219, -500),
       this.defaultConfig
     );
-    this.addToWorld(exitPlane);
-    this.addToGui(exitPlane);
+    this.addToWorld(mazePlane);
 
     // First set of maze walls
     for (let i = 1; i < 3; i++) {
@@ -720,8 +686,7 @@ class MineralWorld extends Game {
       getDimensions(300, 20, 1),
       this.material.getGlassMaterial(),
       getPosition(-1030, 948, 0),
-      this.defaultConfig,
-      this.scoreKeeper
+      this.defaultConfig
     );
     this.addToWorld(fifthPlane);
 
