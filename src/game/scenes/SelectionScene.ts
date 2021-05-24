@@ -15,10 +15,7 @@ class SelectionScene extends BaseScene implements ISkybox {
   private intersects: THREE.Intersection[] = [];
   private selectedWorld: THREE.Mesh;
 
-  constructor(
-    protected canvas: HTMLCanvasElement,
-    private updatePlanetName: (planetName: string) => void
-  ) {
+  constructor(protected canvas: HTMLCanvasElement, private updatePlanetName: (planetName: string) => void) {
     super(canvas);
     this.updatePlanetName = updatePlanetName;
     this.cursor = new THREE.Vector2(-1, -1);
@@ -56,99 +53,22 @@ class SelectionScene extends BaseScene implements ISkybox {
   }
 
   createRockPlanet(x: number) {
-    const color = this.loader
-      .getTextureLoader()
-      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Color.jpg');
-    const normal = this.loader
-      .getTextureLoader()
-      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Normal.jpg');
-    const ao = this.loader
-      .getTextureLoader()
-      .load(
-        '/textures/rockPlanet/rockTextures/Rock012_1K_AmbientOcclusion.jpg'
-      );
-    const displacement = this.loader
-      .getTextureLoader()
-      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Displacement.jpg');
-    const roughness = this.loader
-      .getTextureLoader()
-      .load('/textures/rockPlanet/rockTextures/Rock012_1K_Roughness.jpg');
-    const emission = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Emission.jpg');
-
-    let configObject = {
-      map: color,
-      normalMap: normal,
-      aoMap: ao,
-      roughnessMap: roughness,
-      displacementMap: displacement,
-      displacementScale: 0.1,
-      emissiveMap: emission,
-      emissiveIntensity: 0.5,
-      emissive: 0x209316,
-    };
-
-    this.createPlanet(x, configObject, 'Morghol');
+    this.createPlanet(x, get(LoaderStore).loader.getMineralWorldConfig(), 'Morghol');
   }
 
   createLavaPlanet(x: number) {
-    this.createPlanet(
-      x,
-      get(LoaderStore).loader.getLavaWorldConfig(),
-      'Velknaz'
-    );
+    this.createPlanet(x, get(LoaderStore).loader.getLavaWorldConfig(), 'Velknaz');
   }
 
   createAlientPlanet(x: number) {
-    const color = this.loader
-      .getTextureLoader()
-      .load('/textures/alienPlanet/Chip006_1K_Color.jpg');
-    const emission = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Emission.jpg');
-    const displacement = this.loader
-      .getTextureLoader()
-      .load('/textures/alienPlanet/Chip006_1K_Displacement.jpg');
-    const metalness = this.loader
-      .getTextureLoader()
-      .load('/textures/alienPlanet/Chip006_1K_Metalness.jpg');
-    const normal = this.loader
-      .getTextureLoader()
-      .load('/textures/alienPlanet/Chip006_1K_Normal.jpg');
-    const roughness = this.loader
-      .getTextureLoader()
-      .load('/textures/alienPlanet/Chip006_1K_Roughness.jpg');
-
-    let configObject = {
-      map: color,
-      normalMap: normal,
-      roughnessMap: roughness,
-      displacementMap: displacement,
-      displacementScale: 0.1,
-      emissiveMap: emission,
-      emissiveIntensity: 0.7,
-      emissive: 0x209316,
-      metalnessMap: metalness,
-      metalness: 0.3,
-    };
-
-    this.createPlanet(x, configObject, 'Zetxaru');
+    this.createPlanet(x, get(LoaderStore).loader.getMultiPlayerWorldConfig(), 'Zetxaru');
   }
 
-  createPlanet(
-    x: number,
-    materialConfig: any,
-    name: GameWorld,
-    material?: THREE.MeshStandardMaterial
-  ) {
+  createPlanet(x: number, materialConfig: any, name: GameWorld, material?: THREE.MeshStandardMaterial) {
     const geometry = new THREE.SphereBufferGeometry(50, 128, 128);
     if (!material) material = new THREE.MeshStandardMaterial(materialConfig);
     const planet = new THREE.Mesh(geometry, material);
-    planet.geometry.setAttribute(
-      'uv2',
-      new THREE.Float32BufferAttribute(planet.geometry.attributes.uv.array, 2)
-    );
+    planet.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(planet.geometry.attributes.uv.array, 2));
     planet.name = name;
     planet.position.set(x, 0, -20);
 
@@ -163,9 +83,7 @@ class SelectionScene extends BaseScene implements ISkybox {
   }
 
   getPlanets(): THREE.Mesh[] {
-    return this.scene.children.filter(
-      (obj) => obj.name.length > 4
-    ) as THREE.Mesh[];
+    return this.scene.children.filter((obj) => obj.name.length > 4) as THREE.Mesh[];
   }
 
   tick(): void {

@@ -14,6 +14,7 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
+import SpriteText from 'three-spritetext';
 
 import LoaderStore from '../../shared/LoaderStore';
 
@@ -111,8 +112,7 @@ class LavaWorld extends Game {
       this.addToWorld(firstWall);
     }
 
-    // this.scoreKeeper.createPrize(1016, 2015, -690);
-    this.scoreKeeper.createPrize(0, 10, -100);
+    this.scoreKeeper.createPrize(1016, 2015, -690);
   }
 
   createStartingZone() {
@@ -304,6 +304,10 @@ class LavaWorld extends Game {
       this.bouncePadConfig
     );
     this.addToWorld(bouncePlate);
+
+    const text = new SpriteText('Bounce', 12);
+    text.position.set(3395, 300, -470);
+    this.scene.add(text);
   }
 
   createBounceWayToHeaven() {

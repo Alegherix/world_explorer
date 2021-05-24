@@ -19,6 +19,7 @@ import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getCylinderDimensions, getDimensions, getPosition, getTorusrDimensions } from '../utils/utils';
+import LoaderStore from '../../shared/LoaderStore';
 
 class MultiplayerWorld extends Game {
   private userName: string;
@@ -28,7 +29,7 @@ class MultiplayerWorld extends Game {
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
   private defaultConfig: MeshStandardMaterialParameters;
-  private chipConfig: MeshStandardMaterialParameters;
+  private bouncePadConfig: MeshStandardMaterialParameters;
   private elapsedTime: number;
 
   constructor(
@@ -49,56 +50,20 @@ class MultiplayerWorld extends Game {
       '.png'
       // true
     );
+    this.bouncePadConfig = get(LoaderStore).loader.getMultiPlayerWorldBouncePad();
+    this.defaultConfig = get(LoaderStore).loader.getMultiPlayerWorldPlaneConfig();
 
     this.userName = get(Gamestore).username;
     // this.socket = io('ws://localhost:8000').connect();
     this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
     this.activeGamePieces = [];
 
-    this.initializeTextures();
     this.listenForEvents();
     this.createStartingZone();
     this.createGameMap();
     this.createPlayer(this.userName);
     this.createFinishZone();
     this.world.gravity.set(0, -80, 0);
-  }
-
-  initializeTextures() {
-    // Metal Textures
-    const loader = this.loader.getTextureLoader();
-    const metalColor = loader.load('/textures/metalPlate/MetalPlates006_1K_Color.jpg');
-    const metalNormal = loader.load('/textures/metalPlate/MetalPlates006_1K_Normal.jpg');
-    const metalDisplacement = loader.load('/textures/metalPlate/MetalPlates006_1K_Displacement.jpg');
-    const metalMetalness = loader.load('/textures/metalPlate/MetalPlates006_1K_Metalness.jpg');
-    const metalRoughness = loader.load('/textures/metalPlate/MetalPlates006_1K_Roughness.jpg');
-
-    this.defaultConfig = {
-      opacity: 0.7,
-      transparent: true,
-      map: metalColor,
-      normalMap: metalNormal,
-      displacementMap: metalDisplacement,
-      roughnessMap: metalRoughness,
-      metalnessMap: metalMetalness,
-    };
-
-    // Chip Textures
-    const chipColor = loader.load('/textures/alienPlanet/Chip006_1K_Color.jpg');
-    const chipNormal = loader.load('/textures/alienPlanet/Chip006_1K_Normal.jpg');
-    const chipDisplacement = loader.load('/textures/alienPlanet/Chip006_1K_Displacement.jpg');
-    const chipMetalness = loader.load('/textures/alienPlanet/Chip006_1K_Metalness.jpg');
-    const chipRoughness = loader.load('/textures/alienPlanet/Chip006_1K_Roughness.jpg');
-
-    this.chipConfig = {
-      opacity: 0.8,
-      transparent: true,
-      map: chipColor,
-      normalMap: chipNormal,
-      displacementMap: chipDisplacement,
-      roughnessMap: chipRoughness,
-      metalnessMap: chipMetalness,
-    };
   }
 
   // Run all game related Logic inside here
@@ -286,7 +251,7 @@ class MultiplayerWorld extends Game {
     );
     this.addToWorld(plane);
 
-    const text = new SpriteText('Break!', 12);
+    const text = new SpriteText('Break', 12);
     text.position.set(0, 150, -1150);
     this.scene.add(text);
 
@@ -316,7 +281,7 @@ class MultiplayerWorld extends Game {
         getDimensions(250, 20, 20),
         this.material.getGlassMaterial(),
         getPosition(-300 - offset, 287, -1200),
-        this.chipConfig
+        this.bouncePadConfig
       );
       trap.movementType = {
         start: 'sin',
@@ -333,7 +298,7 @@ class MultiplayerWorld extends Game {
       getDimensions(200, 200, 1),
       this.material.getAdamantineMaterial(),
       getPosition(-1650, 200, -1200),
-      this.chipConfig
+      this.bouncePadConfig
     );
     bouncePlate.movementType = {
       start: 'sin',
@@ -376,7 +341,7 @@ class MultiplayerWorld extends Game {
       getDimensions(20, 250, 40),
       this.material.getGlassMaterial(),
       getPosition(-4570, 650, -1200),
-      this.chipConfig
+      this.bouncePadConfig
     );
     PlaneFactory.slopePlaneUpRight(downObstacleOne);
     downObstacleOne.mesh.rotation.z = Math.PI / 0.5;
@@ -394,7 +359,7 @@ class MultiplayerWorld extends Game {
       getDimensions(20, 250, 40),
       this.material.getGlassMaterial(),
       getPosition(-5000, 650, -1200),
-      this.chipConfig
+      this.bouncePadConfig
     );
     PlaneFactory.slopePlaneUpRight(downObstacleTwo);
     downObstacleTwo.mesh.rotation.z = Math.PI / 0.5;
@@ -418,7 +383,7 @@ class MultiplayerWorld extends Game {
     );
     this.addToWorld(loopEntry);
 
-    const text = new SpriteText('Boost!');
+    const text = new SpriteText('Boost');
     text.position.set(-5300, 325, -1200);
     this.scene.add(text);
 
@@ -498,7 +463,7 @@ class MultiplayerWorld extends Game {
         getDimensions(200, 100, 1),
         this.material.getAdamantineMaterial(),
         getPosition(-7200, 700, 1400 + index * spaceBetweenBouncePlates),
-        this.chipConfig
+        this.bouncePadConfig
       );
       bouncePlate.movementType = {
         start: direction,
@@ -533,7 +498,7 @@ class MultiplayerWorld extends Game {
         getTorusrDimensions(250, 3, 18, 18, 1.65),
         this.material.getGlassMaterial(),
         getPosition(-7070, 252 + offset, 5080),
-        this.chipConfig
+        this.bouncePadConfig
       );
 
       corner.mesh.rotateX(-Math.PI * 0.5);
@@ -569,7 +534,7 @@ class MultiplayerWorld extends Game {
         getDimensions(250, 125, 1),
         this.material.getAdamantineMaterial(),
         getPosition(-5700 + index * xOffset, 150 + index * spaceBetweenBouncePlates, 5208),
-        this.chipConfig
+        this.bouncePadConfig
       );
       PlaneFactory.slopePlaneUpRight(bouncePlate);
       this.addToWorld(bouncePlate);
@@ -583,7 +548,7 @@ class MultiplayerWorld extends Game {
         getDimensions(250, 125, 1),
         this.material.getAdamantineMaterial(),
         getPosition(-6250 - index * xOffset, 300 + index * spaceBetweenBouncePlates, 5208),
-        this.chipConfig
+        this.bouncePadConfig
       );
       PlaneFactory.slopePlaneUpLeft(bouncePlate);
       this.addToWorld(bouncePlate);
@@ -605,7 +570,7 @@ class MultiplayerWorld extends Game {
         getTorusrDimensions(250, 3, 18, 18, 1.65),
         this.material.getGlassMaterial(),
         getPosition(-4453, 1250 + offset, 5080),
-        this.chipConfig
+        this.bouncePadConfig
       );
 
       firstCorner.mesh.rotateX(Math.PI * 0.5);
@@ -628,7 +593,7 @@ class MultiplayerWorld extends Game {
         getTorusrDimensions(250, 3, 18, 18, 1.65),
         this.material.getGlassMaterial(),
         getPosition(-4196, 1250 + offset, 4537),
-        this.chipConfig
+        this.bouncePadConfig
       );
 
       secondCorner.mesh.rotateX(Math.PI * 0.5);
@@ -655,7 +620,7 @@ class MultiplayerWorld extends Game {
         getDimensions(60, 200, 50),
         this.material.getGlassMaterial(),
         getPosition(-3600 + index * spaceBetweenObstacles, 1275, 4408),
-        this.chipConfig
+        this.bouncePadConfig
       );
       obstacleBox.movementType = {
         start: direction,
@@ -675,7 +640,7 @@ class MultiplayerWorld extends Game {
         getDimensions(10, 250, 60),
         this.material.getGlassMaterial(),
         getPosition(-2100 + index * spaceBetweenObstacles, 1275, 4408),
-        this.chipConfig
+        this.bouncePadConfig
       );
       obstaclePlane.movementType = {
         start: direction,
@@ -695,7 +660,7 @@ class MultiplayerWorld extends Game {
         getCylinderDimensions(20, 20, 80, 20),
         this.material.getGlassMaterial(),
         getPosition(-1200 + index * spaceBetweenObstacles, 1275, 4290 + index * 15),
-        this.chipConfig
+        this.bouncePadConfig
       );
       obstacleCylinder.movementType = {
         start: direction,
@@ -715,7 +680,7 @@ class MultiplayerWorld extends Game {
         getCylinderDimensions(20, 20, 80, 20),
         this.material.getGlassMaterial(),
         getPosition(-1400 + index * spaceBetweenObstacles, 1275, 4530 - index * 20),
-        this.chipConfig
+        this.bouncePadConfig
       );
       obstacleCylinder.movementType = {
         start: direction,
@@ -735,7 +700,7 @@ class MultiplayerWorld extends Game {
         getCylinderDimensions(20, 20, 80, 20),
         this.material.getGlassMaterial(),
         getPosition(-1200 + index * spaceBetweenObstacles, 1275, 4420),
-        this.chipConfig
+        this.bouncePadConfig
       );
       obstacleCylinder.movementType = {
         start: direction,
