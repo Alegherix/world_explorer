@@ -111,7 +111,8 @@ class LavaWorld extends Game {
       this.addToWorld(firstWall);
     }
 
-    this.scoreKeeper.createPrize(1016, 2015, -690);
+    // this.scoreKeeper.createPrize(1016, 2015, -690);
+    this.scoreKeeper.createPrize(0, 10, -100);
   }
 
   createStartingZone() {

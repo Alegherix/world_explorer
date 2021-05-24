@@ -55,6 +55,10 @@ abstract class Game implements ISkybox {
       .load(`textures/playerTextures/${playerTextureName}`);
     this.createSkybox(skyboxFolderName, skyboxExtension);
 
+    // GameStore.update((store) => {
+    //   return { ...store, game: this };
+    // });
+
     addKeyEvents();
   }
 

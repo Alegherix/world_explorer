@@ -170,8 +170,6 @@ class SelectionScene extends BaseScene implements ISkybox {
 
   tick(): void {
     requestAnimationFrame(() => {
-      this.stats.begin();
-
       const elapsedTime = this.clock.getElapsedTime();
       this.raycaster.setFromCamera(this.cursor, this.worldCamera);
       this.intersects = this.raycaster.intersectObjects(this.getPlanets());
@@ -201,7 +199,6 @@ class SelectionScene extends BaseScene implements ISkybox {
       }
 
       this.renderer.render(this.scene, this.worldCamera);
-      this.stats.end();
 
       this.tick();
     });

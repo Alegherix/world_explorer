@@ -9,21 +9,21 @@
   import SinglePlayerCounter from './SinglePlayerCounter.svelte';
   import WinMenu from './WinMenu.svelte';
 
-  let canvas;
-  let gameScene: GameScene;
+  let canvas: HTMLCanvasElement;
 
   onMount(() => {
-    if (!gameScene) {
-      gameScene = new GameScene(canvas, $GameStore.world);
+    if (!$GameStore.game) {
+      $GameStore.game = new GameScene(canvas, $GameStore.world);
     }
   });
 
   onDestroy(() => {
-    gameScene = null;
+    $GameStore.game = null;
   });
 
   const restartGame = () => {
-    gameScene = new GameScene(canvas, $GameStore.world);
+    $GameStore.game.resetScene();
+    $GameStore.game.resetGame();
   };
 </script>
 
