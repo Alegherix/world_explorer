@@ -24,3 +24,31 @@ export const saveToFirebase = async (
   });
   return res;
 };
+
+interface IHighScore {
+  username: string;
+  score: number;
+  time: number;
+}
+
+export function getScore(collection: string): Promise<IHighScore[]> {
+  return firestore
+    .collection(collection)
+    .orderBy('score', 'desc')
+    .orderBy('time', 'asc')
+    .limit(5)
+    .get()
+    .then((querySnapshot) => {
+      const temp: IHighScore[] = [];
+      querySnapshot.forEach((doc) => {
+        const { username, time, score } = doc.data();
+        const forageEntity: IHighScore = {
+          username,
+          score,
+          time,
+        };
+        temp.push(forageEntity);
+      });
+      return temp;
+    });
+}

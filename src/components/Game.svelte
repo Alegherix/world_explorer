@@ -4,6 +4,7 @@
   import GameStore from '../shared/GameStore';
   import BoostComponent from './BoostComponent.svelte';
   import ControllerComponent from './ControllerComponent.svelte';
+  import Highscore from './Highscore.svelte';
   import JumpComponent from './JumpComponent.svelte';
   import MenuButton from './MenuButton.svelte';
   import SinglePlayerCounter from './SinglePlayerCounter.svelte';
@@ -29,6 +30,7 @@
 
 <main>
   {#if $GameStore.winnerName && $GameStore.world !== 'Zetxaru'}
+    <Highscore />
     <WinMenu on:restart={restartGame} />
   {/if}
   <canvas class="webgl" bind:this={canvas} />
