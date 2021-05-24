@@ -6,6 +6,7 @@ import {
   OctahedronBufferGeometry,
 } from 'three';
 import GameStore from '../../shared/GameStore';
+import { saveToFirebase } from '../auth/firebaseOperations';
 
 class ScoreKeeper {
   private geometry: CylinderBufferGeometry;
@@ -58,7 +59,17 @@ class ScoreKeeper {
   private haveWon(player: Mesh) {
     if (this.prize.position.distanceTo(player.position) < 10) {
       this.scene.remove(this.prize);
+
       GameStore.update((store) => {
+        if (!store.winnerName) {
+          saveToFirebase({
+            collectionName: store.world,
+            time: store.elapsedTime,
+            username: player.name,
+            score: store.score,
+          });
+        }
+
         return { ...store, winnerName: player.name };
       });
     }

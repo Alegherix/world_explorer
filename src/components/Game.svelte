@@ -4,31 +4,33 @@
   import GameStore from '../shared/GameStore';
   import BoostComponent from './BoostComponent.svelte';
   import ControllerComponent from './ControllerComponent.svelte';
+  import Highscore from './Highscore.svelte';
   import JumpComponent from './JumpComponent.svelte';
   import MenuButton from './MenuButton.svelte';
   import SinglePlayerCounter from './SinglePlayerCounter.svelte';
   import WinMenu from './WinMenu.svelte';
 
-  let canvas;
-  let gameScene: GameScene;
+  let canvas: HTMLCanvasElement;
 
   onMount(() => {
-    if (!gameScene) {
-      gameScene = new GameScene(canvas, $GameStore.world);
+    if (!$GameStore.game) {
+      $GameStore.game = new GameScene(canvas, $GameStore.world);
     }
   });
 
   onDestroy(() => {
-    gameScene = null;
+    $GameStore.game = null;
   });
 
   const restartGame = () => {
-    gameScene = new GameScene(canvas, $GameStore.world);
+    $GameStore.game.resetScene();
+    $GameStore.game.resetGame();
   };
 </script>
 
 <main>
   {#if $GameStore.winnerName && $GameStore.world !== 'Zetxaru'}
+    <Highscore />
     <WinMenu on:restart={restartGame} />
   {/if}
   <canvas class="webgl" bind:this={canvas} />

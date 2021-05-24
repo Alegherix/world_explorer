@@ -2,7 +2,6 @@
  * @desc Used for creating the Base scene which the SelectionScene & GameScene extends their shared properties from.
  */
 
-import Stats from 'stats.js';
 import * as THREE from 'three';
 import Loader from '../utils/Loader';
 
@@ -16,24 +15,16 @@ abstract class BaseScene {
   protected clock: THREE.Clock;
   protected renderer: THREE.WebGLRenderer;
 
-  // Stricly for debugging
-  protected stats;
-
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.clock = new THREE.Clock();
     this.previousElapsedTime = 0;
     this.loader = new Loader();
-    this.scene = new THREE.Scene();
-    this.scene.receiveShadow = true;
 
     this.initRenderer();
     this.initCamera();
-    this.initLights();
+    this.initScene();
 
-    this.stats = new Stats();
-    this.stats.showPanel(0);
-    document.body.appendChild(this.stats.dom);
     window.addEventListener('resize', () => this.onWindowResize(), false);
   }
 
@@ -75,6 +66,12 @@ abstract class BaseScene {
 
     const ambientLight = new THREE.AmbientLight(0x404040);
     this.scene.add(ambientLight);
+  }
+
+  protected initScene() {
+    this.scene = new THREE.Scene();
+    this.scene.receiveShadow = true;
+    this.initLights();
   }
 
   onWindowResize() {

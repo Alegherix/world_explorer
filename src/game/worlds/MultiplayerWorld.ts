@@ -3,35 +3,33 @@
  */
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
+import cannonDebugger from 'cannon-es-debugger';
 import { io, Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
-import type { MeshStandardMaterialParameters, Vector3 } from 'three';
+import type { MeshStandardMaterialParameters, Object3D, Vector3 } from 'three';
 import * as THREE from 'three';
-import type {
-  IActivePlayer,
-  IGamePiece,
-} from '../../shared/frontendInterfaces';
+import SpriteText from 'three-spritetext';
+import type { IActivePlayer } from '../../shared/frontendInterfaces';
 import Gamestore from '../../shared/GameStore';
 import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
 import PlaneFactory from '../components/Plane';
 import PlatformFactory from '../components/Platform';
+import ScoreKeeper from '../components/ScoreKeeper';
 import TubeFactory from '../components/Tube';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
-import ThirdPersonCamera from '../utils/ThirdPersonCamera';
 import {
+  getCylinderDimensions,
   getDimensions,
   getPosition,
-  getCylinderDimensions,
   getTorusrDimensions,
 } from '../utils/utils';
-import cannonDebugger from 'cannon-es-debugger';
-import ScoreKeeper from '../components/ScoreKeeper';
 
 class MultiplayerWorld extends Game {
   private userName: string;
   private socket: Socket;
+  private sprites: Object3D[] = [];
 
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
@@ -132,15 +130,6 @@ class MultiplayerWorld extends Game {
   // Run all game related Logic inside here
   runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
-
-    // for (const gamePiece of this.activeGamePieces) {
-    //   this.move(gamePiece, this.elapsedTime);
-    // }
-
-    // for (const obstacle of this.movingPieces) {
-    //   this.rotate(obstacle, this.elapsedTime);
-    // }
-
     this.elapsedTime = new Date().getTime() / 1000;
 
     this.sendCurrentGameState();
@@ -822,19 +811,19 @@ class MultiplayerWorld extends Game {
 
   listenForEvents() {
     this.socket.on('connect', () => {
-      console.log('Connected');
-
       this.socket.emit('userConnected', { username: this.userName });
     });
 
     this.socket.on(SocketEvent.USER_CONNECTED, ({ username, id }) => {
       this.spawnOtherPlayers(username, id);
+      this.addSprite(username);
     });
 
     this.socket.on(
       SocketEvent.CURRENT_USERS,
       (activePlayers: IActivePlayer[]) => {
         this.spawnExistingPlayers(activePlayers);
+        activePlayers.forEach((player) => this.addSprite(player.username));
       }
     );
 
@@ -884,6 +873,7 @@ class MultiplayerWorld extends Game {
     for (let index = 0; index < this.activeGamePieces.length; index++) {
       const gamepiece = this.activeGamePieces[index];
       if (gamepiece.mesh.userData.clientId === id) {
+        this.scene.remove(this.findSprite(gamepiece.mesh.name));
         this.activeGamePieces.splice(index, 1);
         this.scene.remove(gamepiece.mesh);
         this.world.removeBody(gamepiece.body);
@@ -926,9 +916,35 @@ class MultiplayerWorld extends Game {
           pieceToUpdate.body.position.copy(
             pieceToUpdate.mesh.position as unknown as Vec3
           );
+
+          const spriteToUpdate = this.sprites.find(
+            (elem) => elem.userData.spriteName === pieceToUpdate.mesh.name
+          );
+
+          if (spriteToUpdate) {
+            spriteToUpdate.position.set(
+              position.x,
+              position.y + 15,
+              position.z
+            );
+          }
         }
       }
     });
+  }
+
+  addSprite(username: string) {
+    const spriteText = new SpriteText(username);
+    spriteText.scale.set(22.5, 5, 0);
+    spriteText.userData.spriteName = username;
+    this.sprites.push(spriteText);
+    this.scene.add(spriteText);
+  }
+
+  findSprite(username: string) {
+    return this.sprites.find(
+      (sprite) => (sprite.userData.spriteName = username)
+    );
   }
 }
 
