@@ -4,6 +4,6 @@
 <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(36.5 20) rotate(90) scale(18 31.5)">
 <stop stop-color="white"/>
 <stop offset="1" stop-color="#283C70"/>
-</radialGradient>
+</radialGradient> 
 </defs>
 </svg>

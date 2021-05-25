@@ -23,6 +23,11 @@
     display: flex;
     flex-direction: column;
     width: 250px;
+    margin-bottom: 1.5rem;
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 5;
   }
 
   .move {

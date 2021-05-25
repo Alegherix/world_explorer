@@ -14,6 +14,9 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
+import SpriteText from 'three-spritetext';
+
+import LoaderStore from '../../shared/LoaderStore';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
@@ -27,41 +30,13 @@ class LavaWorld extends Game {
     material: Material,
     camera: THREE.PerspectiveCamera
   ) {
-    super(
-      scene,
-      world,
-      loader,
-      material,
-      camera,
-      'lava.jpg',
-      'lava',
-      '.png'
-      // true
-    );
-    // cannonDebugger(this.scene, this.world.bodies);
+    super(scene, world, loader, material, camera, 'lava.jpg', 'lava', '.png');
+    this.bouncePadConfig = get(LoaderStore).loader.getLavaWorldBouncepad();
+    this.defaultConfig = get(LoaderStore).loader.getLavaWorldPlaneConfig();
     this.scoreKeeper = new ScoreKeeper(this.scene);
     this.createStartingZone();
     this.createGameMap();
     this.createFinishZone();
-  }
-
-  initializeTextures() {
-    const loader = this.loader.getTextureLoader();
-    const map = loader.load('/textures/lavaPlanet/MP_color.jpg');
-    const normal = loader.load('/textures/lavaPlanet/MP_normal.jpg');
-    const displacement = loader.load('/textures/lavaPlanet/MP_height.png');
-    const ambientocclusion = loader.load('/textures/lavaPlanet/MP_ao.jpg');
-    const metallic = loader.load('/textures/lavaPlanet/MP_metallic.jpg');
-    const roughness = loader.load('/textures/lavaPlanet/MP_roughness.jpg');
-
-    this.bouncePadConfig = {
-      map,
-      normalMap: normal,
-      displacementMap: displacement,
-      aoMap: ambientocclusion,
-      roughnessMap: roughness,
-      metalnessMap: metallic,
-    };
   }
 
   // Run all game related Logic inside here
@@ -141,57 +116,21 @@ class LavaWorld extends Game {
   }
 
   createStartingZone() {
-    this.initializeTextures();
     this.createPlayer(get(GameStore).username);
     this.createStartingPlane();
     new Ramp(this.world, this.scene, this.material);
   }
 
   createStartingPlane() {
-    const map = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Color.jpg');
-    const emissiveMap = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Emission.jpg');
-    const displacementMap = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Displacement.jpg');
-    const normalMap = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Normal.jpg');
-    const roughnessMap = this.loader
-      .getTextureLoader()
-      .load('/textures/lavaPlanet/Lava004_1K_Roughness.jpg');
-
     const basePlane: IDimension = { width: 200, height: 200, depth: 0.1 };
     const { mesh, body } = PlaneFactory.createPlane(
       basePlane,
       this.material.getRockMaterial(),
       { x: 0, y: 0, z: 0 },
-      {
-        map,
-        roughnessMap,
-        normalMap,
-        displacementMap,
-        displacementScale: 1.1,
-        emissiveMap,
-        emissiveIntensity: 2,
-      }
+      this.bouncePadConfig
     );
     this.scene.add(mesh);
     this.world.addBody(body);
-    this.defaultConfig = {
-      map,
-      roughnessMap,
-      normalMap,
-      displacementMap,
-      displacementScale: 1.1,
-      emissiveMap,
-      emissiveIntensity: 2,
-      transparent: true,
-      opacity: 0.6,
-    };
   }
 
   createStairs() {
@@ -365,6 +304,10 @@ class LavaWorld extends Game {
       this.bouncePadConfig
     );
     this.addToWorld(bouncePlate);
+
+    const text = new SpriteText('Bounce', 12);
+    text.position.set(3395, 300, -470);
+    this.scene.add(text);
   }
 
   createBounceWayToHeaven() {

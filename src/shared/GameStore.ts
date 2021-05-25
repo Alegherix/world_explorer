@@ -1,6 +1,8 @@
 import { v4 } from 'uuid';
 import { writable } from 'svelte/store';
 import type { GameWorld } from './frontendInterfaces';
+import type Game from '../game/Game';
+import type GameScene from '../game/scenes/GameScene';
 
 interface IScore {
   username: string;
@@ -10,6 +12,7 @@ interface IScore {
   boosts: number;
   jumps: number;
   winnerName: string;
+  game: GameScene;
 }
 
 const GameStore = writable<IScore>({
@@ -20,6 +23,7 @@ const GameStore = writable<IScore>({
   boosts: 3,
   jumps: 4,
   winnerName: null,
+  game: null,
 });
 
 export default GameStore;

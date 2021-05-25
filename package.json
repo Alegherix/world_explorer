@@ -13,6 +13,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-replace": "^2.4.2",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^1.0.10",
     "@types/cannon": "^0.1.5",
@@ -22,6 +23,7 @@
     "@types/three": "^0.127.1",
     "add": "^2.0.6",
     "cannon-es-debugger": "^0.1.2",
+    "dotenv": "^9.0.2",
     "playwright": "^1.11.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
@@ -40,6 +42,7 @@
   "dependencies": {
     "cannon-es": "^0.17.0",
     "dat.gui": "^0.7.7",
+    "firebase": "^8.6.1",
     "sirv-cli": "^1.0.0",
     "socket.io-client": "^4.1.1",
     "three": "^0.128.0",

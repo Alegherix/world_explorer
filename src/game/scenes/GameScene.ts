@@ -2,6 +2,7 @@
  * @desc Used for creating the Game Scene, which is the scene which makes sure to render the actual game play inside
  */
 import * as CANNON from 'cannon-es';
+import { Clock } from 'three';
 import type { GameWorld } from '../../shared/frontendInterfaces';
 import type Game from '../Game';
 import Material from '../utils/Materials';
@@ -77,7 +78,6 @@ class GameScene extends BaseScene {
 
   tick(): void {
     requestAnimationFrame(() => {
-      this.stats.begin();
       this.renderer.render(this.scene, this.worldCamera);
 
       // Time calculations to figure out time since last tick
@@ -85,10 +85,21 @@ class GameScene extends BaseScene {
       const timeDelta = elapsedTime - this.previousElapsedTime;
       this.previousElapsedTime = elapsedTime;
 
-      this.game.runGameLoop(timeDelta, elapsedTime);
-      this.stats.end();
+      this.game?.runGameLoop(timeDelta, elapsedTime);
       this.tick();
     });
+  }
+
+  resetGame() {
+    this.createGameWorld();
+  }
+
+  // Should be called when resetting the scene, to keep some objects, and dispose of others.
+  resetScene() {
+    this.game = null;
+    this.clock = new Clock();
+    this.initScene();
+    this.createPhysicsWorld();
   }
 }
 
