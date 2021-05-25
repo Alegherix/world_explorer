@@ -22,6 +22,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    console.log('Recived a disconnect event from ', socket.id);
+
     gameServer.removeSocket(socket.id);
   });
 

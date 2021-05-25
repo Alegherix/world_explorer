@@ -3,6 +3,8 @@
   import SigninScreen from './SigninScreen.svelte';
   import WorldSelectionSelector from './WorldSelectionSelector.svelte';
   import GameStore from '../shared/GameStore';
+
+  $: document.title = $GameStore.world ?? 'World Explorer';
 </script>
 
 <svelte:head>
