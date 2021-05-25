@@ -7,7 +7,6 @@ interface ISocket {
   disconnectSocket: () => void;
 }
 
-// GLÖM EJ ÄNDRA IFRÅN LOCALHOST TILL HEROKU
 let socket: Socket;
 
 const connectSocket = (): Socket => {
@@ -20,7 +19,7 @@ const isConnected = (): boolean => {
 };
 
 const disconnectSocket = () => {
-  socket.disconnect();
+  socket?.disconnect();
 };
 
 const LoaderStore = writable<ISocket>({
