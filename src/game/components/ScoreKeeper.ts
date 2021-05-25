@@ -5,6 +5,7 @@ import {
   MeshPhongMaterial,
   OctahedronBufferGeometry,
 } from 'three';
+import type { IGamePiece } from '../../shared/frontendInterfaces';
 import GameStore from '../../shared/GameStore';
 import { saveToFirebase } from '../auth/firebaseOperations';
 
@@ -72,6 +73,19 @@ class ScoreKeeper {
 
         return { ...store, winnerName: player.name };
       });
+    }
+  }
+
+  // Make player teleport to spawn
+  watchWinInMultiplayer(gamePiece: IGamePiece) {
+    if (this.prize.position.distanceTo(gamePiece.mesh.position) < 10) {
+      gamePiece.body.position.set(
+        (0.5 - Math.random()) * 400,
+        150,
+        (0.5 - Math.random()) * 400
+      );
+      gamePiece.body.angularVelocity.set(0, 0, 0);
+      gamePiece.body.velocity.set(0, 0, 0);
     }
   }
 

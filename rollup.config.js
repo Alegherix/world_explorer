@@ -54,6 +54,7 @@ export default {
       },
     }),
     replace({
+      preventAssignment: true,
       API_KEY: JSON.stringify(process.env.API_KEY),
       AUTH_DOMAIN: JSON.stringify(process.env.AUTH_DOMAIN),
       PROJECT_ID: JSON.stringify(process.env.PROJECT_ID),

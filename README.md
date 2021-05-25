@@ -55,6 +55,7 @@ This game was created using:
 - [#25 - Bug fixes with menu and sprites.](https://github.com/Alegherix/world_explorer/pull/25)
 - [#26 - Fixed an issue with disconnect being called on undefined client.](https://github.com/Alegherix/world_explorer/pull/26)
 - [#27 - Removed debugger DatGUI and updated README.](https://github.com/Alegherix/world_explorer/pull/27)
+- [#28 - Added respawn whenever user takes prize in multiplayer.](https://github.com/Alegherix/world_explorer/pull/28)
 </details>
 
 <br>
