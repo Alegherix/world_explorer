@@ -31,7 +31,7 @@ class MultiplayerWorld extends Game {
   private userName: string;
   private socket: Socket;
   private sprites: Object3D[] = [];
-  private elapsedTime: number;
+  private scoreKeeper: ScoreKeeper;
 
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
@@ -55,12 +55,13 @@ class MultiplayerWorld extends Game {
       'mineral.jpg',
       'alien',
       '.png'
-      // true
     );
     this.bouncePadConfig =
       get(LoaderStore).loader.getMultiPlayerWorldBouncePad();
     this.defaultConfig =
       get(LoaderStore).loader.getMultiPlayerWorldPlaneConfig();
+
+    this.scoreKeeper = new ScoreKeeper(this.scene);
 
     this.userName = get(Gamestore).username;
     this.socket = get(SocketStore).connectSocket();
@@ -77,10 +78,10 @@ class MultiplayerWorld extends Game {
   // Run all game related Logic inside here
   runGameLoop(timeDelta: number, elapsedTime: number) {
     if (!this.useOrbitCamera) this.gameCamera.update();
-    this.elapsedTime = new Date().getTime() / 1000;
+    this.scoreKeeper.watchWinInMultiplayer(this.currentGamePiece);
 
     this.sendCurrentGameState();
-    this.runGameUpdates(timeDelta, elapsedTime, -50);
+    this.runGameUpdates(timeDelta, new Date().getTime() / 1000, -50);
   }
 
   // Mesh of starting zone
@@ -232,8 +233,7 @@ class MultiplayerWorld extends Game {
       this.addToWorld(wall);
     }
 
-    const scoreKeeper = new ScoreKeeper(this.scene);
-    scoreKeeper.createPrize(1950, 1265, 4410);
+    this.scoreKeeper.createPrize(1950, 1265, 4410);
   }
 
   createStartJump() {
