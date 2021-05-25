@@ -16,6 +16,8 @@ const port = process.env.PORT || 8000;
 const gameServer = new GameServer(io);
 
 io.on('connection', (socket) => {
+  console.log(Object.keys(io.sockets.sockets));
+
   socket.on('userConnected', (message: IConnected) => {
     gameServer.addSocket(socket, message.username);
     gameServer.broadcastIncomingUser(socket, message.username);

@@ -25,7 +25,6 @@ class GameScene extends BaseScene {
     this.tick();
   }
 
-  // To be used later
   createGameWorld() {
     switch (this.selectedWorld) {
       case 'Morghol':

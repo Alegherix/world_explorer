@@ -4,7 +4,8 @@
 import type * as CANNON from 'cannon-es';
 import { get } from 'svelte/store';
 import type { MeshStandardMaterialParameters } from 'three';
-import GameStore from '../../shared/GameStore';
+import SpriteText from 'three-spritetext';
+import LoaderStore from '../../shared/LoaderStore';
 import PlaneFactory from '../components/Plane';
 import Ramp from '../components/Ramp';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -14,9 +15,6 @@ import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
 import { getDimensions, getPosition } from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
-import SpriteText from 'three-spritetext';
-
-import LoaderStore from '../../shared/LoaderStore';
 
 class LavaWorld extends Game {
   private scoreKeeper: ScoreKeeper;
@@ -30,7 +28,17 @@ class LavaWorld extends Game {
     material: Material,
     camera: THREE.PerspectiveCamera
   ) {
-    super(scene, world, loader, material, camera, 'lava.jpg', 'lava', '.png');
+    super(
+      scene,
+      world,
+      loader,
+      material,
+      camera,
+      200,
+      'lava.jpg',
+      'lava',
+      '.png'
+    );
     this.bouncePadConfig = get(LoaderStore).loader.getLavaWorldBouncepad();
     this.defaultConfig = get(LoaderStore).loader.getLavaWorldPlaneConfig();
     this.scoreKeeper = new ScoreKeeper(this.scene);
@@ -44,7 +52,7 @@ class LavaWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-    this.runGameUpdates(timeDelta, elapsedTime, -450, 200);
+    this.runGameUpdates(timeDelta, elapsedTime, -450);
   }
 
   createGameMap() {
@@ -116,13 +124,17 @@ class LavaWorld extends Game {
   }
 
   createStartingZone() {
-    this.createPlayer(get(GameStore).username);
+    this.createPlayer();
     this.createStartingPlane();
     new Ramp(this.world, this.scene, this.material);
   }
 
   createStartingPlane() {
-    const basePlane: IDimension = { width: 200, height: 200, depth: 0.1 };
+    const basePlane: IDimension = {
+      width: this.width,
+      height: this.width,
+      depth: 0.1,
+    };
     const { mesh, body } = PlaneFactory.createPlane(
       basePlane,
       this.material.getRockMaterial(),

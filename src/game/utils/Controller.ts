@@ -120,8 +120,17 @@ const jump = () => {
   }
 };
 
-const replenishJump = () => {
-  const { jumps } = get(GameStore);
+const replenishMovements = () => {
+  const { boosts, jumps } = get(GameStore);
+
+  if (boosts < 3) {
+    const currentTime = new Date().getTime();
+    if (currentTime > currentGamePiece.mesh.userData.lastBoost + 5000) {
+      GameStore.update((val) => ({ ...val, boosts: val.boosts + 1 }));
+      currentGamePiece.mesh.userData.lastBoost = currentTime;
+    }
+  }
+
   if (jumps < 4) {
     const currentTime = new Date().getTime();
     if (currentTime > currentGamePiece.mesh.userData.lastJump + 5000) {
@@ -131,20 +140,7 @@ const replenishJump = () => {
   }
 };
 
-// replenish Boost every 5 sec
-const replenishBoost = () => {
-  const { boosts } = get(GameStore);
-  if (boosts < 3) {
-    const currentTime = new Date().getTime();
-    if (currentTime > currentGamePiece.mesh.userData.lastBoost + 5000) {
-      GameStore.update((val) => ({ ...val, boosts: val.boosts + 1 }));
-      currentGamePiece.mesh.userData.lastBoost = currentTime;
-    }
-  }
-};
-
 export const runController = () => {
   steer();
-  replenishBoost();
-  replenishJump();
+  replenishMovements();
 };

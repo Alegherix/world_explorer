@@ -18,7 +18,12 @@ import TubeFactory from '../components/Tube';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
-import { getCylinderDimensions, getDimensions, getPosition, getTorusrDimensions } from '../utils/utils';
+import {
+  getCylinderDimensions,
+  getDimensions,
+  getPosition,
+  getTorusrDimensions,
+} from '../utils/utils';
 import LoaderStore from '../../shared/LoaderStore';
 
 class MultiplayerWorld extends Game {
@@ -45,13 +50,16 @@ class MultiplayerWorld extends Game {
       loader,
       material,
       camera,
+      400,
       'mineral.jpg',
       'alien',
       '.png'
       // true
     );
-    this.bouncePadConfig = get(LoaderStore).loader.getMultiPlayerWorldBouncePad();
-    this.defaultConfig = get(LoaderStore).loader.getMultiPlayerWorldPlaneConfig();
+    this.bouncePadConfig =
+      get(LoaderStore).loader.getMultiPlayerWorldBouncePad();
+    this.defaultConfig =
+      get(LoaderStore).loader.getMultiPlayerWorldPlaneConfig();
 
     this.userName = get(Gamestore).username;
     // this.socket = io('ws://localhost:8000').connect();
@@ -61,7 +69,7 @@ class MultiplayerWorld extends Game {
     this.listenForEvents();
     this.createStartingZone();
     this.createGameMap();
-    this.createPlayer(this.userName);
+    this.createPlayer();
     this.createFinishZone();
     this.world.gravity.set(0, -80, 0);
   }
@@ -72,14 +80,17 @@ class MultiplayerWorld extends Game {
     this.elapsedTime = new Date().getTime() / 1000;
 
     this.sendCurrentGameState();
-    this.runGameUpdates(timeDelta, elapsedTime, -50, 400);
+    this.runGameUpdates(timeDelta, elapsedTime, -50);
   }
 
   // Mesh of starting zone
   createStartingZone() {
-    const planeWidth = 400;
-    const planeHeight = 400;
-    const planeGeometry = new THREE.PlaneBufferGeometry(planeWidth, planeHeight, 128, 128);
+    const planeGeometry = new THREE.PlaneBufferGeometry(
+      this.width,
+      this.width,
+      128,
+      128
+    );
     const planeMaterial = new THREE.MeshStandardMaterial(this.defaultConfig);
 
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -92,7 +103,9 @@ class MultiplayerWorld extends Game {
     plane.position.y = -0.2;
     this.scene.add(plane);
 
-    const floorShape = new CANNON.Box(new Vec3(planeWidth / 2, planeHeight / 2, 0.1));
+    const floorShape = new CANNON.Box(
+      new Vec3(this.width / 2, this.width / 2, 0.1)
+    );
     this.createBoundry(-1, 0, 0, 0, 0, 0, Math.PI * 0.5, floorShape);
 
     const wallProperties = [
@@ -345,7 +358,9 @@ class MultiplayerWorld extends Game {
     );
     PlaneFactory.slopePlaneUpRight(downObstacleOne);
     downObstacleOne.mesh.rotation.z = Math.PI / 0.5;
-    downObstacleOne.body.quaternion.copy(downObstacleOne.mesh.quaternion as unknown as CANNON.Quaternion);
+    downObstacleOne.body.quaternion.copy(
+      downObstacleOne.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     downObstacleOne.movementType = {
       start: 'sin',
       distance: 50,
@@ -363,7 +378,9 @@ class MultiplayerWorld extends Game {
     );
     PlaneFactory.slopePlaneUpRight(downObstacleTwo);
     downObstacleTwo.mesh.rotation.z = Math.PI / 0.5;
-    downObstacleTwo.body.quaternion.copy(downObstacleTwo.mesh.quaternion as unknown as CANNON.Quaternion);
+    downObstacleTwo.body.quaternion.copy(
+      downObstacleTwo.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     downObstacleTwo.movementType = {
       start: 'cos',
       distance: 75,
@@ -395,7 +412,9 @@ class MultiplayerWorld extends Game {
     );
     loopPartOne.mesh.rotateZ(-Math.PI * 0.5);
     loopPartOne.mesh.rotateY(Math.PI * 0.25);
-    loopPartOne.body.quaternion.copy(loopPartOne.mesh.quaternion as unknown as CANNON.Quaternion);
+    loopPartOne.body.quaternion.copy(
+      loopPartOne.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(loopPartOne);
 
     const loopPartTwo = TubeFactory.createCustomTube(
@@ -406,7 +425,9 @@ class MultiplayerWorld extends Game {
     );
     loopPartTwo.mesh.rotateZ(Math.PI * 0.5);
     loopPartTwo.mesh.rotateY(Math.PI * 0.25);
-    loopPartTwo.body.quaternion.copy(loopPartTwo.mesh.quaternion as unknown as CANNON.Quaternion);
+    loopPartTwo.body.quaternion.copy(
+      loopPartTwo.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(loopPartTwo);
 
     const loopExit = PlaneFactory.createPlane(
@@ -425,7 +446,9 @@ class MultiplayerWorld extends Game {
     );
     tube.mesh.rotateX(Math.PI * 0.5);
     tube.mesh.rotateZ(-Math.PI * 0.5);
-    tube.body.quaternion.copy(tube.mesh.quaternion as unknown as CANNON.Quaternion);
+    tube.body.quaternion.copy(
+      tube.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(tube);
 
     const ramp = PlaneFactory.createPlane(
@@ -503,7 +526,9 @@ class MultiplayerWorld extends Game {
 
       corner.mesh.rotateX(-Math.PI * 0.5);
       corner.mesh.rotateZ(-Math.PI * 0.525);
-      corner.body.quaternion.copy(corner.mesh.quaternion as unknown as CANNON.Quaternion);
+      corner.body.quaternion.copy(
+        corner.mesh.quaternion as unknown as CANNON.Quaternion
+      );
       this.addToWorld(corner);
     }
   }
@@ -533,7 +558,11 @@ class MultiplayerWorld extends Game {
       const bouncePlate = PlaneFactory.createPlane(
         getDimensions(250, 125, 1),
         this.material.getAdamantineMaterial(),
-        getPosition(-5700 + index * xOffset, 150 + index * spaceBetweenBouncePlates, 5208),
+        getPosition(
+          -5700 + index * xOffset,
+          150 + index * spaceBetweenBouncePlates,
+          5208
+        ),
         this.bouncePadConfig
       );
       PlaneFactory.slopePlaneUpRight(bouncePlate);
@@ -547,7 +576,11 @@ class MultiplayerWorld extends Game {
       const bouncePlate = PlaneFactory.createPlane(
         getDimensions(250, 125, 1),
         this.material.getAdamantineMaterial(),
-        getPosition(-6250 - index * xOffset, 300 + index * spaceBetweenBouncePlates, 5208),
+        getPosition(
+          -6250 - index * xOffset,
+          300 + index * spaceBetweenBouncePlates,
+          5208
+        ),
         this.bouncePadConfig
       );
       PlaneFactory.slopePlaneUpLeft(bouncePlate);
@@ -575,7 +608,9 @@ class MultiplayerWorld extends Game {
 
       firstCorner.mesh.rotateX(Math.PI * 0.5);
       firstCorner.mesh.rotateZ(Math.PI * 0.525);
-      firstCorner.body.quaternion.copy(firstCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+      firstCorner.body.quaternion.copy(
+        firstCorner.mesh.quaternion as unknown as CANNON.Quaternion
+      );
       this.addToWorld(firstCorner);
     }
 
@@ -598,7 +633,9 @@ class MultiplayerWorld extends Game {
 
       secondCorner.mesh.rotateX(Math.PI * 0.5);
       secondCorner.mesh.rotateZ(-Math.PI * 0.525);
-      secondCorner.body.quaternion.copy(secondCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+      secondCorner.body.quaternion.copy(
+        secondCorner.mesh.quaternion as unknown as CANNON.Quaternion
+      );
       this.addToWorld(secondCorner);
     }
   }
@@ -659,7 +696,11 @@ class MultiplayerWorld extends Game {
       const obstacleCylinder = PlatformFactory.createCylinderPlatform(
         getCylinderDimensions(20, 20, 80, 20),
         this.material.getGlassMaterial(),
-        getPosition(-1200 + index * spaceBetweenObstacles, 1275, 4290 + index * 15),
+        getPosition(
+          -1200 + index * spaceBetweenObstacles,
+          1275,
+          4290 + index * 15
+        ),
         this.bouncePadConfig
       );
       obstacleCylinder.movementType = {
@@ -679,7 +720,11 @@ class MultiplayerWorld extends Game {
       const obstacleCylinder = PlatformFactory.createCylinderPlatform(
         getCylinderDimensions(20, 20, 80, 20),
         this.material.getGlassMaterial(),
-        getPosition(-1400 + index * spaceBetweenObstacles, 1275, 4530 - index * 20),
+        getPosition(
+          -1400 + index * spaceBetweenObstacles,
+          1275,
+          4530 - index * 20
+        ),
         this.bouncePadConfig
       );
       obstacleCylinder.movementType = {
@@ -727,12 +772,17 @@ class MultiplayerWorld extends Game {
       this.addSprite(username);
     });
 
-    this.socket.on(SocketEvent.CURRENT_USERS, (activePlayers: IActivePlayer[]) => {
-      this.spawnExistingPlayers(activePlayers);
-      activePlayers.forEach((player) => this.addSprite(player.username));
-    });
+    this.socket.on(
+      SocketEvent.CURRENT_USERS,
+      (activePlayers: IActivePlayer[]) => {
+        this.spawnExistingPlayers(activePlayers);
+        activePlayers.forEach((player) => this.addSprite(player.username));
+      }
+    );
 
-    this.socket.on(SocketEvent.USER_DISCONNECTED, (id) => this.removeDisconnectedUser(id));
+    this.socket.on(SocketEvent.USER_DISCONNECTED, (id) =>
+      this.removeDisconnectedUser(id)
+    );
 
     this.socket.on(SocketEvent.UPDATE_STATE, (update: IActivePlayer[]) => {
       this.updateGameState(update);
@@ -806,16 +856,30 @@ class MultiplayerWorld extends Game {
     update.forEach(({ id, position, velocity }) => {
       if (position && velocity) {
         const { x, y, z } = position;
-        const pieceToUpdate = this.activeGamePieces.find((piece) => piece.mesh.userData.clientId === id);
+        const pieceToUpdate = this.activeGamePieces.find(
+          (piece) => piece.mesh.userData.clientId === id
+        );
         if (pieceToUpdate) {
           pieceToUpdate.mesh.position.set(x, y, z);
-          pieceToUpdate.body.angularVelocity.set(velocity.x, velocity.y, velocity.z);
-          pieceToUpdate.body.position.copy(pieceToUpdate.mesh.position as unknown as Vec3);
+          pieceToUpdate.body.angularVelocity.set(
+            velocity.x,
+            velocity.y,
+            velocity.z
+          );
+          pieceToUpdate.body.position.copy(
+            pieceToUpdate.mesh.position as unknown as Vec3
+          );
 
-          const spriteToUpdate = this.sprites.find((elem) => elem.userData.spriteName === pieceToUpdate.mesh.name);
+          const spriteToUpdate = this.sprites.find(
+            (elem) => elem.userData.spriteName === pieceToUpdate.mesh.name
+          );
 
           if (spriteToUpdate) {
-            spriteToUpdate.position.set(position.x, position.y + 15, position.z);
+            spriteToUpdate.position.set(
+              position.x,
+              position.y + 15,
+              position.z
+            );
           }
         }
       }
@@ -831,7 +895,9 @@ class MultiplayerWorld extends Game {
   }
 
   findSprite(username: string) {
-    return this.sprites.find((sprite) => (sprite.userData.spriteName = username));
+    return this.sprites.find(
+      (sprite) => (sprite.userData.spriteName = username)
+    );
   }
 }
 

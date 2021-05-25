@@ -4,7 +4,6 @@
 import type * as CANNON from 'cannon-es';
 import { get } from 'svelte/store';
 import type { MeshStandardMaterialParameters } from 'three';
-import GameStore from '../../shared/GameStore';
 import PlaneFactory from '../components/Plane';
 import PlatformFactory from '../components/Platform';
 import TubeFactory from '../components/Tube';
@@ -12,7 +11,12 @@ import ScoreKeeper from '../components/ScoreKeeper';
 import Game from '../Game';
 import type Loader from '../utils/Loader';
 import type Material from '../utils/Materials';
-import { getDimensions, getCylinderDimensions, getTorusrDimensions, getPosition } from '../utils/utils';
+import {
+  getDimensions,
+  getCylinderDimensions,
+  getTorusrDimensions,
+  getPosition,
+} from '../utils/utils';
 import type { IDimension } from './../../shared/interfaces';
 import SpriteText from 'three-spritetext';
 import LoaderStore from '../../shared/LoaderStore';
@@ -35,6 +39,7 @@ class MineralWorld extends Game {
       loader,
       material,
       camera,
+      200,
       'moon.jpg',
       'space',
       '.jpg'
@@ -54,12 +59,12 @@ class MineralWorld extends Game {
     if (!this.useOrbitCamera) this.gameCamera.update();
     this.scoreKeeper.watchScore(this.currentGamePiece.mesh);
     this.updatePlaytime(elapsedTime);
-    this.runGameUpdates(timeDelta, elapsedTime, -350, 200);
+    this.runGameUpdates(timeDelta, elapsedTime, -350);
   }
 
   createStartingZone() {
     this.createStartingPlane();
-    this.createPlayer(get(GameStore).username);
+    this.createPlayer();
   }
 
   createGameMap() {
@@ -133,7 +138,11 @@ class MineralWorld extends Game {
   }
 
   createStartingPlane() {
-    const basePlane: IDimension = { width: 200, height: 200, depth: 0.1 };
+    const basePlane: IDimension = {
+      width: this.width,
+      height: this.width,
+      depth: 0.1,
+    };
     const { mesh, body } = PlaneFactory.createPlane(
       basePlane,
       this.material.getRockMaterial(),
@@ -174,7 +183,9 @@ class MineralWorld extends Game {
       this.bouncePadConfig
     );
     firstBounceCorner.mesh.rotateZ(-Math.PI * 0.3);
-    firstBounceCorner.body.quaternion.copy(firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+    firstBounceCorner.body.quaternion.copy(
+      firstBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(firstBounceCorner);
 
     const bounceText1 = new SpriteText('Bounce!', 5);
@@ -213,7 +224,9 @@ class MineralWorld extends Game {
       this.bouncePadConfig
     );
     secondBounceCorner.mesh.rotateZ(Math.PI * 0.2);
-    secondBounceCorner.body.quaternion.copy(secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion);
+    secondBounceCorner.body.quaternion.copy(
+      secondBounceCorner.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(secondBounceCorner);
 
     const bounceText2 = new SpriteText('Bounce!', 5);
@@ -570,7 +583,9 @@ class MineralWorld extends Game {
       this.defaultConfig
     );
     tube.mesh.rotateZ(-Math.PI * 0.5);
-    tube.body.quaternion.copy(tube.mesh.quaternion as unknown as CANNON.Quaternion);
+    tube.body.quaternion.copy(
+      tube.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(tube);
 
     const secondPlane = PlaneFactory.createPlane(
@@ -589,7 +604,9 @@ class MineralWorld extends Game {
       this.defaultConfig
     );
     secondTube.mesh.rotateZ(Math.PI * 0.5);
-    secondTube.body.quaternion.copy(secondTube.mesh.quaternion as unknown as CANNON.Quaternion);
+    secondTube.body.quaternion.copy(
+      secondTube.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(secondTube);
 
     const thirdPlane = PlaneFactory.createPlane(
@@ -617,7 +634,9 @@ class MineralWorld extends Game {
     );
     thirdTubePartTwo.mesh.rotateZ(-Math.PI * 0.5);
     thirdTubePartTwo.mesh.rotateX(-Math.PI * 0.5);
-    thirdTubePartTwo.body.quaternion.copy(thirdTubePartTwo.mesh.quaternion as unknown as CANNON.Quaternion);
+    thirdTubePartTwo.body.quaternion.copy(
+      thirdTubePartTwo.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(thirdTubePartTwo);
 
     const fourthPlane = PlaneFactory.createPlane(
@@ -636,7 +655,9 @@ class MineralWorld extends Game {
     );
     thirdTube.mesh.rotateY(Math.PI * 1.5);
     thirdTube.mesh.rotateX(Math.PI * 0.5);
-    thirdTube.body.quaternion.copy(thirdTube.mesh.quaternion as unknown as CANNON.Quaternion);
+    thirdTube.body.quaternion.copy(
+      thirdTube.mesh.quaternion as unknown as CANNON.Quaternion
+    );
     this.addToWorld(thirdTube);
 
     const fifthPlane = PlaneFactory.createPlane(
@@ -729,7 +750,9 @@ class MineralWorld extends Game {
         this.bouncePadConfig
       );
       tube.mesh.rotateY(Math.PI * 0.5);
-      tube.body.quaternion.copy(tube.mesh.quaternion as unknown as CANNON.Quaternion);
+      tube.body.quaternion.copy(
+        tube.mesh.quaternion as unknown as CANNON.Quaternion
+      );
       this.addToWorld(tube);
     }
   }
