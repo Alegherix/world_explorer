@@ -62,7 +62,16 @@ This game was created using:
 
 # Code Review
 
-1. `example.js:10-15` - Remember to think about X and this could be refactored using the amazing Y function.
+1. `Plane.ts:4-10` - Box3 and Vector3 are imported but not used.
+2. `Platform.ts:45-129` - A bunch of commented code that you could remove.
+3. `Game.ts` - Some functions have return types and others don't.
+4. `MultiplayerWorld.ts` - This file is 900 lines of code, maybe you could break it up into multiple files to make it easier to read.
+5. `Game.ts:83 & 131` - Here you are repeating the code determining start position for the player. Maybe move it to a function.
+6. `Loader.ts:2` - MeshStandardMaterial is imported but not used.
+7. `Controller.ts:77-107` - If you hold W and D at the same time while in the air the ball will accelerate an extreme amount when you hit the ground. Don't know if this is intended.
+8. `GameServer.ts:21` - A variable is defined but not used.
+9. `Tube.ts:21-22` - Some commented code.
+10. `SigninScreen.svelte:15` - You have input type but not a label.
 
 # Creators
 
