@@ -14,12 +14,12 @@ const io = new socket_io_1.Server(httpServer, {
 const port = process.env.PORT || 8000;
 const gameServer = new GameServer_1.default(io);
 io.on('connection', (socket) => {
-    console.log(Object.keys(io.sockets.sockets));
     socket.on('userConnected', (message) => {
         gameServer.addSocket(socket, message.username);
         gameServer.broadcastIncomingUser(socket, message.username);
     });
     socket.on('disconnect', () => {
+        console.log('Recived a disconnect event from ', socket.id);
         gameServer.removeSocket(socket.id);
     });
     socket.on(interfaces_1.SocketEvent.UPDATE_STATE, (state) => {

@@ -3,7 +3,7 @@
  */
 import * as CANNON from 'cannon-es';
 import { Vec3 } from 'cannon-es';
-import { io, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { get } from 'svelte/store';
 import type { MeshStandardMaterialParameters, Object3D, Vector3 } from 'three';
 import * as THREE from 'three';
@@ -11,6 +11,8 @@ import SpriteText from 'three-spritetext';
 import type { IActivePlayer } from '../../shared/frontendInterfaces';
 import Gamestore from '../../shared/GameStore';
 import { IPosition, IStateUpdate, SocketEvent } from '../../shared/interfaces';
+import LoaderStore from '../../shared/LoaderStore';
+import SocketStore from '../../shared/SocketStore';
 import PlaneFactory from '../components/Plane';
 import PlatformFactory from '../components/Platform';
 import ScoreKeeper from '../components/ScoreKeeper';
@@ -24,18 +26,17 @@ import {
   getPosition,
   getTorusrDimensions,
 } from '../utils/utils';
-import LoaderStore from '../../shared/LoaderStore';
 
 class MultiplayerWorld extends Game {
   private userName: string;
   private socket: Socket;
   private sprites: Object3D[] = [];
+  private elapsedTime: number;
 
   // Used for testing, and caping responses sent to the backend server.
   private counter: number = 0;
   private defaultConfig: MeshStandardMaterialParameters;
   private bouncePadConfig: MeshStandardMaterialParameters;
-  private elapsedTime: number;
 
   constructor(
     scene: THREE.Scene,
@@ -62,8 +63,7 @@ class MultiplayerWorld extends Game {
       get(LoaderStore).loader.getMultiPlayerWorldPlaneConfig();
 
     this.userName = get(Gamestore).username;
-    // this.socket = io('ws://localhost:8000').connect();
-    this.socket = io('https://world-explorer-backend.herokuapp.com/').connect();
+    this.socket = get(SocketStore).connectSocket();
     this.activeGamePieces = [];
 
     this.listenForEvents();
@@ -826,7 +826,12 @@ class MultiplayerWorld extends Game {
     for (let index = 0; index < this.activeGamePieces.length; index++) {
       const gamepiece = this.activeGamePieces[index];
       if (gamepiece.mesh.userData.clientId === id) {
-        this.scene.remove(this.findSprite(gamepiece.mesh.name));
+        // Clear sprites from scene
+        const spriteToBeRemoved = this.findSprite(gamepiece.mesh.name);
+        this.scene.remove(spriteToBeRemoved);
+        this.sprites.splice(this.sprites.indexOf(spriteToBeRemoved), 1);
+
+        // Remove other pieces from scene
         this.activeGamePieces.splice(index, 1);
         this.scene.remove(gamepiece.mesh);
         this.world.removeBody(gamepiece.body);

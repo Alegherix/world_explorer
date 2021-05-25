@@ -1,9 +1,15 @@
 <script lang="ts">
   import { removeEventListeners } from '../game/utils/Controller';
   import GameStore from '../shared/GameStore';
+  import SocketStore from '../shared/SocketStore';
+
   const handleMenu = () => {
     removeEventListeners();
+
     GameStore.update((store) => {
+      if ($SocketStore.isConnected) {
+        $SocketStore.disconnectSocket();
+      }
       store.game.resetScene();
       return {
         ...store,
